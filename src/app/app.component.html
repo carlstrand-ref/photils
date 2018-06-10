@@ -19,11 +19,11 @@
   </mat-grid-list>
 </div>
 
-<mat-toolbar *ngIf="isRoot == false">    
-    <button mat-button (click)="goBack()">
+<mat-toolbar *ngIf="isRoot == false" color="primary">    
+    <button mat-raised-button color="primary" (click)="goBack()">
         Back
     </button>
-    <span>My Application</span>    
+    <span>{{title}}</span>    
 </mat-toolbar>
 
 <router-outlet></router-outlet>

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterContentChecked, AfterContentInit } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
-
+import { AppServics } from '../app-service.service';
 
 @Component({
   selector: 'app-dof',
@@ -15,7 +15,7 @@ export class DofComponent implements OnInit {
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10};
   public apertures = [];
 
-  constructor() {
+  constructor(private appService: AppServics) {
     for(const camera of this.data) {
       this.vendors.add(camera.CameraMaker);
 
@@ -63,7 +63,7 @@ export class DofComponent implements OnInit {
   }
 
   ngOnInit() {
-    
+    this.appService.setTitle("Depth of Field Calculator");
   }
 
 }
