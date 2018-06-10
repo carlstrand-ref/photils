@@ -47,6 +47,10 @@ export class DofComponent implements AfterViewInit {
     let d = Math.sqrt(sw**2 + sh**2);
     let CoC = d / 1500;
     let s = this.dataModel.distance * 1000; // convert m to mm
+    
+    if(!this.metricSystem)
+      s = this.dataModel.distance *  0.3048 * 1000;
+
     let H = this.dataModel.focalLength + (this.dataModel.focalLength ** 2) / (this.dataModel.aperture * CoC); // Hyperfocal in mm
     let Hs = s *  H;
     let Dn = Hs / (H + s);
