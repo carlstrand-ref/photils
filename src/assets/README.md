@@ -1,0 +1,1 @@
+Camera Sensor Data from [https://github.com/openMVG/CameraSensorSizeDatabase](https://github.com/openMVG/CameraSensorSizeDatabase)
