@@ -9,6 +9,8 @@ import { MatCardModule, MatDividerModule, MatFormFieldModule, MatInputModule } f
 import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
 import { ExposureComponent } from './exposure/exposure.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,8 @@ import { ExposureComponent } from './exposure/exposure.component';
     MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [],
   bootstrap: [AppComponent]
