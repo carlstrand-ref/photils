@@ -10,7 +10,10 @@ import {
   MatDividerModule, 
   MatFormFieldModule, 
   MatInputModule, 
-  MatGridListModule 
+  MatGridListModule, 
+  MatToolbarModule,
+  MatIconModule,
+  MatButtonModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -18,6 +21,7 @@ import { DofComponent } from './dof/dof.component';
 import { ExposureComponent } from './exposure/exposure.component';
 import { environment } from '../environments/environment';
 import { AppRoutingModule } from './/app-routing.module';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -26,6 +30,10 @@ import { AppRoutingModule } from './/app-routing.module';
     ExposureComponent
   ],
   imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatToolbarModule,
+    CommonModule,
     MatInputModule,
     MatDividerModule,
     BrowserAnimationsModule,
