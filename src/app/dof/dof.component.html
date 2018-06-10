@@ -1,23 +1,42 @@
 
-  dof works!
-  <div>Vendor: {{this.dataModel.vendor}}</div>
-  <div>Model: {{this.selectedModel}}</div>
+  {{dataModel.aperture}}
   <br /> <br /> 
   <mat-card>
     <mat-form-field>
-      <mat-select placeholder="select camera vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor()">
+      <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor()">
         <mat-option *ngFor="let vendor of vendors" [value]="vendor">
           {{ vendor }}
         </mat-option>
       </mat-select>
     </mat-form-field>    
-    <mat-divider></mat-divider>
 
     <mat-form-field>
-      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'select model'}}" [(ngModel)]="dataModel.model">
+      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel()">
         <mat-option *ngFor="let model of selectedModels" [value]="model">
-          {{ model }}
+          {{ model.CameraModel }}
         </mat-option>
       </mat-select>
+    </mat-form-field>
+    
+
+    <mat-form-field>
+      <mat-select placeholder="Aperture" [(ngModel)]="dataModel.aperture" (selectionChange)="calculateDof()"
+        disabled="{{dataModel.vendor === '' || dataModel.model === ''}}" >
+          <mat-option *ngFor="let aperture of apertures" [value]="aperture">
+            {{ aperture }}
+          </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput type="number" placeholder="Focal legnth " [(ngModel)]="dataModel.focalLength" 
+        (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
+        <span matSuffix>mm</span>          
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance" 
+        (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
+        <span matSuffix>m</span>          
     </mat-form-field>
   </mat-card>

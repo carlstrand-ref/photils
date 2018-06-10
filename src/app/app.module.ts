@@ -17,6 +17,7 @@ import { ExposureComponent } from './exposure/exposure.component';
     ExposureComponent
   ],
   imports: [
+    MatInputModule,
     MatDividerModule,
     BrowserModule,
     FormsModule,
