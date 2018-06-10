@@ -1,6 +1,23 @@
 
   dof works!
-  {{this.data}}
-  <div *ngFor="let camera of data">
-    {{camera.CameraModel}}
-  </div>
+  <div>Vendor: {{this.dataModel.vendor}}</div>
+  <div>Model: {{this.selectedModel}}</div>
+  <br /> <br /> 
+  <mat-card>
+    <mat-form-field>
+      <mat-select placeholder="select camera vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor()">
+        <mat-option *ngFor="let vendor of vendors" [value]="vendor">
+          {{ vendor }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>    
+    <mat-divider></mat-divider>
+
+    <mat-form-field>
+      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'select model'}}" [(ngModel)]="dataModel.model">
+        <mat-option *ngFor="let model of selectedModels" [value]="model">
+          {{ model }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-card>

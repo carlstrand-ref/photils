@@ -1,7 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { MatCardModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { MatSelectModule, } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule, MatDividerModule, MatFormFieldModule, MatInputModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
@@ -14,8 +17,16 @@ import { ExposureComponent } from './exposure/exposure.component';
     ExposureComponent
   ],
   imports: [
+    MatDividerModule,
     BrowserModule,
-    MatCardModule
+    FormsModule,
+    MatCardModule,
+    MatSelectModule,
+    MatCardModule,
+    MatSelectModule,
+    MatInputModule,
+    MatFormFieldModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

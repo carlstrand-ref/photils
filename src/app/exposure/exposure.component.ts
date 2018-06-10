@@ -6,10 +6,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./exposure.component.css']
 })
 export class ExposureComponent implements OnInit {
+  public option: string = 'none';
 
   ngOnInit() {
-    console.warn(ExposureComponent.calculateTimeValue(5.6, 100, 8.3
-    ));
+    console.warn(ExposureComponent.calculateTimeValue(5.6, 100, 8.3));
+  }
+
+  change() {
+    console.warn(this.option);
   }
 
   private static calculateExposureValue(fstop: number, iso: number, time: number): number {
