@@ -1,16 +1,23 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { MatSelectModule, } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule, MatDividerModule, MatFormFieldModule, MatInputModule } from '@angular/material';
+import { MatSelectModule } from '@angular/material/select';
+import { 
+  MatCardModule, 
+  MatDividerModule, 
+  MatFormFieldModule, 
+  MatInputModule, 
+  MatGridListModule 
+} from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
 import { ExposureComponent } from './exposure/exposure.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { AppRoutingModule } from './/app-routing.module';
 
 @NgModule({
   declarations: [
@@ -21,16 +28,19 @@ import { environment } from '../environments/environment';
   imports: [
     MatInputModule,
     MatDividerModule,
+    BrowserAnimationsModule,
     BrowserModule,
     FormsModule,
+    MatDividerModule,
+    MatGridListModule,
     MatCardModule,
     MatSelectModule,
     MatCardModule,
     MatSelectModule,
     MatInputModule,
     MatFormFieldModule,
-    BrowserAnimationsModule,
-    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production })
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

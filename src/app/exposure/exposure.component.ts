@@ -12,6 +12,11 @@ export class ExposureComponent implements OnInit {
   public time: number = 0.125;
   public exposure: number = 8;
 
+  public fstop_c;
+  public iso_c;
+  public time_c;
+
+
   ngOnInit() {
     this.change();
   }

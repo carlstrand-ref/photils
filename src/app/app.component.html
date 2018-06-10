@@ -1,5 +1,21 @@
 <!--The content below is only a placeholder and can be replaced.-->
+<mat-grid-list cols="2" rowHeight="4:3" gutterSize="10px">
+    <mat-grid-tile>
+        <mat-card>
+            <mat-card-title>
+                <a routerLink="/exposure" routerLinkActive="active">Exposure</a>
+            </mat-card-title>
+        </mat-card>
+    </mat-grid-tile>
 
-<app-dof></app-dof>
-<app-exposure></app-exposure>
+    <mat-grid-tile>
+        <mat-card>
+            <mat-card-title>
+                    <a routerLink="/dof" routerLinkActive="active">Depth of Field</a>
+            </mat-card-title>
+        </mat-card>
+    </mat-grid-tile>
+</mat-grid-list>
+
+<router-outlet></router-outlet>
 
