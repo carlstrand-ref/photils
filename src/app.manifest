@@ -1,0 +1,11 @@
+{
+  "name": "Photils",
+  "short_name": "Test",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "A simply readable Hacker News app.",
+  ​​"orientation": "portrait",
+  "lang": "en-US",
+  "icons": [],
+  "related_applications": []
+}
