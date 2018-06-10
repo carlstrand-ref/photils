@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { MatCardModule } from '@angular/material';
+
 import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
 
@@ -10,7 +12,8 @@ import { DofComponent } from './dof/dof.component';
     DofComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    MatCardModule
   ],
   providers: [],
   bootstrap: [AppComponent]
