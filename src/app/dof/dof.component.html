@@ -37,4 +37,10 @@
         (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
         <span matSuffix>m</span>          
     </mat-form-field>
+
+    <mat-slide-toggle
+      color='primary'
+      [(ngModel)]="metricSystem">
+          {{metricSystem == true ? 'Metric' : 'Imperial'}}
+      </mat-slide-toggle>
   </mat-card>

@@ -13,7 +13,8 @@ import {
   MatGridListModule, 
   MatToolbarModule,
   MatIconModule,
-  MatButtonModule
+  MatButtonModule,
+  MatSlideToggleModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -30,6 +31,7 @@ import { CommonModule } from '@angular/common';
     ExposureComponent
   ],
   imports: [
+    MatSlideToggleModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,

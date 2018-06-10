@@ -23,8 +23,12 @@ export class AppComponent implements OnInit {
     });
 
     this.appService.title.subscribe((t) => {
-      this.title = t;
+      //this.title = t;
     });    
+  }
+
+  public setTitle(title:String) {
+    this.title = title;
   }
 
   public goBack() {

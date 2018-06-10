@@ -1,21 +1,23 @@
-import { Component, OnInit, AfterContentChecked, AfterContentInit } from '@angular/core';
+import { Component, OnInit, AfterContentChecked, AfterContentInit, AfterViewInit } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
+import { AppComponent } from '../app.component';
 
 @Component({
   selector: 'app-dof',
   templateUrl: './dof.component.html',
   styleUrls: ['./dof.component.css']
 })
-export class DofComponent implements OnInit {
+export class DofComponent implements AfterViewInit {
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = new Array<any>();
   public models: {} = {};
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10};
   public apertures = [];
+  public metricSystem:boolean = true;
 
-  constructor(private appService: AppServics) {
+  constructor(private appService: AppServics, private appComponent: AppComponent) {
     for(const camera of this.data) {
       this.vendors.add(camera.CameraMaker);
 
@@ -51,7 +53,15 @@ export class DofComponent implements OnInit {
     let Df = Hs / (H - s);
     let DoF = Df - Dn;
 
-    console.log(H / 1000.0, Dn / 1000.0, Df / 1000.0, DoF / 1000);
+    let result = {
+      nearLimit: Dn / 1000.0, 
+      farLimit: Df / 1000.0, 
+      hyperFocal: H / 1000.0, 
+      DoF: DoF / 1000.0,
+      circleOfConfusion: CoC
+    };
+
+    console.log(result);
   }
 
   public selectVendor(evt:any) {    
@@ -62,8 +72,8 @@ export class DofComponent implements OnInit {
     this.calculateDof();
   }
 
-  ngOnInit() {
-    this.appService.setTitle("Depth of Field Calculator");
+  ngAfterViewInit() {
+    this.appComponent.setTitle("Depth of Field Calculator");
   }
 
 }
