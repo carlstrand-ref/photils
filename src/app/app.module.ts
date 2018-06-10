@@ -5,11 +5,13 @@ import { MatCardModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
+import { ExposureComponent } from './exposure/exposure.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DofComponent
+    DofComponent,
+    ExposureComponent
   ],
   imports: [
     BrowserModule,
