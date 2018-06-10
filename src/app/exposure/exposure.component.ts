@@ -6,14 +6,34 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./exposure.component.css']
 })
 export class ExposureComponent implements OnInit {
-  public option: string = 'none';
+  public option: string = 'fstop';
+  public fstop: number = 5.6;
+  public iso: number = 100;
+  public time: number = 0.125;
+  public exposure: number = 8;
 
   ngOnInit() {
-    console.warn(ExposureComponent.calculateTimeValue(5.6, 100, 8.3));
+    this.change();
   }
 
   change() {
-    console.warn(this.option);
+    switch(this.option) {
+      case 'fstop':
+        this.fstop = ExposureComponent.calculateFStop(this.exposure, this.iso, this.time);
+        break;
+      
+      case 'iso':
+        this.iso = ExposureComponent.calculateISOValue(this.fstop, this.exposure, this.time);
+        break;
+
+      case 'time':
+        this.time = ExposureComponent.calculateTimeValue(this.fstop, this.iso, this.exposure);
+        break;
+
+      case 'exposure':
+        this.exposure = ExposureComponent.calculateExposureValue(this.fstop, this.iso, this.time);
+        break;
+    }
   }
 
   private static calculateExposureValue(fstop: number, iso: number, time: number): number {
