@@ -1,5 +1,5 @@
 <mat-form-field>
-    <mat-select [(ngModel)]="option" (selectionChange)="change()">
+    <mat-select [(ngModel)]="option" (selectionChange)="change()" placeholder="Target">
         <mat-option value="fstop">F-Stop</mat-option>
         <mat-option value="iso">ISO</mat-option>
         <mat-option value="time">Exposure time</mat-option>
@@ -7,18 +7,34 @@
     </mat-select>
 </mat-form-field>
 
+<h1>Current settings:</h1>
+
 <mat-form-field>
-    <input matInput type="number" placeholder="F-Stop" value="5.6">
+    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop" value="5.6">
 </mat-form-field>
 
 <mat-form-field>
-    <input matInput type="number" placeholder="ISO" value="100">
+    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso" value="100">
 </mat-form-field>
 
 <mat-form-field>
-    <input matInput type="number" placeholder="Exposure time" value="0.1">
+    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time" value="0.1">
 </mat-form-field>
 
 <mat-form-field>
-    <input matInput type="number" placeholder="Exposure value" value="8">
+    <input matInput type="number" placeholder="Neutral density (ND)" [(ngModel)]="exposure" value="8">
+</mat-form-field>
+
+<h1>Equivalent settings:</h1>
+
+<mat-form-field>
+    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop-c" value="5.6">
+</mat-form-field>
+
+<mat-form-field>
+    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso-c" value="100">
+</mat-form-field>
+
+<mat-form-field>
+    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time-c" value="0.1">
 </mat-form-field>
