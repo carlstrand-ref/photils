@@ -25,15 +25,17 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './/app-routing.module';
 import { CommonModule } from '@angular/common';
 import { MainComponent } from './main/main.component';
+import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     DofComponent,
     ExposureComponent,
-    MainComponent
+    MainComponent,
+    DofVisualizerComponent
   ],
-  imports: [      
+  imports: [          
     BrowserAnimationsModule,  
     MatSlideToggleModule,
     MatButtonModule,
