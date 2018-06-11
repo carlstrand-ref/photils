@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentChecked, AfterContentInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
 import { Location } from '@angular/common';
@@ -11,6 +11,7 @@ import { DofVisualizerComponent } from './dof-visualizer/dof-visualizer.componen
   styleUrls: ['./dof.component.css']
 })
 export class DofComponent {
+  @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = new Array<any>();
@@ -47,12 +48,14 @@ export class DofComponent {
     let sw = camera['SensorWidth(mm)'];    
     let d = Math.sqrt(sw**2 + sh**2);
     let CoC = d / 1500;
+    let focalLength = this.dataModel.focalLength;
     let s = this.dataModel.distance * 1000; // convert m to mm
+    let fullFrame = sw > 35.5;
     
     if(!this.dataModel.metric)
       s = this.dataModel.distance *  0.3048 * 1000;
-
-    let H = this.dataModel.focalLength + (this.dataModel.focalLength ** 2) / (this.dataModel.aperture * CoC); // Hyperfocal in mm
+  
+    let H = focalLength + (focalLength ** 2) / (this.dataModel.aperture * CoC); // Hyperfocal in mm
     let Hs = s *  H;
     let Dn = Hs / (H + s);
     let Df = Hs / (H - s);
@@ -66,7 +69,18 @@ export class DofComponent {
       circleOfConfusion: CoC
     };
 
-    console.log(result);
+    if(!fullFrame)
+      focalLength *= Number((43.27 / d).toPrecision(2)); // full frame diagonal = 43.27
+
+    
+    let fov = 2 * Math.atan(sw / (2 * focalLength)); // in rad
+    this.dofVisualizer.updateCamera(fov);
+
+    this.dofVisualizer.updateDoF(
+      this.dataModel.aperture, 
+      focalLength,
+      this.dataModel.distance
+    );
   }
 
   public selectVendor(evt:any) {    
