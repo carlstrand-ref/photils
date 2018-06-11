@@ -5,7 +5,8 @@
     <span>Depth of Field Calculator</span>    
 </mat-toolbar>
 
-  <mat-card>
+<mat-card>
+  <div>
     <mat-form-field>
       <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor()">
         <mat-option *ngFor="let vendor of vendors" [value]="vendor">
@@ -22,7 +23,6 @@
       </mat-select>
     </mat-form-field>
     
-
     <mat-form-field>
       <mat-select placeholder="Aperture" [(ngModel)]="dataModel.aperture" (selectionChange)="calculateDof()"
         disabled="{{dataModel.vendor === '' || dataModel.model === ''}}" >
@@ -50,5 +50,9 @@
       disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
       [(ngModel)]="dataModel.metric">
         Metric
-      </mat-slide-toggle>
-  </mat-card>
+    </mat-slide-toggle>
+  </div>
+  <div>
+      <dof-visualizer></dof-visualizer>
+  </div>
+</mat-card>

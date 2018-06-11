@@ -2,6 +2,7 @@ import { Component, OnInit, AfterContentChecked, AfterContentInit, AfterViewInit
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
 import { Location } from '@angular/common';
+import { DofVisualizerComponent } from './dof-visualizer/dof-visualizer.component';
 
 
 @Component({
