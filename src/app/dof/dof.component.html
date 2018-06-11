@@ -41,13 +41,14 @@
     <mat-form-field>
         <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance" 
         (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
-        <span matSuffix>{{metricSystem == true ? 'm' : 'ft'}}</span>          
+        <span matSuffix>{{dataModel.metric == true ? 'm' : 'ft'}}</span>          
     </mat-form-field>
 
     <mat-slide-toggle
       color='primary'
       (change)="calculateDof()"
-      [(ngModel)]="metricSystem">
-          {{metricSystem == true ? 'Metric' : 'Imperial'}}
+      disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
+      [(ngModel)]="dataModel.metric">
+        Metric
       </mat-slide-toggle>
   </mat-card>

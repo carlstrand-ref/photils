@@ -14,9 +14,8 @@ export class DofComponent {
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = new Array<any>();
   public models: {} = {};
-  public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10};
-  public apertures = [];
-  public metricSystem:boolean = true;
+  public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
+  public apertures = [];  
 
   constructor(private appService: AppServics, private location: Location) {
     for(const camera of this.data) {
@@ -49,7 +48,7 @@ export class DofComponent {
     let CoC = d / 1500;
     let s = this.dataModel.distance * 1000; // convert m to mm
     
-    if(!this.metricSystem)
+    if(!this.dataModel.metric)
       s = this.dataModel.distance *  0.3048 * 1000;
 
     let H = this.dataModel.focalLength + (this.dataModel.focalLength ** 2) / (this.dataModel.aperture * CoC); // Hyperfocal in mm
