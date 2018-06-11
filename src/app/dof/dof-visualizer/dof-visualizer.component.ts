@@ -29,14 +29,13 @@ export class DofVisualizerComponent implements AfterViewInit {
   } 
 
   public updateCamera(fov:number) {
-    console.log(fov);
     this.leftCamera.fov = fov;
   }
 
   public updateDoF(fStop:number, focalLength:number, focusDistance:number) {
-    this.pipeline.depthOfField.focalLength = focalLength * 1000.0;
+    this.pipeline.depthOfField.focalLength = focalLength * 10;
     this.pipeline.depthOfField.fStop = fStop;
-    this.pipeline.depthOfField.focusDistance = focusDistance * 1000.0;
+    this.pipeline.depthOfField.focusDistance = focusDistance;    
   }
 
   private createScene() {
@@ -64,7 +63,7 @@ export class DofVisualizerComponent implements AfterViewInit {
     pbr.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("assets/textures/environment.dds", scene);
     let gridSize = 4;
     for(let i=0;i<gridSize;i++){
-        for(let j=0;j<66;j++){
+        for(let j=0;j<100;j++){
             let sphereMat = pbr.clone("sphereMat");
             sphereMat.metallic = 0.1;
             sphereMat.roughness = 0.0;
@@ -92,7 +91,7 @@ export class DofVisualizerComponent implements AfterViewInit {
     
     // Create default pipeline and enable dof with Medium blur level
     this.pipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [scene.activeCamera]);
-    this.pipeline.depthOfFieldBlurLevel = BABYLON.DepthOfFieldEffectBlurLevel.Medium;
+    this.pipeline.depthOfFieldBlurLevel = BABYLON.DepthOfFieldEffectBlurLevel.High;
     this.pipeline.depthOfFieldEnabled = true;
     this.pipeline.depthOfField.focalLength = 180;
     this.pipeline.depthOfField.fStop = 3;

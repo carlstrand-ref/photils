@@ -72,14 +72,14 @@ export class DofComponent {
     if(!fullFrame)
       focalLength *= Number((43.27 / d).toPrecision(2)); // full frame diagonal = 43.27
 
-    
+    console.log(result);
     let fov = 2 * Math.atan(sw / (2 * focalLength)); // in rad
     this.dofVisualizer.updateCamera(fov);
 
     this.dofVisualizer.updateDoF(
       this.dataModel.aperture, 
       focalLength,
-      this.dataModel.distance
+      s
     );
   }
 
