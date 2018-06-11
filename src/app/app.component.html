@@ -1,32 +1,5 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div  *ngIf="isRoot">
-  <mat-grid-list cols="2" rowHeight="4:3" gutterSize="10px">
-      <mat-grid-tile>
-          <mat-card routerLink="/exposure" routerLinkActive="active">
-            <mat-card-title>
-                Exposure
-              </mat-card-title>              
-            <mat-icon>exposure</mat-icon>
-          </mat-card>
-      </mat-grid-tile>
-
-      <mat-grid-tile>
-          <mat-card routerLink="/dof" routerLinkActive="active">
-              <mat-card-title> 
-                Depth of Field
-              </mat-card-title>
-              <mat-icon>camera</mat-icon>
-          </mat-card>
-      </mat-grid-tile>
-  </mat-grid-list>
-</div>
-
-<mat-toolbar *ngIf="isRoot == false" color="primary">    
-    <button mat-raised-button color="primary" (click)="goBack()">
-        Back
-    </button>
-    <span>{{title}}</span>    
-</mat-toolbar>
-
-<router-outlet></router-outlet>
+<main [@routerTransition]="getState(o)">
+  <router-outlet #o="outlet"></router-outlet>
+</main>
 

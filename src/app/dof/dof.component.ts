@@ -1,14 +1,15 @@
 import { Component, OnInit, AfterContentChecked, AfterContentInit, AfterViewInit } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
-import { AppComponent } from '../app.component';
+import { Location } from '@angular/common';
+
 
 @Component({
   selector: 'app-dof',
   templateUrl: './dof.component.html',
   styleUrls: ['./dof.component.css']
 })
-export class DofComponent implements AfterViewInit {
+export class DofComponent {
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = new Array<any>();
@@ -17,7 +18,7 @@ export class DofComponent implements AfterViewInit {
   public apertures = [];
   public metricSystem:boolean = true;
 
-  constructor(private appService: AppServics, private appComponent: AppComponent) {
+  constructor(private appService: AppServics, private location: Location) {
     for(const camera of this.data) {
       this.vendors.add(camera.CameraMaker);
 
@@ -74,10 +75,6 @@ export class DofComponent implements AfterViewInit {
 
   public selectModel(evt:any) {
     this.calculateDof();
-  }
-
-  ngAfterViewInit() {
-    this.appComponent.setTitle("Depth of Field Calculator");
   }
 
 }

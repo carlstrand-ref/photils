@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-exposure',
@@ -15,6 +16,8 @@ export class ExposureComponent implements OnInit {
   public fstop_c;
   public iso_c;
   public time_c;
+
+  constructor( private location: Location) {}
 
 
   ngOnInit() {

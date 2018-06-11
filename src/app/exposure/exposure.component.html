@@ -1,3 +1,10 @@
+<mat-toolbar color="primary">    
+        <button mat-raised-button color="primary" (click)="location.back()">
+            Back
+        </button>
+        <span>Exposure Calculator</span>    
+    </mat-toolbar>
+
 <mat-form-field>
     <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop" value="5.6">
 </mat-form-field>
