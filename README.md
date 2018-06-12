@@ -25,3 +25,35 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+
+
+
+### Required for geolocation:
+
+Generate a local certificate in some folder:
+```
+git clone https://github.com/RubenVermeulen/generate-trusted-ssl-certificate.git
+cd generate-trusted-ssl-certificate
+bash generate.sh
+```
+
+Create a ssl folder inside this directory, copy the server.crt and server.key file into this folder.
+Enable ssl for dev-server with the angular.json file.
+
+```
+"serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "photils:build",
+            "ssl": true,
+            "sslKey": "ssl/server.key",
+            "sslCert": "ssl/server.crt"
+          },
+          ...
+```
+
+run dev server with the following command:
+```
+ng serve --host 0.0.0.0 --disableHostChecks
+```
+
