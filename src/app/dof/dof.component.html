@@ -51,8 +51,51 @@
       [(ngModel)]="dataModel.metric">
         Metric
     </mat-slide-toggle>
-  </div>
-  <div>
-      <dof-visualizer #dofVisualizer></dof-visualizer>
+
+    <mat-slide-toggle
+      color='primary'
+      disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
+      (change)="calculateDof()"
+      [(ngModel)]="visualize">
+        Visualize
+    </mat-slide-toggle>
+  </div>  
+
+  <div *ngIf="result.isReady" class="result" 
+  fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+    <mat-card class="item" fxFlex>
+      <mat-card-title>Subject distance</mat-card-title>
+      <mat-card-content>{{dataModel.distance.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+    </mat-card>    
+    <mat-card class="item" fxFlex>
+      <mat-card-title>DoF Near limit</mat-card-title>
+      <mat-card-content>{{result.nearLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+    </mat-card>
+
+    <mat-card class="item" fxFlex>
+      <mat-card-title>DoF Far limit</mat-card-title>
+      <mat-card-content>{{result.farLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+    </mat-card>
+
+    <mat-card class="item" fxFlex>
+        <mat-card-title>
+          DoF Total          
+        </mat-card-title>
+        <mat-card-content>
+            
+          {{result.DoF.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}
+        </mat-card-content>
+      </mat-card>
+
+    <mat-card class="item" fxFlex>
+      <mat-card-title>Hyperfocal distance</mat-card-title>
+      <mat-card-content>{{result.hyperFocal.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+    </mat-card>
+
+    <mat-card class="item" fxFlex>
+      <mat-card-title>Circle of confusion</mat-card-title>
+      <mat-card-content>{{result.circleOfConfusion.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+    </mat-card>
   </div>
 </mat-card>
+<dof-visualizer *ngIf="visualize" #dofVisualizer (onInit)="calculateDof()"></dof-visualizer>

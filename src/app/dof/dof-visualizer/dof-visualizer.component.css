@@ -1,6 +1,6 @@
 #canvas {
     width: 100%;
-    height: calc(100vh - 40px);
+    height: 80vh;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;

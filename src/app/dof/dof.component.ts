@@ -1,9 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, DoCheck } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
 import { Location } from '@angular/common';
 import { DofVisualizerComponent } from './dof-visualizer/dof-visualizer.component';
-
+import { Utils } from '../utils';
 
 @Component({
   selector: 'app-dof',
@@ -18,6 +18,9 @@ export class DofComponent {
   public models: {} = {};
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
   public apertures = [];  
+  private visualize = false;
+  private utils = Utils;
+  public result:DofCalculation =  new DofCalculation();
 
   constructor(private appService: AppServics, private location: Location) {
     for(const camera of this.data) {
@@ -30,9 +33,7 @@ export class DofComponent {
       this.models[camera.CameraMaker].push(camera);
     }
 
-
     for(let i = -1; i <= 12; i++) {      
-      let aperture = Math.sqrt(2)**(i);
       for(let j = 0; j < 3; j++) {
         let av = (i + j/3.0);               
         let dec_places = i < 6 ? 1 : 0;              
@@ -42,44 +43,38 @@ export class DofComponent {
     }
   }
 
+
   private calculateDof() {    
     let camera = this.dataModel.model;
     let sh = camera['SensorHeight(mm)'];
     let sw = camera['SensorWidth(mm)'];    
     let d = Math.sqrt(sw**2 + sh**2);
     let CoC = d / 1500;
+    
     let focalLength = this.dataModel.focalLength;
-    let s = this.dataModel.distance * 1000; // convert m to mm
-    let fullFrame = sw > 35.5;
+    let s = this.dataModel.distance * 1000; // convert m to mm    
     
     if(!this.dataModel.metric)
-      s = this.dataModel.distance *  0.3048 * 1000;
+      s = this.dataModel.distance *  0.3048 * 1000; // convert feet to mm
+
+    this.result.calculate(
+      focalLength, s,
+      this.dataModel.aperture,
+      CoC
+    );
   
-    let H = focalLength + (focalLength ** 2) / (this.dataModel.aperture * CoC); // Hyperfocal in mm
-    let Hs = s *  H;
-    let Dn = Hs / (H + s);
-    let Df = Hs / (H - s);
-    let DoF = Df - Dn;
+    if (this.dofVisualizer === undefined)
+      return;
 
-    let result = {
-      nearLimit: Dn / 1000.0, 
-      farLimit: Df / 1000.0, 
-      hyperFocal: H / 1000.0, 
-      DoF: DoF / 1000.0,
-      circleOfConfusion: CoC
-    };
-
-    if(!fullFrame)
+    if(!(sw > 35.5)) // is not fullframe     
       focalLength *= Number((43.27 / d).toPrecision(2)); // full frame diagonal = 43.27
 
-    console.log(result);
     let fov = 2 * Math.atan(sw / (2 * focalLength)); // in rad
     this.dofVisualizer.updateCamera(fov);
 
     this.dofVisualizer.updateDoF(
       this.dataModel.aperture, 
-      focalLength,
-      s
+      focalLength, s,this.result
     );
   }
 
@@ -90,5 +85,50 @@ export class DofComponent {
   public selectModel(evt:any) {
     this.calculateDof();
   }
+}
 
+export class DofCalculation {
+  public nearLimit: number;
+  public farLimit: number;
+  public hyperFocal: number;
+  public DoF: number;
+  public circleOfConfusion: number;
+  public isReady = false;
+  
+  calculate(
+    focalLength:number, 
+    subjectDistance: number, 
+    fstop:number, 
+    CoC:number) {
+    
+    
+    let H = focalLength + (focalLength ** 2) / (fstop * CoC); // Hyperfocal in mm
+    let Hs = subjectDistance *  H;
+    let Dn = Hs / (H + subjectDistance);
+    let Df = Hs / (H - subjectDistance);
+    let DoF = Df - Dn;
+
+
+    let isInfinity = subjectDistance >= H ; 
+    console.log("isInfinity", isInfinity, this.hyperFocal);
+
+    this.hyperFocal = H / 1000.0;
+    this.nearLimit = Dn / 1000.0;
+    this.farLimit =  isInfinity ? Infinity : Df / 1000.0;    
+    this.DoF = isInfinity ? Infinity : DoF / 1000.0;
+    this.circleOfConfusion = CoC;
+    this.isReady = true;
+    console.log(this);
+      
+  }
+
+  toString() {
+    return {
+      nearLimit: this.nearLimit,
+      farLimit: this.farLimit,
+      hyperFocal: this.hyperFocal,
+      DoF: this.DoF,
+      CoC: this.circleOfConfusion
+    }
+  }
 }
