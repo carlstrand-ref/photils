@@ -1,0 +1,22 @@
+.app-menu {
+    padding: 20px;
+}
+.mat-card {
+    text-align: center;
+    cursor: pointer;
+    width: 192px;
+    height: 128px;
+    max-width: 80%;
+    margin: 0 auto;
+}
+.mat-card .mat-card-title {
+    height: 2em;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.mat-card .mat-icon {
+    width: 100%;
+    font-size: 5em;    
+}
