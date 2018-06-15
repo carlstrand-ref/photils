@@ -52,15 +52,12 @@ export class DofComponent {
     let CoC = d / 1500;
     
     let focalLength = this.dataModel.focalLength;
-    let s = this.dataModel.distance * 1000; // convert m to mm    
-    
-    if(!this.dataModel.metric)
-      s = this.dataModel.distance *  0.3048 * 1000; // convert feet to mm
+    let s = this.dataModel.distance * 1000; // convert m to mm        
 
     this.result.calculate(
       focalLength, s,
       this.dataModel.aperture,
-      CoC
+      CoC, this.dataModel.metric
     );
   
     if (this.dofVisualizer === undefined)
@@ -99,7 +96,8 @@ export class DofCalculation {
     focalLength:number, 
     subjectDistance: number, 
     fstop:number, 
-    CoC:number) {
+    CoC:number,
+    isMetric:boolean) {
     
     
     let H = focalLength + (focalLength ** 2) / (fstop * CoC); // Hyperfocal in mm
@@ -110,15 +108,14 @@ export class DofCalculation {
 
 
     let isInfinity = subjectDistance >= H ; 
-    console.log("isInfinity", isInfinity, this.hyperFocal);
 
-    this.hyperFocal = H / 1000.0;
-    this.nearLimit = Dn / 1000.0;
-    this.farLimit =  isInfinity ? Infinity : Df / 1000.0;    
-    this.DoF = isInfinity ? Infinity : DoF / 1000.0;
+    let f = isMetric ? 1 : 3.2808;
+    this.hyperFocal = (H / 1000.0) * f;
+    this.nearLimit = (Dn / 1000.0) * f;
+    this.farLimit =  isInfinity ? Infinity : (Df / 1000.0)  * f;    
+    this.DoF = isInfinity ? Infinity : (DoF / 1000.0)  * f;
     this.circleOfConfusion = CoC;
     this.isReady = true;
-    console.log(this);
       
   }
 
