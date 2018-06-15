@@ -8,7 +8,7 @@ import { Utils } from '../utils';
 @Component({
   selector: 'app-dof',
   templateUrl: './dof.component.html',
-  styleUrls: ['./dof.component.css']
+  styleUrls: ['./dof.component.scss']
 })
 export class DofComponent {
   @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;

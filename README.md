@@ -54,6 +54,6 @@ Enable ssl for dev-server with the angular.json file.
 
 run dev server with the following command:
 ```
-ng serve --host 0.0.0.0 --disableHostChecks
+ng serve --host 0.0.0.0 --disableHostCheck
 ```
 

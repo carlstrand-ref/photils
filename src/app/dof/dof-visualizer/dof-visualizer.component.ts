@@ -6,7 +6,7 @@ import { LOCATION_INITIALIZED } from '@angular/common';
 @Component({
   selector: 'dof-visualizer',
   templateUrl: './dof-visualizer.component.html',
-  styleUrls: ['./dof-visualizer.component.css']
+  styleUrls: ['./dof-visualizer.component.scss']
 })
 export class DofVisualizerComponent implements OnInit, AfterViewInit {  
   @Output() onInit: EventEmitter<any> = new EventEmitter();
@@ -87,7 +87,7 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     // Create scene
     let sideBySide = (this.canvas.width / this.canvas.height) >= 1;
     let scene = new BABYLON.Scene(this.engine);
-    scene.clearColor = new BABYLON.Color4(0.5,0.5,0.5, 1.0);
+    scene.clearColor = new BABYLON.Color4(0.18,0.18,0.18, 1.0);
 
     this.leftCamera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 1.5, -1.0), scene);
     this.leftCamera.speed = 0.01;
@@ -108,6 +108,8 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
 
     this.leftCamera.viewport = new BABYLON.Viewport(0, 0, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.rightCamera.viewport = new BABYLON.Viewport(sideBySide ? 0.5 : 0.0, sideBySide ? 0.0 : 0.5, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
+    this.leftCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.leftCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
+    this.rightCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.rightCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
 
     new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(10, 10.0, 50.0), scene);    
 

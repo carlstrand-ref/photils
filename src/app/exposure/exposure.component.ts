@@ -4,7 +4,7 @@ import { Location } from '@angular/common';
 @Component({
   selector: 'app-exposure',
   templateUrl: './exposure.component.html',
-  styleUrls: ['./exposure.component.css']
+  styleUrls: ['./exposure.component.scss']
 })
 export class ExposureComponent implements OnInit {
   public option: string = 'fstop';

@@ -26,6 +26,8 @@ import { AppRoutingModule } from './/app-routing.module';
 import { CommonModule } from '@angular/common';
 import { MainComponent } from './main/main.component';
 import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.component';
+import { ArSphereComponent } from './ar-sphere/ar-sphere.component';
+import { InspirationComponent } from './inspiration/inspiration.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,9 @@ import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.comp
     DofComponent,
     ExposureComponent,
     MainComponent,
-    DofVisualizerComponent
+    DofVisualizerComponent,
+    ArSphereComponent,
+    InspirationComponent
   ],
   imports: [          
     BrowserAnimationsModule,  

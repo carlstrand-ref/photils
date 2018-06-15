@@ -4,7 +4,7 @@ import { Component, OnInit, HostListener} from '@angular/core';
 @Component({
   selector: 'app-ar-sphere',
   templateUrl: './ar-sphere.component.html',
-  styleUrls: ['./ar-sphere.component.css']
+  styleUrls: ['./ar-sphere.component.scss']
 })
 export class ArSphereComponent implements OnInit {
   public orientationSupported = false;

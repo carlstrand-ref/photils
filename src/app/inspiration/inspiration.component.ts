@@ -5,7 +5,7 @@ import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
 @Component({
   selector: 'app-inspiration',
   templateUrl: './inspiration.component.html',
-  styleUrls: ['./inspiration.component.css']
+  styleUrls: ['./inspiration.component.scss']
 })
 export class InspirationComponent implements OnInit {
 

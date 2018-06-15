@@ -1,5 +1,5 @@
-<div fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="10px" fxLayoutGap.xs="0">
-  <div fxFlex="50%">
+<div class="app-menu" fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="10px">
+  <div fxFlex="33" fxFlex.lt-sm="50">
       <mat-card routerLink="/exposure" routerLinkActive="active">
         <mat-card-title>
             Exposure
@@ -8,12 +8,21 @@
       </mat-card>
   </div>
 
-  <div fxFlex="50%">
-      <mat-card routerLink="/dof" routerLinkActive="active">
+  <div fxFlex="33" fxFlex.lt-sm="50">
+      <mat-card routerLink="/dof">
           <mat-card-title> 
             Depth of Field
           </mat-card-title>
           <mat-icon>camera</mat-icon>
+      </mat-card>
+  </div>
+
+  <div fxFlex="33" fxFlex.lt-sm="50">
+      <mat-card routerLink="/inspiration">
+          <mat-card-title> 
+            AR Inspiration
+          </mat-card-title>
+          <mat-icon>image_search</mat-icon>
       </mat-card>
   </div>
 </div>
