@@ -15,6 +15,7 @@ export class ArSphereComponent implements OnInit , OnDestroy{
   private engine;
   private scene; 
   private camera: BABYLON.DeviceOrientationCamera;
+  private needle;
 
   @HostListener('window:deviceorientation', ["$event"]) handleOrientation(e) {    
     //console.log(e);  
@@ -37,6 +38,8 @@ export class ArSphereComponent implements OnInit , OnDestroy{
     }
 
     this.initEngine();
+
+    this.needle = document.getElementById('needle');
   }
 
   ngOnDestroy() {
@@ -105,9 +108,18 @@ export class ArSphereComponent implements OnInit , OnDestroy{
             self.hasVideo = true;
           }
       }
+
+      self.rotateNeedle(new BABYLON.Angle(self.camera.rotation.y).degrees());
     });
 
     return scene;
+  }
+
+  private rotateNeedle(deg) {
+    deg -= 45; // 45deg = reset needle to north
+    let mat = this.needle.getCTM();    
+    let matDeg = ((180 / Math.PI) * Math.atan2(mat.b, mat.a));
+    this.needle.setAttribute("transform", "rotate(" + deg + " 17 16)");
   }
 
 }
