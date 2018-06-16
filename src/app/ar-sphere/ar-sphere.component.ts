@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener} from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, HostListener} from '@angular/core';
 
 
 @Component({
@@ -23,7 +23,7 @@ export class ArSphereComponent implements OnInit , OnDestroy{
     this.orientationSupported = true;
   }
 
-  constructor() {
+  constructor(private cdRef: ChangeDetectorRef) {
     this.isMobile = navigator.userAgent.indexOf("Mobile") !== -1;
   }
 
@@ -109,7 +109,7 @@ export class ArSphereComponent implements OnInit , OnDestroy{
           }
       }
 
-      self.rotateNeedle(new BABYLON.Angle(self.camera.rotation.y).degrees());
+      self.rotateNeedle(new BABYLON.Angle(self.scene.activeCamera.rotationQuaternion.toEulerAngles().y).degrees());
     });
 
     return scene;
@@ -118,7 +118,7 @@ export class ArSphereComponent implements OnInit , OnDestroy{
   private rotateNeedle(deg) {
     deg -= 45; // 45deg = reset needle to north
     let mat = this.needle.getCTM();    
-    let matDeg = ((180 / Math.PI) * Math.atan2(mat.b, mat.a));
+    //let matDeg = ((180 / Math.PI) * Math.atan2(mat.b, mat.a));
     this.needle.setAttribute("transform", "rotate(" + deg + " 17 16)");
   }
 
