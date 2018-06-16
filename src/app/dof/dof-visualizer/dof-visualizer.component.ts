@@ -14,7 +14,7 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
   private engine;
   private scene; 
   private pipeline;
-  private leftCamera: BABYLON.FreeCamera;
+  private leftCamera: BABYLON.DeviceOrientationCamera;
   private rightCamera: BABYLON.FreeCamera;
   private dofObjects = {nearPlane: undefined, farPlane: undefined, dof: undefined};
   
@@ -89,11 +89,13 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     let scene = new BABYLON.Scene(this.engine);
     scene.clearColor = new BABYLON.Color4(0.18,0.18,0.18, 1.0);
 
-    this.leftCamera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 1.5, -1.0), scene);
+    this.leftCamera = new BABYLON.DeviceOrientationCamera("camera1", new BABYLON.Vector3(0, 1.5, -1.0), scene);
     this.leftCamera.speed = 0.01;
     this.leftCamera.minZ = 0.001;
-    this.leftCamera.attachControl(this.canvas, true);  
     this.leftCamera.layerMask = ~0b11;      
+    this.leftCamera.attachControl(this.canvas, true);  
+    if(navigator.userAgent.indexOf("Mobile") !== -1)
+      this.leftCamera.inputs.removeByType("touch");
 
     this.rightCamera = new BABYLON.FreeCamera("camera2", new BABYLON.Vector3(50, 1.5, 50), scene);  
     this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, 50));
