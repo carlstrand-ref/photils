@@ -3,44 +3,29 @@
         <mat-icon aria-label="Example icon-button with a heart icon">chevron_left</mat-icon>
     </button>
     <span>Exposure Calculator</span>    
-    </mat-toolbar>
+</mat-toolbar>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop" value="5.6">
-</mat-form-field>
+<div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Aperture</mat-card-title>
+        <mat-form-field>
+            <input matInput type="number" placeholder="F-Stop" [(ngModel)]="currentFStop" (blur)="elementOnBlur()" value="5.6">
+        </mat-form-field>
+    </mat-card>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso" value="100">
-</mat-form-field>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>ISO Sensitivity</mat-card-title>
+        <mat-form-field>
+            <input matInput type="number" placeholder="ISO" [(ngModel)]="currentISO" (blur)="elementOnBlur()" value="100">
+        </mat-form-field>
+    </mat-card>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time" value="0.1">
-</mat-form-field>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Exposure time</mat-card-title>
+        <mat-form-field>
+            <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="currentTime" (blur)="elementOnBlur()" value="0.1">
+        </mat-form-field>
+    </mat-card>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="Neutral density (ND)" [(ngModel)]="exposure" value="8">
-</mat-form-field>
-
-<mat-divider></mat-divider>
-<mat-card-subtitle>Equivalent settings:</mat-card-subtitle>
-
-<mat-form-field>
-        <mat-select [(ngModel)]="option" (selectionChange)="change()" placeholder="Target">
-            <mat-option value="fstop">F-Stop</mat-option>
-            <mat-option value="iso">ISO</mat-option>
-            <mat-option value="time">Exposure time</mat-option>
-            <mat-option value="value">Exposure value</mat-option>
-        </mat-select>
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop_c" value="5.6">
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso_c" value="100">
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time_c" value="0.1">
-</mat-form-field>
+    <button matButton (click)="buttonOnClick()">Lock</button>
+</div>
