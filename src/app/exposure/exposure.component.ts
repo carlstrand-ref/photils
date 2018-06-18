@@ -11,7 +11,7 @@ export class ExposureComponent implements OnInit {
   public currentFStop: number = 5.6;
   public currentISO: number = 100;
   public currentTime: number = 0.125;
-  public currentEV: number = null;
+  public currentEV: number = -Infinity;
   public evLocked: boolean = false;
 
   public constructor(private location: Location) {}
@@ -22,7 +22,6 @@ export class ExposureComponent implements OnInit {
   }
 
   public onValueChanged(elementName: string) {
-    debugger;
     // Calculate exposure value of current settings to find equivalent settings
     if (!this.evLocked) {
       this.updateCurrentEV();
