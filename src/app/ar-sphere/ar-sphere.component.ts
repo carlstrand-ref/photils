@@ -18,6 +18,7 @@ export class ArSphereComponent implements OnInit , OnDestroy{
   private deviceId; 
   private alpha = 0.0;
 
+  // https://developers.google.com/web/updates/2016/03/device-orientation-changes
   @HostListener('window:deviceorientationabsolute', ["$event"]) 
   @HostListener('window:deviceorientation', ["$event"]) 
   handleOrientation(e) {    
@@ -112,13 +113,13 @@ export class ArSphereComponent implements OnInit , OnDestroy{
     this.camera.attachControl(this.canvas, true);
 
     // Video plane
-    var videoPlane = BABYLON.Mesh.CreatePlane("Screen", 1, scene);
+    let videoPlane = BABYLON.Mesh.CreatePlane("Screen", 1, scene);
     videoPlane.position.y = 0;
     videoPlane.position.z = 100;    
     videoPlane.parent = this.camera
 
     // Video material
-    var videoMat = new BABYLON.StandardMaterial("textVid", scene);    
+    let videoMat = new BABYLON.StandardMaterial("textVid", scene);    
     videoMat.emissiveColor = new BABYLON.Color3(1,1,1);
     videoMat.backFaceCulling = false;
       
