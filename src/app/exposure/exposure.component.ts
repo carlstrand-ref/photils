@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 
 @Component({
@@ -7,7 +7,9 @@ import { Location } from '@angular/common';
   styleUrls: ['./exposure.component.scss']
 })
 export class ExposureComponent implements OnInit {
-  public option: string = 'fstop';
+  public fstopName: string = 'fstop';
+  public timeName: string = 'time';
+  public isoName: string = 'iso';
 
   // Setting fields
   public currentFStop: number = 5.6;
@@ -22,18 +24,31 @@ export class ExposureComponent implements OnInit {
     this.updateCurrentEV();
   }
 
-  public elementOnBlur(e) {
+  public onValueChanged(elementName: string) {
     if(!this.evLocked) {
       this.updateCurrentEV();
     }
     
     else {
+      debugger;
+      switch(elementName) {
+        case 'iso':
+          // ISO fallthrough to time update for now
+        case 'fstop':
+          // F-stop changed, update to equivalent exposure time
+          this.currentTime = ExposureComponent.calculateTimeValue(this.currentFStop, this.currentISO, this.currentEV);
+          break;
 
+        case 'time':
+          // Exposure time changed, update to equivalent f-stop
+          this.currentFStop = ExposureComponent.calculateFStop(this.currentEV, this.currentISO, this.currentTime);
+          break;
+      }
     }
   }
 
-  public buttonOnClick() {
-    
+  public onButtonStateChange() {
+    this.evLocked = !this.evLocked;
   }
 
   private updateCurrentEV() {
@@ -41,21 +56,7 @@ export class ExposureComponent implements OnInit {
       this.currentEV = ExposureComponent.calculateExposureValue(this.currentFStop, this.currentISO, this.currentTime);
   }
 
-  /*switch(this.option) {
-    case 'fstop':
-      this.targetFStop = ExposureComponent.calculateFStop(currentEV, this.targetISO, this.targetTime);
-      this.targetFStop = Number(this.targetFStop.toPrecision(2));
-      break;
-    
-    case 'iso':
-      this.targetISO = ExposureComponent.calculateISOValue(this.targetFStop, currentEV, this.targetTime);
-      break;
 
-    case 'time':
-      this.targetTime = ExposureComponent.calculateTimeValue(this.targetFStop, this.targetISO, currentEV);
-      this.targetTime = Number(this.targetTime.toPrecision(2));
-      break;
-  }*/
 
   private static calculateExposureValue(fstop: number, iso: number, time: number): number {
     return Math.round(Math.log2(100 * Math.pow(fstop, 2) / (iso * time)));

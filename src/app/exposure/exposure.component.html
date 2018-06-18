@@ -9,23 +9,30 @@
     <mat-card class="item" fxFlex>
         <mat-card-title>Aperture</mat-card-title>
         <mat-form-field>
-            <input matInput type="number" placeholder="F-Stop" [(ngModel)]="currentFStop" (blur)="elementOnBlur()" value="5.6">
-        </mat-form-field>
-    </mat-card>
-
-    <mat-card class="item" fxFlex>
-        <mat-card-title>ISO Sensitivity</mat-card-title>
-        <mat-form-field>
-            <input matInput type="number" placeholder="ISO" [(ngModel)]="currentISO" (blur)="elementOnBlur()" value="100">
+            <input #fstopInput matInput name="fstop" type="number" placeholder="F-Stop" [(ngModel)]="currentFStop" (blur)="onValueChanged(fstopInput.name)">
         </mat-form-field>
     </mat-card>
 
     <mat-card class="item" fxFlex>
         <mat-card-title>Exposure time</mat-card-title>
         <mat-form-field>
-            <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="currentTime" (blur)="elementOnBlur()" value="0.1">
+            <input #timeInput matInput name="time" type="number" placeholder="Exposure time (s)" [(ngModel)]="currentTime" (blur)="onValueChanged(timeInput.name)">
+        </mat-form-field>
+    </mat-card> 
+
+    <mat-card class="item" fxFlex>
+        <mat-card-title>ISO Sensitivity</mat-card-title>
+        <mat-form-field>
+            <input #isoInput matInput name="iso" type="number" placeholder="ISO" [(ngModel)]="currentISO" (blur)="onValueChanged(isoInput.name)">
         </mat-form-field>
     </mat-card>
 
-    <button matButton (click)="buttonOnClick()">Lock</button>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Exposure value</mat-card-title>
+        <mat-form-field>
+            <input matInput disabled type="number" placeholder="Exposure value (EV)" [(ngModel)]="currentEV">
+        </mat-form-field>
+    </mat-card>
+
+    <button mat-raised-button (click)="onButtonStateChange()">{{ evLocked ? 'Unlock' : 'Lock' }}</button>
 </div>
