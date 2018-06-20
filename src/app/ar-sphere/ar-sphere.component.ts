@@ -18,6 +18,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   public hasVideo = false;
   public isMobile:boolean = false;
   public scene; 
+  private videoPlane;
   private videoObject; 
   private canvas;
   private engine;  
@@ -53,12 +54,39 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       if (!('ondeviceorientationabsolute' in this.window))
         throw Error('The deviceorientationabsolute Event is not supported but requried');      
 
-      let constraint = { audio: false, video: { facingMode: this.isMobile ? 'environment' : 'user' } };  
-      this.videoObject = document.createElement('video');
-      this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraint);    
+      let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: this.isMobile ? 'environment' : 'user' } };  
+      this.videoObject = document.createElement('video');      
+      this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraints);    
+      
       this.videoObject.onloadedmetadata = () => {
         this.hasVideo = true;
         this.videoObject.play();
+        let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
+        console.log(settings, this.camera);
+
+        let verticalHalf = 0.5;
+        let horizontalHalf = 0.5;
+
+        let canvasAspect = (Math.max(this.canvas.width, this.canvas.height) / Math.min(this.canvas.width, this.canvas.height))
+        if(this.canvas.width > this.canvas.height) {          
+          this.videoPlane.scaling = new BABYLON.Vector3(settings.aspectRatio, 1, 1);
+          horizontalHalf = canvasAspect / 2.0;
+        } else {          
+          this.videoPlane.scaling = new BABYLON.Vector3(1, settings.aspectRatio, 1);
+          verticalHalf = canvasAspect / 2.0;          
+        }
+
+        this.camera.orthoLeft = -horizontalHalf;
+        this.camera.orthoRight = horizontalHalf;
+        this.camera.orthoTop = verticalHalf;
+        this.camera.orthoBottom = -verticalHalf;          
+
+        console.log( this.camera.orthoLeft, 
+          this.camera.orthoRight,
+          this.camera.orthoTop,
+          this.camera.orthoBottom,
+          this.videoPlane.scaling);
+
       }    
 
       let position = await this.getPosition();
@@ -131,7 +159,8 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     this.camera.orthoTop = 0.5;
     this.camera.orthoBottom = -0.5;                
     this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.gyro.alpha, this.gyro.beta, this.gyro.gamma));
-    this.camera.attachControl(this.canvas, true);    
+    this.camera.attachControl(this.canvas, true);   
+    
 
     // remove unused inputs for mobile
     if(this.isMobile) {
@@ -141,20 +170,20 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     }
 
     // Video plane
-    let videoPlane = BABYLON.Mesh.CreatePlane("Screen", 1, scene);
-    videoPlane.position.y = 0;
-    videoPlane.position.z = 100;    
-    videoPlane.parent = this.camera
+    this.videoPlane = BABYLON.Mesh.CreatePlane("Screen", 1, scene);
+    this.videoPlane.position.y = 0;
+    this.videoPlane.position.z = 100;    
+    this.videoPlane.parent = this.camera
     if(!this.isMobile)
-      videoPlane.rotation.y = Math.PI;
+      this.videoPlane.rotation.y = Math.PI;
 
     // Video material
     let videoMat = new BABYLON.StandardMaterial("textVid", scene);    
     videoMat.emissiveColor = new BABYLON.Color3(1,1,1);
     videoMat.backFaceCulling = false;
       
-    videoMat.diffuseTexture = new BABYLON.VideoTexture("livestream", this.videoObject, scene, null);     
-    videoPlane.material = videoMat;   
+    videoMat.diffuseTexture = new BABYLON.VideoTexture("livestream", this.videoObject, scene, false);     
+    this.videoPlane.material = videoMat;   
 
     scene.onAfterCameraRenderObservable.add(() => {      
       this.rotateNeedle(this.gyro.alpha);
