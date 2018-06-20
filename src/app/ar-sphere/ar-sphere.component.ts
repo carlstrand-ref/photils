@@ -69,24 +69,10 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
         let canvasAspect = (Math.max(this.canvas.width, this.canvas.height) / Math.min(this.canvas.width, this.canvas.height))
         if(this.canvas.width > this.canvas.height) {          
-          this.videoPlane.scaling = new BABYLON.Vector3(settings.aspectRatio, 1, 1);
           horizontalHalf = canvasAspect / 2.0;
         } else {          
-          this.videoPlane.scaling = new BABYLON.Vector3(1, settings.aspectRatio, 1);
           verticalHalf = canvasAspect / 2.0;          
         }
-
-        this.camera.orthoLeft = -horizontalHalf;
-        this.camera.orthoRight = horizontalHalf;
-        this.camera.orthoTop = verticalHalf;
-        this.camera.orthoBottom = -verticalHalf;          
-
-        console.log( this.camera.orthoLeft, 
-          this.camera.orthoRight,
-          this.camera.orthoTop,
-          this.camera.orthoBottom,
-          this.videoPlane.scaling);
-
       }    
 
       let position = await this.getPosition();
@@ -146,18 +132,11 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   private createScene() {    
     let scene = new BABYLON.Scene(this.engine);    
-    this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);     
-    this.camera.rotationQuaternion = BABYLON.Quaternion.FromRotationMatrix(BABYLON.Matrix.RotationY(BABYLON.Tools.ToRadians(this.gyro.alpha)));
-    this.camera.position =  this.initialPosition;
-    //this.camera.fov = 1.345649;
+    this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);         
+    this.camera.position =  this.initialPosition;    
     this.camera.speed = 0.01;
     this.camera.minZ = 0.0001;   
-    this.camera.maxZ = 10000;
-    this.camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA; 
-    this.camera.orthoLeft = -0.5;
-    this.camera.orthoRight = 0.5;
-    this.camera.orthoTop = 0.5;
-    this.camera.orthoBottom = -0.5;                
+    this.camera.maxZ = 10000;         
     this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.gyro.alpha, this.gyro.beta, this.gyro.gamma));
     this.camera.attachControl(this.canvas, true);   
     
@@ -169,21 +148,10 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.camera.inputs.removeByType("FreeCameraMouseInput");
     }
 
-    // Video plane
-    this.videoPlane = BABYLON.Mesh.CreatePlane("Screen", 1, scene);
-    this.videoPlane.position.y = 0;
-    this.videoPlane.position.z = 100;    
-    this.videoPlane.parent = this.camera
-    if(!this.isMobile)
-      this.videoPlane.rotation.y = Math.PI;
-
-    // Video material
-    let videoMat = new BABYLON.StandardMaterial("textVid", scene);    
-    videoMat.emissiveColor = new BABYLON.Color3(1,1,1);
-    videoMat.backFaceCulling = false;
-      
-    videoMat.diffuseTexture = new BABYLON.VideoTexture("livestream", this.videoObject, scene, false);     
-    this.videoPlane.material = videoMat;   
+    let background = new BABYLON.Layer("back", null, scene);
+	  background.texture = new BABYLON.VideoTexture("livestream", this.videoObject, scene, false);     
+	  background.isBackground = true;
+	  background.texture.level = 0;
 
     scene.onAfterCameraRenderObservable.add(() => {      
       this.rotateNeedle(this.gyro.alpha);
