@@ -62,7 +62,7 @@ import { InspirationComponent } from './inspiration/inspiration.component';
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule
   ],
-  providers: [],
+  providers: [{provide: Window, useValue: window }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
