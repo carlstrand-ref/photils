@@ -94,8 +94,11 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     this.leftCamera.minZ = 0.001;
     this.leftCamera.layerMask = ~0b11;      
     this.leftCamera.attachControl(this.canvas, true);  
-    if(navigator.userAgent.indexOf("Mobile") !== -1)
-      this.leftCamera.inputs.removeByType("touch");
+    if(navigator.userAgent.indexOf("Mobile") !== -1) {
+      this.leftCamera.inputs.removeByType("FreeCameraTouchInput");
+      this.leftCamera.inputs.removeByType("FreeCameraKeyboardMoveInput");
+      this.leftCamera.inputs.removeByType("FreeCameraMouseInput");
+    }
 
     this.rightCamera = new BABYLON.FreeCamera("camera2", new BABYLON.Vector3(50, 1.5, 50), scene);  
     this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, 50));
