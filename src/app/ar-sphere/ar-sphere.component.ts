@@ -73,6 +73,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     } catch(ex) {      
       this.error = ex.name + ": " + ex.message;
+      this.stopVideo();
     }
   }
 
@@ -98,6 +99,8 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         track.stop();
       });
       this.videoObject.srcObject = null;
+
+      this.hasVideo = false;
     }
   }
 
