@@ -1,3 +1,4 @@
+@import "../../themes";
 canvas {
     height: calc(100vh - 64px);
     width: 100%;
@@ -12,4 +13,8 @@ canvas {
     right: 10px;
     top: 10px;
     opacity: 0.7;
+}
+
+.error .mat-card{
+    background-color: mat-color($dark-warn, 900);
 }
