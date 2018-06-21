@@ -25,6 +25,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private camera: BABYLON.FreeCamera;
   private gyro : {alpha: number, beta: number, gamma: number } = {alpha: 0, beta: 0, gamma: 0};
   private initialPosition = undefined;  
+  public geoLocation: {lat: number, long: number};
 
   constructor(
     private window: Window
@@ -62,20 +63,20 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         this.hasVideo = true;
         this.videoObject.play();
         let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
-        console.log(settings, this.camera);
 
-        let verticalHalf = 0.5;
-        let horizontalHalf = 0.5;
+        // let verticalHalf = 0.5;
+        // let horizontalHalf = 0.5;
 
-        let canvasAspect = (Math.max(this.canvas.width, this.canvas.height) / Math.min(this.canvas.width, this.canvas.height))
-        if(this.canvas.width > this.canvas.height) {          
-          horizontalHalf = canvasAspect / 2.0;
-        } else {          
-          verticalHalf = canvasAspect / 2.0;          
-        }
+        // let canvasAspect = (Math.max(this.canvas.width, this.canvas.height) / Math.min(this.canvas.width, this.canvas.height))
+        // if(this.canvas.width > this.canvas.height) {          
+        //   horizontalHalf = canvasAspect / 2.0;
+        // } else {          
+        //   verticalHalf = canvasAspect / 2.0;          
+        // }
       }    
 
       let position = await this.getPosition();
+      this.geoLocation = {lat: position.coords.latitude, long: position.coords.longitude};
       let pos = Utils.latLonToXYZ(position.coords.latitude, position.coords.longitude);      
       this.initialPosition = new BABYLON.Vector3(
         pos.x / 1000.0, 
@@ -95,8 +96,10 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     return new Promise((resolve, reject) => {
       setTimeout(()=> {        
         try {
-          if(!this.hasOrientationData)
-            throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
+          // if(!this.hasOrientationData)
+          //   throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
+          resolve();
+          this.initEngine(); 
         } catch (e) {          
           reject(e)
         }
@@ -132,6 +135,8 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   private createScene() {    
     let scene = new BABYLON.Scene(this.engine);    
+    scene.ambientColor = new BABYLON.Color3(1, 1, 1);
+
     this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);         
     this.camera.position =  this.initialPosition;    
     this.camera.speed = 0.01;
@@ -151,7 +156,9 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     let background = new BABYLON.Layer("back", null, scene);
 	  background.texture = new BABYLON.VideoTexture("livestream", this.videoObject, scene, false);     
 	  background.isBackground = true;
-	  background.texture.level = 0;
+    background.texture.level = 0;
+    
+    new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, 0), scene);
 
     scene.onAfterCameraRenderObservable.add(() => {      
       this.rotateNeedle(this.gyro.alpha);
@@ -175,7 +182,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
       if(!this.isNorthDirection && this.initialPosition !== undefined) {                                 
         this.isNorthDirection = true;                        
-        this.initEngine();                
+                       
       }
     }
 

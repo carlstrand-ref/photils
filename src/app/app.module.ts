@@ -28,6 +28,7 @@ import { MainComponent } from './main/main.component';
 import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.component';
 import { ArSphereComponent } from './ar-sphere/ar-sphere.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { InspirationComponent } from './inspiration/inspiration.component';
     MatFormFieldModule,
     FlexLayoutModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [{provide: Window, useValue: window }],
   bootstrap: [AppComponent]

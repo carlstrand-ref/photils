@@ -2,7 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
-import { Vector2, Vector3 } from 'babylonjs';
+import {  Vector3 } from 'babylonjs';
+import { AdvancedDynamicTexture } from 'babylonjs-gui';
+import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
+import { HttpClient } from '@angular/common/http'; 
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-inspiration',
@@ -11,55 +15,79 @@ import { Vector2, Vector3 } from 'babylonjs';
 })
 export class InspirationComponent implements OnInit {
   @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
-
+  private imageServices: GeoImageService[] = []; 
   private minDistance = 0.1; // in km
-  private dummyData :{ lat: number, lon: number, altitude: number, title: string }[] = [
-    { lat: 51.98364221, lon: 9.81239562, altitude: 94, title:'Fargus Grecon' },
-    { lat: 52.003723, lon: 9.834583, altitude: 320.0, title:'Himmelbergturm' },
-    { lat: 51.99344372, lon: 9.81900254, altitude: 92, title:'MM Packaging' },
-    { lat: 51.994069, lon: 9.823915, altitude: 100, title:'Mozardstraße' },
-  ];
 
-  constructor(private location: Location) { }
+  constructor(private location: Location, private http: HttpClient) {
+    let s = new FlickrImageService('686d968ee5fac542bb420630b04d9b87', http);    
+    this.imageServices.push(s);
+  }
 
   ngOnInit() {
     
   }
 
   private sphereReady() {
-    console.log("ready!");
-    this.placeLocations(this.dummyData);
+    console.log("ready!");    
+
+    this.loadImages();    
   }
 
-  private placeLocations(locations : { lat: number, lon: number, altitude: number, title: string }[]) {
-    for( const location of locations ) {
-      let coords = Utils.latLonToXYZ(location['lat'], location['lon']);      
-      let pos = new BABYLON.Vector3(coords.x / 1000.0, location.altitude / 1000.0, coords.y / 1000.0);
+  private async loadImages() {
+    let photos: IGeoImage[] = [];
+    for(let service of this.imageServices) {      
+      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.long, 40);      
+      photos = [...photos, ...p];
+    }
+
+    for(let photo of photos) {
+      this.placePhoto(photo)
+    }
+  }
+
+
+  private placePhoto(photo:IGeoImage) {
+    // add image to scene if successful loaded
+    photo.image.subscribe( (dimension:{width: number, height: number}) => {
+      let coords = Utils.latLonToXYZ(photo.lat, photo.long);      
+      let pos = new BABYLON.Vector3(coords.x / 1000.0, (Math.random() * 20 - 10) / 1000.0, coords.y / 1000.0);
+
+      let ratio = Math.max(dimension.width, dimension.height) / Math.min(dimension.width, dimension.height);
+      let width = 1.0;
+      let height = 1.0;
+
+      if(dimension.width > dimension.height) {
+        width *= ratio;
+      } else {
+        height *= ratio;
+      }
             
-      let box = BABYLON.MeshBuilder.CreatePlane("wall", {width: 0.25, height: 0.125}, this.arSphere.scene);            
+      let plane = BABYLON.MeshBuilder.CreatePlane("wall_"+photo.title, {width: width, height: height}, this.arSphere.scene);            
       let d = BABYLON.Vector3.DistanceSquared(this.arSphere.scene.activeCamera.position, pos);          
-      box.position = pos;
+      plane.position = pos;
+      plane.scaling = new Vector3(d / 10.0, d / 10.0, d / 10.0);
 
       // move object to minDistance km if too close
       if (d <= this.minDistance) {
         let camPos:Vector3 = this.arSphere.scene.activeCamera.position;
         let dir = pos.subtract(camPos).normalize();        
         dir.multiply(new Vector3(this.minDistance, 0, this.minDistance));      
-        box.position.addInPlace(dir);                        
+        plane.position.addInPlace(dir);                        
       }
 
-      box.lookAt(this.arSphere.scene.activeCamera.position);            
+      plane.lookAt(this.arSphere.scene.activeCamera.position);            
 
-      let font = "bold 44px monospace";
-      let dynTexture =  new BABYLON.DynamicTexture(location.title, {width:512, height:256}, this.arSphere.scene);
-      dynTexture.drawText(location.title, 75, 135, font, "green", "white", true, true);
+      let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);   
+      let button = BABYLON.GUI.Button.CreateImageOnlyButton("button_" + photo.title, photo.imageUrl);   
+      button.width = 1;
+      button.height = 1;
 
-      let boxMaterial = new BABYLON.StandardMaterial("material", this.arSphere.scene);
-      boxMaterial.emissiveColor = new BABYLON.Color3(0.58, 0, 0.86);
-      boxMaterial.diffuseTexture = dynTexture;
-      boxMaterial.backFaceCulling = true;
-      box.material = boxMaterial;
-    }
+      button.onPointerUpObservable.add(() => {                
+        console.log("nu", plane.name, photo.title);
+      });      
+
+      imageTexture.addControl(button);
+    });
   }
 
 }
