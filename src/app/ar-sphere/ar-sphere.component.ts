@@ -80,7 +80,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       let pos = Utils.latLonToXYZ(position.coords.latitude, position.coords.longitude);      
       this.initialPosition = new BABYLON.Vector3(
         pos.x / 1000.0, 
-        position.coords.altitude / 1000.0, 
+        pos.z / 1000.0, 
         pos.y / 1000.0
       );
 

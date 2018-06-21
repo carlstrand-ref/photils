@@ -50,7 +50,7 @@ export class InspirationComponent implements OnInit {
     // add image to scene if successful loaded
     photo.image.subscribe( (dimension:{width: number, height: number}) => {
       let coords = Utils.latLonToXYZ(photo.lat, photo.long);      
-      let pos = new BABYLON.Vector3(coords.x / 1000.0, (Math.random() * 20 - 10) / 1000.0, coords.y / 1000.0);
+      let pos = new BABYLON.Vector3(coords.x / 1000.0, coords.z / 1000.0, coords.y / 1000.0);
 
       let ratio = Math.max(dimension.width, dimension.height) / Math.min(dimension.width, dimension.height);
       let width = 1.0;
