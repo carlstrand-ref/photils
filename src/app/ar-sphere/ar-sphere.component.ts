@@ -17,7 +17,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   public hasOrientationData = false;
   public hasVideo = false;
   public isMobile:boolean = false;
-  public scene; 
+  public scene;   
   private videoPlane;
   private videoObject; 
   private canvas;
@@ -139,9 +139,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);         
     this.camera.position =  this.initialPosition;    
-    this.camera.speed = 0.01;
-    this.camera.minZ = 0.0001;   
-    this.camera.maxZ = 10000;         
+    this.camera.minZ = 0.01;   
     this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.gyro.alpha, this.gyro.beta, this.gyro.gamma));
     this.camera.attachControl(this.canvas, true);   
     
@@ -158,7 +156,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 	  background.isBackground = true;
     background.texture.level = 0;
     
-    new BABYLON.DirectionalLight("DirectionalLight", new BABYLON.Vector3(0, -1, 0), scene);
+    new BABYLON.HemisphericLight("HemisphericLight", new BABYLON.Vector3(0, 1, 0), scene);
 
     scene.onAfterCameraRenderObservable.add(() => {      
       this.rotateNeedle(this.gyro.alpha);
