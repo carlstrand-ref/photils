@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Location } from '@angular/common';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
@@ -17,9 +17,12 @@ export class InspirationComponent implements OnInit {
   @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
   private imageServices: GeoImageService[] = []; 
   private minDistance = 0.1; // in km
-  private groupZones = 8; // device unit circel in N peaces to group images in zones
+  private groupZones = 12; // device unit circel in N peaces to group images in zones
+  private zones = {};
+  private zoneRange: number;
 
   constructor(private location: Location, private http: HttpClient) {
+    this.zoneRange = 360 / this.groupZones;
     let s = new FlickrImageService('686d968ee5fac542bb420630b04d9b87', http);    
     this.imageServices.push(s);
   }
@@ -30,7 +33,6 @@ export class InspirationComponent implements OnInit {
 
   private sphereReady() {
     console.log("ready!");    
-
     this.loadImages();    
   }
 
@@ -42,91 +44,111 @@ export class InspirationComponent implements OnInit {
     }
 
     for(let photo of photos) {
-      this.placePhoto(photo)
+      this.groupImage(photo)
     }
+
+    this.placeGroups();
+
   }
 
+  private placeGroups() {
+    let cam = this.arSphere.scene.activeCamera;    
 
-  private placePhoto(photo:IGeoImage) {
-    // add image to scene if successful loaded
-    let zones = [];
-    let zoneRange = 360 / this.groupZones;
-    let color = ["#b84c7d",
-    "#69ab54",
-    "#7f62b8",
-    "#bca93d",
-    "#b74a43",
-    "#46c19a",
-    "#c96934",
-    "#937b35"]
-    
-    
-    photo.image.subscribe( (dimension:{width: number, height: number}) => {
-      let coords = Utils.latLonToXYZ(photo.lat, photo.long);      
-      let pos = new BABYLON.Vector3(coords.x / 1000.0, coords.z / 1000.0, coords.y / 1000.0);
-      let cam = this.arSphere.scene.activeCamera;
-      let ratio = Math.max(dimension.width, dimension.height) / Math.min(dimension.width, dimension.height);
-      let width = 1.0;
-      let height = 1.0;
+    for(let i in this.zones) {
+      console.log("zone " + i + " with " + this.zones[i].length + " items");
+      let plane:BABYLON.Mesh = BABYLON.MeshBuilder.CreatePlane("zone_"+i, {width: 0.25, height: 0.25}, this.arSphere.scene);            
+      let pos:Vector3 = this.zones[i][0].position.subtract(cam.position);            
+      pos.normalize().multiplyInPlace(new Vector3(1, 0, 1)).addInPlace(cam.position);      
+      plane.position = pos;            
+      plane.lookAt(cam.position);               
 
-      if(dimension.width > dimension.height) {
-        width *= ratio;
-      } else {
-        height *= ratio;
-      }
-            
-      let plane = BABYLON.MeshBuilder.CreatePlane("wall_"+photo.title, {width: width, height: height}, this.arSphere.scene);            
-      let d = BABYLON.Vector3.DistanceSquared(cam.position, pos);          
-      plane.position = pos;
-      plane.scaling = new Vector3(d / 10.0, d / 10.0, d / 10.0);
-
-      // move object to minDistance km if too close
-      if (d <= this.minDistance) {
-        let camPos:Vector3 = cam.position;
-        let dir = pos.subtract(camPos).normalize();        
-        dir.multiply(new Vector3(this.minDistance, 0, this.minDistance));      
-        plane.position.addInPlace(dir);                        
-      }
-
-      plane.lookAt(cam.position);            
-      
-      let v1 = cam.position.add(new Vector3(1,0,0));
-      let v2 = pos.subtract(cam.position);
-      
-      let dot = v1.x * v2.x + v1.y * v2.y;
-      let det = v1.x * v2.x - v1.y * v2.y
-
-      let angle = Math.atan2(det, dot);
-      let angleDeg = BABYLON.Tools.ToDegrees(angle);
-
-      if(angleDeg < 0) angleDeg += 360;
-
-      let z = undefined;
-      for(let i = 0; i < this.groupZones; i++) {
-        if(angleDeg >= i * zoneRange && angleDeg <= (i + 1) * zoneRange) {
-          z = i;                                   
-          break;
-        }     
-      }
-    
-      if(!(zones[z] instanceof Array))
-        zones[z] = []
-
-      zones[z].push(plane);
-     
-      let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);   
-      let button = BABYLON.GUI.Button.CreateImageOnlyButton("button_" + photo.title, photo.imageUrl);   
+      let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);         
+      let button = BABYLON.GUI.Button.CreateImageWithCenterTextButton( "button_zone_" + i, ""+this.zones[i].length, 'assets/textures/aperture.png');         
+      button.fontSize = 300;
       button.width = 1.0;
       button.height = 1.0;
-      button.thickness = 10.0;      
-      button.color = color[z];
+      button.thickness = 0.0;         
+      button.zIndex = 1000;         
+      button.color = "#9e449e";   
+      button.alpha = 0.8   
 
       button.onPointerUpObservable.add(() => {                
-        console.log("nu", plane.name, photo.title);
+        console.log("nu", plane.name);
+        this.placeInGrid(Number(i));
       });      
 
       imageTexture.addControl(button);
-    });
+    }
   }
 
+  private groupImage(photo:IGeoImage) {    
+    let cam = this.arSphere.scene.activeCamera;       
+    let d = BABYLON.Vector3.DistanceSquared(cam.position, photo.position);          
+    // move object to minDistance km if too close
+    if (d <= this.minDistance) {      
+      let dir = photo.position.subtract(cam.position).normalize();        
+      dir.multiplyInPlace(new Vector3(this.minDistance, 0, this.minDistance));     
+      photo.position.addInPlace(dir);                        
+    }
+
+    let v1 = cam.position.add(new Vector3(1,0,0));
+    let v2 = photo.position.subtract(cam.position);
+    
+    let dot = v1.x * v2.x + v1.y * v2.y;
+    let det = v1.x * v2.x - v1.y * v2.y
+
+    let angle = Math.atan2(det, dot);
+    let angleDeg = BABYLON.Tools.ToDegrees(angle);
+
+    if(angleDeg < 0) angleDeg += 360;
+
+    let z = undefined;
+    for(let i = 0; i < this.groupZones; i++) {
+      if(angleDeg >= i * this.zoneRange && angleDeg <= (i + 1) * this.zoneRange) {
+        z = i;                                   
+        break;
+      }     
+    }
+  
+    if(!(this.zones[z] instanceof Array))
+      this.zones[z] = []
+
+    this.zones[z].push(photo);
+  }
+
+
+  private placeInGrid(zone:number) {
+    let photos = this.zones[zone];
+    console.log(photos);
+    //photo.image.subscribe( (dimension:{width: number, height: number}) => {      
+      //let width = 1.0;
+      //let height = 1.0;
+      // let ratio = Math.max(dimension.width, dimension.height) / Math.min(dimension.width, dimension.height);
+      // if(dimension.width > dimension.height) {
+      //   width *= ratio;
+      // } else {
+      //   height *= ratio;
+      // }
+            
+      // let plane = BABYLON.MeshBuilder.CreatePlane("wall_"+photo.title, {width: width, height: height}, this.arSphere.scene);            
+      // plane.position = pos;
+      // plane.scaling = new Vector3(d / 10.0, d / 10.0, d / 10.0);    
+
+      // plane.lookAt(cam.position);            
+      
+      
+      
+      // let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);   
+      // let button = BABYLON.GUI.Button.CreateImageOnlyButton("button_" + photo.title, photo.imageUrl);   
+      // button.width = 1.0;
+      // button.height = 1.0;
+      // button.thickness = 10.0;      
+
+      // button.onPointerUpObservable.add(() => {                
+      //   console.log("nu", plane.name, photo.title);
+      // });      
+
+      // imageTexture.addControl(button);
+    //});
+  }
 }
