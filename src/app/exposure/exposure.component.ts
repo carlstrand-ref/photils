@@ -7,45 +7,63 @@ import { Location } from '@angular/common';
   styleUrls: ['./exposure.component.scss']
 })
 export class ExposureComponent implements OnInit {
-  public option: string = 'fstop';
-  public fstop: number = 5.6;
-  public iso: number = 100;
-  public time: number = 0.125;
-  public exposure: number = 8;
+  // Setting fields
+  public currentFStop: number = 5.6;
+  public currentISO: number = 100;
+  public currentTime: number = 0.125;
+  public currentEV: number = -Infinity;
+  public evLocked: boolean = false;
 
-  public fstop_c;
-  public iso_c;
-  public time_c;
+  public constructor(private location: Location) {}
 
-  constructor( private location: Location) {}
-
-
-  ngOnInit() {
-    this.change();
+  public ngOnInit() {
+    // Calculate initial exposure value of default settings
+    this.updateCurrentEV();
   }
 
-  change() {
-    switch(this.option) {
-      case 'fstop':
-        this.fstop = ExposureComponent.calculateFStop(this.exposure, this.iso, this.time);
-        break;
-      
-      case 'iso':
-        this.iso = ExposureComponent.calculateISOValue(this.fstop, this.exposure, this.time);
-        break;
+  public onValueChanged(elementName: string) {
+    // Calculate exposure value of current settings to find equivalent settings
+    if (!this.evLocked) {
+      this.updateCurrentEV();
+    }
 
-      case 'time':
-        this.time = ExposureComponent.calculateTimeValue(this.fstop, this.iso, this.exposure);
-        break;
+    // Update the exposure parameters based on changed input and the detected exposure value
+    else {
+      switch (elementName) {
+        case 'iso':
+        // ISO fallthrough to time update for now
+        case 'fstop':
+          this.updateCurrentTimeValue();
+          break;
 
-      case 'exposure':
-        this.exposure = ExposureComponent.calculateExposureValue(this.fstop, this.iso, this.time);
-        break;
+        case 'time':
+          this.updateCurrentFStop();
+          break;
+      }
     }
   }
 
+  public onButtonStateChange() {
+    this.evLocked = !this.evLocked;
+  }
+
+  private updateCurrentFStop() {
+    // Exposure time changed, update to equivalent f-stop
+    this.currentFStop = ExposureComponent.calculateFStop(this.currentEV, this.currentISO, this.currentTime);
+  }
+
+  private updateCurrentTimeValue() {
+    // F-stop changed, update to equivalent exposure time
+    this.currentTime = ExposureComponent.calculateTimeValue(this.currentFStop, this.currentISO, this.currentEV);
+  }
+
+  private updateCurrentEV() {
+    // Calculate the exposure value of the current settings
+    this.currentEV = ExposureComponent.calculateExposureValue(this.currentFStop, this.currentISO, this.currentTime);
+  }
+
   private static calculateExposureValue(fstop: number, iso: number, time: number): number {
-    return Math.log2(100 * Math.pow(fstop, 2) / (iso * time))
+    return Math.round(Math.log2(100 * Math.pow(fstop, 2) / (iso * time)));
   }
 
   private static calculateFStop(ev: number, iso: number, time: number): number {
