@@ -3,44 +3,36 @@
         <mat-icon aria-label="Example icon-button with a heart icon">chevron_left</mat-icon>
     </button>
     <span>Exposure Calculator</span>    
-    </mat-toolbar>
+</mat-toolbar>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop" value="5.6">
-</mat-form-field>
+<div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Aperture</mat-card-title>
+        <mat-form-field>
+            <input #fstopInput matInput name="fstop" type="number" placeholder="F-Stop" [(ngModel)]="currentFStop" (blur)="onValueChanged(fstopInput.name)">
+        </mat-form-field>
+    </mat-card>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso" value="100">
-</mat-form-field>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Exposure time</mat-card-title>
+        <mat-form-field>
+            <input #timeInput matInput name="time" type="number" placeholder="Exposure time (s)" [(ngModel)]="currentTime" (blur)="onValueChanged(timeInput.name)">
+        </mat-form-field>
+    </mat-card> 
 
-<mat-form-field>
-    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time" value="0.1">
-</mat-form-field>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>ISO Sensitivity</mat-card-title>
+        <mat-form-field>
+            <input #isoInput matInput name="iso" type="number" placeholder="ISO" [(ngModel)]="currentISO" (blur)="onValueChanged(isoInput.name)">
+        </mat-form-field>
+    </mat-card>
 
-<mat-form-field>
-    <input matInput type="number" placeholder="Neutral density (ND)" [(ngModel)]="exposure" value="8">
-</mat-form-field>
+    <mat-card class="item" fxFlex>
+        <mat-card-title>Exposure value</mat-card-title>
+        <mat-form-field>
+            <input matInput disabled type="number" placeholder="Exposure value (EV)" [(ngModel)]="currentEV">
+        </mat-form-field>
+    </mat-card>
 
-<mat-divider></mat-divider>
-<mat-card-subtitle>Equivalent settings:</mat-card-subtitle>
-
-<mat-form-field>
-        <mat-select [(ngModel)]="option" (selectionChange)="change()" placeholder="Target">
-            <mat-option value="fstop">F-Stop</mat-option>
-            <mat-option value="iso">ISO</mat-option>
-            <mat-option value="time">Exposure time</mat-option>
-            <mat-option value="value">Exposure value</mat-option>
-        </mat-select>
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="F-Stop" [(ngModel)]="fstop_c" value="5.6">
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="ISO" [(ngModel)]="iso_c" value="100">
-</mat-form-field>
-
-<mat-form-field>
-    <input matInput type="number" placeholder="Exposure time (s)" [(ngModel)]="time_c" value="0.1">
-</mat-form-field>
+    <button mat-raised-button (click)="onButtonStateChange()">{{ evLocked ? 'Unlock' : 'Lock' }}</button>
+</div>
