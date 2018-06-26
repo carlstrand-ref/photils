@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Location } from '@angular/common';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
-import {  Vector3, Color3, TransformNode, Mesh } from 'babylonjs';
+import {  Vector3, Color3, TransformNode, Mesh, Quaternion } from 'babylonjs';
 import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
 import { HttpClient } from '@angular/common/http'; 
@@ -17,7 +17,7 @@ export class InspirationComponent implements OnInit {
   @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
   private imageServices: GeoImageService[] = []; 
   private minDistance = 0.1; // in km
-  private groupZones = 12; // device unit circel in N peaces to group images in zones
+  private groupZones = 8; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
   private zones = {};
   private zoneRange: number;
@@ -35,6 +35,7 @@ export class InspirationComponent implements OnInit {
 
   private sphereReady() {
     console.log("ready!");    
+    //this.debugZones();
     this.loadImages();    
   }
 
@@ -132,21 +133,29 @@ export class InspirationComponent implements OnInit {
   private groupImage(photo:IGeoImage) {    
     let cam = this.arSphere.scene.activeCamera;               
 
-    let v1 = cam.position.add(new Vector3(1,0,0));
-    let v2 = photo.position.subtract(cam.position);
+    let v1:Vector3 = cam.position.subtract(new Vector3(0,0,1));
+    v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
+
+    let v2:Vector3 = photo.position.subtract(cam.position);
+    v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
+
+    console.log(v1.toString(), v2.toString());
     
-    let dot = v1.x * v2.x + v1.y * v2.y;
-    let det = v1.x * v2.x - v1.y * v2.y
+    let dot = v1.x * v2.x + v1.y * v2.y;    
+    let a = dot / (v1.lengthSquared() * v2.lengthSquared());
 
-    let angle = Math.atan2(det, dot);
-    let angleDeg = BABYLON.Tools.ToDegrees(angle);
 
+    //let det = v1.x * v2.x - v1.y * v2.y
+    //let angle = Math.atan2(det, dot);
+    let angleDeg = BABYLON.Tools.ToDegrees(a);
     if(angleDeg < 0) angleDeg += 360;
 
+    console.log(angleDeg, BABYLON.Tools.ToDegrees(a));
+
     let z = undefined;
-    for(let i = 0; i < this.groupZones; i++) {
-      if(angleDeg >= i * this.zoneRange && angleDeg <= (i + 1) * this.zoneRange) {
-        z = i;                                   
+    for(let i = 0; i < this.groupZones; i++) {      
+      if(angleDeg >= i * this.zoneRange && angleDeg <= (i + 1) * this.zoneRange) {                
+        z = i;          
         break;
       }     
     }
@@ -157,6 +166,31 @@ export class InspirationComponent implements OnInit {
     this.zones[z].push(photo);
   }
 
+  private debugZones() {
+    let cam = this.arSphere.scene.activeCamera;                   
+    let v1 = cam.position.clone();
+    v1.y -= 0.1;
+
+    let v2 = v1.clone();
+    v2.normalize().multiplyInPlace(new Vector3(4, 0, 4));      
+    
+    
+    let deg = 0;
+    for(let i = 0; i < this.groupZones; i++) {                
+      let rad = BABYLON.Tools.ToRadians(deg);
+      let mat = BABYLON.Matrix.RotationY(rad);  
+      let rv = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);    
+      let options = {
+        points: [v1, rv],
+        colors: [
+          Utils.hueToColor3(deg, 1.0, 1.0).toColor4(),
+          Utils.hueToColor3(deg, 1.0, 1.0).toColor4()
+        ]
+      };
+      let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
+      deg += this.zoneRange;      
+    }    
+  }
 
   private placeImages(zone:number, position: BABYLON.Vector3) {
     let photos = this.zones[zone];    
@@ -217,9 +251,7 @@ export class InspirationComponent implements OnInit {
         let height = 1.0;
 
         if(img.width >= img.height) width *= ratio;
-        else height *= ratio;
-
-        console.log(width, height, photo.title, img.width, img.height);
+        else height *= ratio;        
 
         plane.scaling = new BABYLON.Vector3(width, height, 1);
         let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);   
@@ -360,49 +392,6 @@ export class InspirationComponent implements OnInit {
       a.setEasingFunction(new BABYLON.QuadraticEase());
     
     this.arSphere.scene.beginAnimation(plane, 0, 60, false);
-  }
-
-  private imageDetailsUI(show:boolean = true, image?:IGeoImage) {
-    
-  }
-
-  private initImageDetailsUI() {
-    let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
-    let panel = new BABYLON.GUI.StackPanel("stackpanel");
-    panel.isVertical = false;
-    panel.height = "70px";
-    panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_BOTTOM;
-    advancedTexture.addControl(panel);
-
-    let btnRoute = BABYLON.GUI.Button.CreateSimpleButton("btnRoute", "Route");
-    btnRoute.width = 0.4;
-    btnRoute.height = "40px";      
-    btnRoute.color = "white";
-    btnRoute.cornerRadius = 0;
-    btnRoute.background = "green";
-    btnRoute.thickness = 0.1;
-    btnRoute.onPointerUpObservable.add(function() {
-        alert("you did it!");
-    });
-
-    let btnView = BABYLON.GUI.Button.CreateSimpleButton("btnView", "View on Website");
-    btnView.width = 0.4;
-    btnView.height = "40px";
-    btnView.color = "white";
-    btnView.cornerRadius = 0;
-    btnView.thickness = 0.1;
-    btnView.background = "green";
-    btnView.onPointerUpObservable.add(function() {
-        alert("you did it!");
-    });
-
-    panel.addControl(btnRoute);
-    panel.addControl(btnView);
-
-    BABYLON.Tags.EnableFor(advancedTexture);
-    (advancedTexture as any).addTags("details_ui");
-
-    panel.isVisible = false;
   }
 
   private openRoute() {
