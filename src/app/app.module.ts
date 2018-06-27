@@ -1,3 +1,4 @@
+import 'hammerjs';
 import { BrowserModule } from '@angular/platform-browser';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +16,9 @@ import {
   MatToolbarModule,
   MatIconModule,
   MatButtonModule,
-  MatSlideToggleModule
+  MatSliderModule,
+  MatSlideToggleModule,  
+  MatProgressSpinnerModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -41,15 +44,15 @@ import { HttpClientModule } from '@angular/common/http';
     InspirationComponent
   ],
   imports: [          
-    BrowserAnimationsModule,  
+    BrowserModule,    
+    BrowserAnimationsModule,
+    CommonModule,
     MatSlideToggleModule,
     MatButtonModule,
     MatIconModule,
     MatToolbarModule,
-    CommonModule,
     MatInputModule,
-    MatDividerModule,        
-    BrowserModule,
+    MatDividerModule,            
     FormsModule,
     MatDividerModule,
     MatGridListModule,
@@ -57,9 +60,11 @@ import { HttpClientModule } from '@angular/common/http';
     MatSelectModule,
     MatCardModule,
     MatSelectModule,
+    MatSliderModule,
     MatInputModule,
     MatFormFieldModule,
-    FlexLayoutModule,
+    MatProgressSpinnerModule,
+    FlexLayoutModule,      
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
     HttpClientModule
