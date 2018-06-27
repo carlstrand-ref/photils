@@ -42,7 +42,7 @@ export class Utils {
             case 4:
                 return new BABYLON.Color3(t, p, v);
             case 5:
-                return new BABYLON.Color3(v, q, p);
+                return new BABYLON.Color3(v, p, q);
         }
     }
 }
