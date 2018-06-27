@@ -1,12 +1,10 @@
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
-import { Location } from '@angular/common';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
-import {  Vector3, Color3, TransformNode, Mesh, Quaternion } from 'babylonjs';
+import {  Vector3, TransformNode } from 'babylonjs';
 import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
 import { HttpClient } from '@angular/common/http'; 
-import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-inspiration',
@@ -17,11 +15,14 @@ export class InspirationComponent implements OnInit {
   @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
   private imageServices: GeoImageService[] = []; 
   private minDistance = 0.1; // in km
-  private groupZones = 8; // device unit circel in N peaces to group images in zones
+  private loading:boolean = false;
+  private groupZones = 6; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
   private zones = {};
   private zoneRange: number;
   private selectedImage = null;
+  private displaySettings = false;
+  private radius = 10;
 
   constructor(private http: HttpClient) {
     this.zoneRange = 360 / this.groupZones;
@@ -35,14 +36,24 @@ export class InspirationComponent implements OnInit {
 
   private sphereReady() {
     console.log("ready!");    
-    //this.debugZones();
+    this.debugZones();
     this.loadImages();    
   }
 
+  private clearScene() {
+    this.arSphere.reset();
+  }
+
+  private applyFilter() {    
+    this.clearScene();
+    this.loadImages();
+  }
+
   private async loadImages() {
+    this.loading = true;
     let photos: IGeoImage[] = [];
     for(let service of this.imageServices) {      
-      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.long, 40);      
+      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.long, this.radius);      
       photos = [...photos, ...p];
     }
 
@@ -51,16 +62,24 @@ export class InspirationComponent implements OnInit {
     }
 
     this.placeGroups();
+    this.loading = false;
   }
 
   private placeGroups() {
     let cam = this.arSphere.scene.activeCamera;    
+    for(let i in this.zones) {                    
+      let v1 = cam.position.clone();      
+      let v2 = v1.clone();
+      v2.normalize().multiplyInPlace(new Vector3(1.5, 0, 1.5));
 
-    for(let i in this.zones) {
-      console.log("zone " + i + " with " + this.zones[i].length + " items");
-      let plane:BABYLON.Mesh = BABYLON.MeshBuilder.CreatePlane("zone_"+i, {width: 0.2, height: 0.2}, this.arSphere.scene);            
-      let pos:Vector3 = this.zones[i][0].position.subtract(cam.position);            
-      pos.normalize().multiplyInPlace(new Vector3(1, 0, 1)).addInPlace(cam.position);      
+      let half = this.zoneRange / 2.0;
+      let deg = this.zoneRange * Number(i) + half;      
+
+      let rad = BABYLON.Tools.ToRadians(deg);
+      let mat = BABYLON.Matrix.RotationY(rad);  
+      let pos = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);                        
+
+      let plane:BABYLON.Mesh = BABYLON.MeshBuilder.CreatePlane("zone_"+i, {width: 0.2, height: 0.2}, this.arSphere.scene);                  
       plane.position = pos;            
       plane.lookAt(cam.position);                     
 
@@ -76,7 +95,7 @@ export class InspirationComponent implements OnInit {
       button.alpha = 0.8   
 
       let placed = false;
-      button.onPointerUpObservable.add(() => {                
+      button.onPointerUpObservable.add(() => {          
         if(!placed) {
           this.placeImages(Number(i), pos);                    
         } else {
@@ -86,7 +105,7 @@ export class InspirationComponent implements OnInit {
         placed = !placed;
       });      
 
-      imageTexture.addControl(button);
+      imageTexture.addControl(button);      
     }
   }
 
@@ -137,24 +156,17 @@ export class InspirationComponent implements OnInit {
     v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
 
     let v2:Vector3 = photo.position.subtract(cam.position);
-    v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
-
-    console.log(v1.toString(), v2.toString());
+    v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));       
     
-    let dot = v1.x * v2.x + v1.y * v2.y;    
-    let a = dot / (v1.lengthSquared() * v2.lengthSquared());
-
-
-    //let det = v1.x * v2.x - v1.y * v2.y
-    //let angle = Math.atan2(det, dot);
-    let angleDeg = BABYLON.Tools.ToDegrees(a);
+    let dot = v1.x * v2.x + v1.z * v2.z;    
+    let angle = dot / (v1.lengthSquared() * v2.lengthSquared());  
+    let angleDeg = BABYLON.Tools.ToDegrees(angle);
+        
     if(angleDeg < 0) angleDeg += 360;
-
-    console.log(angleDeg, BABYLON.Tools.ToDegrees(a));
 
     let z = undefined;
     for(let i = 0; i < this.groupZones; i++) {      
-      if(angleDeg >= i * this.zoneRange && angleDeg <= (i + 1) * this.zoneRange) {                
+      if(angleDeg >= i * this.zoneRange && angleDeg <= (i + 1) * this.zoneRange) {                        
         z = i;          
         break;
       }     
@@ -169,26 +181,28 @@ export class InspirationComponent implements OnInit {
   private debugZones() {
     let cam = this.arSphere.scene.activeCamera;                   
     let v1 = cam.position.clone();
-    v1.y -= 0.1;
+    v1.y -= 0.5;
 
     let v2 = v1.clone();
-    v2.normalize().multiplyInPlace(new Vector3(4, 0, 4));      
+    v2.normalize().multiplyInPlace(new Vector3(4, 0, 4));        
     
     
-    let deg = 0;
-    for(let i = 0; i < this.groupZones; i++) {                
+    for(let i = 0; i < this.groupZones; i++) { 
+      let deg = i * this.zoneRange;
+      console.log(deg, this.arSphere.gyro.alpha, i * this.zoneRange);
+      deg -= this.arSphere.gyro.alpha
+      if(deg < 0) deg += 360;
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
       let rv = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);    
+      rv.y = cam.position.y;
+      let c = Utils.hueToColor3(i * this.zoneRange, 1.0, 1.0).toColor4();
+      console.log("deg: " + deg + " color: " + c);
       let options = {
         points: [v1, rv],
-        colors: [
-          Utils.hueToColor3(deg, 1.0, 1.0).toColor4(),
-          Utils.hueToColor3(deg, 1.0, 1.0).toColor4()
-        ]
-      };
-      let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
-      deg += this.zoneRange;      
+        colors: [c, c]        
+      };      
+      BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
     }    
   }
 
@@ -203,7 +217,7 @@ export class InspirationComponent implements OnInit {
     let maxImages = Math.min(photos.length, this.maxImagesPerGroupd);
     let step = Math.PI * 2 / maxImages;
     let p = 0;  
-    let r = 0.3;  
+    let r = 0.35;  
     
     for (let i = 0; i < maxImages; i++) {
       let photo = photos[i];
@@ -218,8 +232,8 @@ export class InspirationComponent implements OnInit {
       BABYLON.Tags.EnableFor(plane);
       (plane as any).addTags("mesh_zone_" + zone);
     
-      let xAnimation = new BABYLON.Animation("plane_x"+ photo.title, "position.x", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-      let yAnimation = new BABYLON.Animation("plane_y"+ photo.title, "position.y", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+      let xAnimation = new BABYLON.Animation("plane_x"+ photo.title, "position.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+      let yAnimation = new BABYLON.Animation("plane_y"+ photo.title, "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
       
       let xKeys = [{
           frame : 0,
@@ -240,7 +254,9 @@ export class InspirationComponent implements OnInit {
       xAnimation.setKeys(xKeys);
       yAnimation.setKeys(yKeys);
 
-      let easeFnc = new BABYLON.QuadraticEase();
+      let easeFnc = new BABYLON.ElasticEase(2, 3);
+      easeFnc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
+
       xAnimation.setEasingFunction(easeFnc);
       yAnimation.setEasingFunction(easeFnc);      
       plane.animations = [xAnimation, yAnimation];        
@@ -261,15 +277,14 @@ export class InspirationComponent implements OnInit {
         button.thickness = 0.0;    
         button.zIndex = 100;    
 
-        button.onPointerUpObservable.add(() => {                    
+        button.onPointerUpObservable.add(() => {           
           if(this.selectedImage !== null)  {          
             this.deselectImage();
           }
 
           if(this.selectedImage !== null && this.selectedImage.image === plane) {
             this.selectedImage = null;
-            zoneButton.setEnabled(true);
-            this.imageDetailsUI(false);
+            zoneButton.setEnabled(true);            
             return;   
           }
             
@@ -287,7 +302,7 @@ export class InspirationComponent implements OnInit {
         imageTexture.addControl(button);
         
         plane.visibility = 1;        
-        this.arSphere.scene.beginAnimation(plane, 0, 60, false);
+        this.arSphere.scene.beginAnimation(plane, 0, 30, false);
 
       });
 

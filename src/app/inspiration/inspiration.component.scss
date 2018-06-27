@@ -1,5 +1,13 @@
 .container {
     position: relative;
+
+    .mat-progress-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -75px;
+        margin-top: -75px;
+    }
 }
 
 .ui {
@@ -12,4 +20,28 @@
     background: rgba(0, 0, 0, 0.8);
     margin-left: -125px;
     left: 50%;
+}
+
+.settings.sidebar {
+    position: absolute;
+    display: none;
+    top: 0px;
+    right: 0px;
+    width: 0px;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    -webkit-transition: width 0.5s; /* Safari */
+    transition: width 0.5s;    
+
+    &.opened {
+        display: block;
+        padding: 10px;
+        width: 80px;     
+        text-align: center;   
+    }
+
+    .mat-raised-button {
+        max-width: 70px;
+        min-width: 50px;
+    }
 }
