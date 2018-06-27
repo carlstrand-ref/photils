@@ -23,7 +23,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private canvas;
   private engine;  
   private camera: BABYLON.FreeCamera;
-  private gyro : {alpha: number, beta: number, gamma: number } = {alpha: 0, beta: 0, gamma: 0};
+  public gyro : {alpha: number, beta: number, gamma: number } = {alpha: 0, beta: 0, gamma: 0};
   private initialPosition = undefined;  
   public geoLocation: {lat: number, long: number};
 
@@ -48,6 +48,14 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   ngOnDestroy() {
     this.stopVideo()
+  }
+
+  public reset() {
+    this.stopVideo();
+    this.scene.dispose();
+    this.engine.dispose();    
+
+    this.initSensors();
   }
 
   private async initSensors() {
@@ -139,7 +147,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);         
     this.camera.position =  this.initialPosition;    
-    this.camera.minZ = 0.01;   
+    this.camera.minZ = 0.4;     
     this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.gyro.alpha, this.gyro.beta, this.gyro.gamma));
     this.camera.attachControl(this.canvas, true);   
     
