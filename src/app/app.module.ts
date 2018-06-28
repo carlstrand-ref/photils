@@ -18,7 +18,9 @@ import {
   MatButtonModule,
   MatSliderModule,
   MatSlideToggleModule,  
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatPaginatorModule,
+  MatPaginatorIntl
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -32,7 +34,7 @@ import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.comp
 import { ArSphereComponent } from './ar-sphere/ar-sphere.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
 import { HttpClientModule } from '@angular/common/http';
-
+import { PaginationProvider } from './inspiration/paginationProvider';
 @NgModule({
   declarations: [
     AppComponent,
@@ -63,13 +65,17 @@ import { HttpClientModule } from '@angular/common/http';
     MatSliderModule,
     MatInputModule,
     MatFormFieldModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     FlexLayoutModule,      
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [{provide: Window, useValue: window }],
+  providers: [
+    {provide: Window, useValue: window }, 
+    { provide: MatPaginatorIntl, useClass: PaginationProvider}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
