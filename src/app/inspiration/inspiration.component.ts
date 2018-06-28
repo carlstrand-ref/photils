@@ -5,6 +5,7 @@ import {  Vector3, TransformNode, MeshBuilder } from 'babylonjs';
 import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
 import { HttpClient } from '@angular/common/http'; 
+import { PageEvent } from '@angular/material';
 
 @Component({
   selector: 'app-inspiration',
@@ -24,6 +25,7 @@ export class InspirationComponent implements OnInit {
   private displaySettings = false;
   private radius = 5;
   private usedSceneObjects = [];
+  private paginator: {page: number, pages: number, total: number, numItemsPerPages:number };
 
   constructor(private http: HttpClient) {
     this.zoneRange = 360 / this.groupZones;
@@ -48,32 +50,42 @@ export class InspirationComponent implements OnInit {
     }    
   }
 
-  private applyFilter() {        
-    this.clearScene();
+  private applyFilter() {            
+    this.zones = {};
+    this.clearScene();    
     this.loadImages();
     this.displaySettings = false;
   }
 
   private async loadImages() {
+    let page = this.paginator === undefined ? 1 : this.paginator.page;
     this.loading = true;
     let photos: IGeoImage[] = [];
     for(let service of this.imageServices) {      
-      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius);      
+      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius, page);      
       photos = [...photos, ...p];
     }
 
-    for(let photo of photos) {
+    for(let photo of photos) {      
       this.groupImage(photo)
     }
 
     this.placeGroups();
+
+    // hacky needs to be more generic
+    let s = this.imageServices[0] as FlickrImageService;
+    this.paginator = {
+      page: s.getCurrentPage(),
+      pages: s.getNumPages(),
+      total: s.getTotal(),
+      numItemsPerPages: s.getItemsPerPage()
+    }
+    console.log(this.paginator);
     this.loading = false;
   }
 
   private placeGroups() {
-    let cam = this.arSphere.scene.activeCamera;    
-    console.log(this.zones);
-
+    let cam = this.arSphere.scene.activeCamera;        
     let startPoint = cam.position.clone();
     let v1 = Vector3.Left();
     let half = this.zoneRange / 2.0;
@@ -87,7 +99,6 @@ export class InspirationComponent implements OnInit {
       let mat = BABYLON.Matrix.RotationY(rad);  
       let pos = BABYLON.Vector3.TransformCoordinates(v1, mat);          
       pos = startPoint.add(pos);
-      console.log("zone: " + i + " at: " +deg+ "°");  
       
       //let pos = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);                        
 
@@ -181,7 +192,7 @@ export class InspirationComponent implements OnInit {
       photo.lat, photo.long
     )
 
-    console.log(photo.equirectengularCoordinates(this.radius, this.arSphere.geoLocation))
+    //console.log(photo.equirectengularCoordinates(this.radius, this.arSphere.geoLocation))
         
     if(angleDeg < 0) angleDeg += 360;
 
@@ -192,8 +203,6 @@ export class InspirationComponent implements OnInit {
         break;
       }     
     }
-
-    console.log(z);
   
     if(!(this.zones[z] instanceof Array))
       this.zones[z] = []
@@ -224,7 +233,7 @@ export class InspirationComponent implements OnInit {
         colors: [c, c]        
       };      
       let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
-      this.usedSceneObjects.push(line);
+      //this.usedSceneObjects.push(line);
     }    
   }
 
@@ -240,13 +249,15 @@ export class InspirationComponent implements OnInit {
     let step = Math.PI * 2 / maxImages;
     let p = 0;  
     let r = 0.35;  
+
+    this.usedSceneObjects.push(node);
     
     for (let i = 0; i < maxImages; i++) {
       let photo = photos[i];
       let x = r * Math.sin(p);
       let y = r * Math.cos(p);
 
-      let plane = BABYLON.MeshBuilder.CreatePlane("image_zone_"+zone+"_"+photo.title, {width: 0.1, height: 0.1}, this.arSphere.scene);            
+      let plane = BABYLON.MeshBuilder.CreatePlane("image_zone_"+zone+"_"+photo.id, {width: 0.1, height: 0.1}, this.arSphere.scene);            
       plane.parent = node;      
       plane.position = new BABYLON.Vector3(0, 0, 0);  
       plane.visibility = 0;
@@ -294,7 +305,7 @@ export class InspirationComponent implements OnInit {
 
         plane.scaling = new BABYLON.Vector3(width, height, 1);
         let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);   
-        let button = BABYLON.GUI.Button.CreateImageOnlyButton("button_" + photo.title, img.objUrl);   
+        let button = BABYLON.GUI.Button.CreateImageOnlyButton("button_" + photo.id, img.objUrl);   
         button.width = 1.0;
         button.height = 1.0;     
         button.thickness = 0.0;    
@@ -326,9 +337,10 @@ export class InspirationComponent implements OnInit {
         
         plane.visibility = 1;        
         this.arSphere.scene.beginAnimation(plane, 0, 30, false);
-        this.usedSceneObjects.push(plane, imageTexture, button);
+        this.usedSceneObjects.push(imageTexture, button);
       });
 
+      this.usedSceneObjects.push(plane);
       p += step;
     }    
   }
@@ -430,6 +442,11 @@ export class InspirationComponent implements OnInit {
       a.setEasingFunction(new BABYLON.QuadraticEase());
     
     this.arSphere.scene.beginAnimation(plane, 0, 60, false);
+  }
+  private changePage(e:PageEvent) {
+    console.log("change: " , e);
+    this.paginator.page = e.pageIndex + 1;
+    this.applyFilter();
   }
 
   private openRoute() {

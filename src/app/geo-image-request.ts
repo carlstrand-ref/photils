@@ -5,6 +5,7 @@ import { Vector2, Vector3 } from 'babylonjs';
 import { Utils } from './utils';
 
 export interface IGeoImage {
+    id: number,
     title: string,
     thumbnailUrl: string,
     imageUrl: string,
@@ -22,7 +23,7 @@ export class GeoImage implements IGeoImage {
     public position: Vector3;
     private cache:any = {};
 
-    constructor (public title: string, public thumbnailUrl: string, 
+    constructor (public id:number, public title: string, public thumbnailUrl: string, 
         public imageUrl:string,public detailsUrl:string, public lat:number, public long: number,
         public views: number, private http: HttpClient) {
             //let pos = Utils.latLonToXYZ(lat, long);            
@@ -76,7 +77,11 @@ export class GeoImage implements IGeoImage {
 }
 
 export abstract class GeoImageService {
-    abstract async getImages(lat: number, long: number, radius: number, units?:number) : Promise<IGeoImage[]>;
+    abstract getCurrentPage():number;
+    abstract getNumPages(): number;
+    abstract getTotal(): number;
+    abstract getItemsPerPage(): number;
+    abstract async getImages(lat: number, long: number, radius: number, page?:number, units?:number) : Promise<IGeoImage[]>;    
 }
 
 enum flickrMethod {
@@ -88,6 +93,14 @@ enum flickrMethod {
 })
 export class FlickrImageService extends GeoImageService {
     private baseUrl =  'https://api.flickr.com/services/rest/?method=';
+    private _currentPage: number = 1;
+    private _numPages: number;
+    private _total: number;
+    private _itemsPerPage: number = 100;
+    public getCurrentPage(): number { return this._currentPage };
+    public getNumPages(): number { return this._numPages };
+    public getTotal(): number { return this._total };
+    public getItemsPerPage() : number { return this._itemsPerPage };         
     
     constructor(private apiKey: string, private http: HttpClient) {
         super();        
@@ -97,19 +110,29 @@ export class FlickrImageService extends GeoImageService {
         let url = this.baseUrl + 
             method +
             '&nojsoncallback=1' +
-            '&per_page=100' +             
+            '&per_page=' + this._itemsPerPage +             
             '&api_key=' + this.apiKey + 
             '&format=json&' + parameters;
         return this.http.get(url).toPromise();
     }
 
-    public async getImages(lat: number, lon: number, radius: number, units?:number) : Promise<IGeoImage[]> {        
+
+
+    public async getImages(lat: number, lon: number, radius: number, page?:number, units?:number) : Promise<IGeoImage[]> {        
+        this._currentPage = page === undefined ? this._currentPage : page;   
+
         return new Promise<IGeoImage[]>((resolve, reject) => {            
             let parameters = 'lat='+lat+'&lon='+lon + "&radius="+ radius +
-                '&extras=geo,url_t,url_z,views,path_alias';            
+                             '&extras=geo,url_t,url_z,views,path_alias' + 
+                             '&page='+this._currentPage;
+
             this.sendRequest(flickrMethod.photoSearch, parameters)
-            .then((data) => {                
-                let photos: GeoImage[] = [];                
+            .then((data: any) => {     
+                console.log("p:", page);                 
+                let photos: GeoImage[] = [];  
+                this._numPages = Number(data.photos.pages);
+                this._total = Number(data.photos.total);
+                              
                 for (let photo of (data as any).photos.photo) {                                        
                     if ( !('url_z' in photo))
                         continue;                    
@@ -119,6 +142,7 @@ export class FlickrImageService extends GeoImageService {
                                   + photo.owner + "/" + photo.id
 
                     let geoImage = new GeoImage(
+                        photo.id,
                         photo.title, photo.url_t, photo.url_z, details,
                         Number(photo.latitude), Number(photo.longitude),
                         Number(photo.views), this.http )

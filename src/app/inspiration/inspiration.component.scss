@@ -11,15 +11,26 @@
 }
 
 .ui {
-    position: absolute;
-    top: 0px;
-    width: 250px;
-    height: 40px;
-    padding: 10px;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.8);
-    margin-left: -125px;
-    left: 50%;
+    position: absolute;    
+    background: rgba(0, 0, 0, 0.8);    
+
+    &.controls {
+        top: 0px;
+        width: 250px;
+        height: 40px;
+        padding: 10px;
+        text-align: center;
+        margin-left: -125px;
+        left: 50%;
+    }
+
+    &.mat-paginator {
+        width: 100%;
+        bottom: 0px;
+        left: 0px;
+        top: auto;
+        margin: 0 auto;        
+    }
 }
 
 .settings.sidebar {

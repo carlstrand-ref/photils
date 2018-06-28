@@ -3,7 +3,7 @@
         <mat-icon aria-label="icon-button with a back icon">chevron_left</mat-icon>
     </button>
     <span>AR Inspiration</span> 
-    
+    <span class="spacer"></span>
     <button mat-icon-button
         class="gui settings button" (click)="displaySettings = !displaySettings">
         <mat-icon aria-label="icon-button with a settings icon">settings</mat-icon>
@@ -13,7 +13,7 @@
 <div class="container">
     <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>        
     <mat-progress-spinner mode="indeterminate" color="warn" *ngIf="loading"></mat-progress-spinner>
-    <div *ngIf="selectedImage !== null" class="ui">
+    <div *ngIf="selectedImage !== null" class="ui controls">
         <button mat-button color="primary" (click)="openRoute()">Route
             <mat-icon aria-label="icon-button with a directions icon">directions</mat-icon>
         </button>
@@ -39,4 +39,12 @@
             <mat-icon>done</mat-icon>
         </button>
     </div>
+
+    <mat-paginator *ngIf="paginator" class="ui" 
+        hidePageSize
+        [length]="paginator.total"
+        [pageIndex] = "paginator.page - 1"
+        [pageSize]="paginator.numItemsPerPages"        
+        (page)="changePage($event)">
+    </mat-paginator>
 </div>
