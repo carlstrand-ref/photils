@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Vector3 } from 'babylonjs';
+import { Vector2, Vector3 } from 'babylonjs';
 import { Utils } from './utils';
 
 export interface IGeoImage {
@@ -14,7 +14,8 @@ export interface IGeoImage {
     views: number,    
     thumbnail:Observable<{width: number, height:number}>,
     image:Observable<{width: number, height:number}>
-    position: Vector3;
+    //position: Vector3;
+    equirectengularCoordinates(radius: number, origin:{lat: number, lon:number}):Vector2;
 }
 
 export class GeoImage implements IGeoImage {
@@ -24,9 +25,9 @@ export class GeoImage implements IGeoImage {
     constructor (public title: string, public thumbnailUrl: string, 
         public imageUrl:string,public detailsUrl:string, public lat:number, public long: number,
         public views: number, private http: HttpClient) {
-            let pos = Utils.latLonToXYZ(lat, long);            
-            pos.divideInPlace(new Vector3(1000.0, 1000.0, 1000.0));
-            this.position = new Vector3(pos.x, pos.z, pos.y);
+            //let pos = Utils.latLonToXYZ(lat, long);            
+            //pos.divideInPlace(new Vector3(1000.0, 1000.0, 1000.0));
+            //this.position = new Vector3(pos.x, pos.z, pos.y);
         };
 
     thumbnail = new Observable<{objUrl:string, width: number, height:number}>( observer => {        
@@ -67,6 +68,10 @@ export class GeoImage implements IGeoImage {
             }
         });    
     }); 
+
+    equirectengularCoordinates(radius:number, origin:{lat: number, lon:number}) : Vector2 {
+        return Utils.latLonToEquirectengular(radius, {lat: this.lat, lon: this.long}, origin).divideInPlace(new Vector2(1000.0, 1000.0));
+    }
     
 }
 
@@ -92,22 +97,23 @@ export class FlickrImageService extends GeoImageService {
         let url = this.baseUrl + 
             method +
             '&nojsoncallback=1' +
-            '&per_page=100' + 
+            '&per_page=100' +             
             '&api_key=' + this.apiKey + 
             '&format=json&' + parameters;
         return this.http.get(url).toPromise();
     }
 
-    public async getImages(lat: number, long: number, radius: number, units?:number) : Promise<IGeoImage[]> {        
+    public async getImages(lat: number, lon: number, radius: number, units?:number) : Promise<IGeoImage[]> {        
         return new Promise<IGeoImage[]>((resolve, reject) => {            
-            let parameters = 'lat='+lat+'&lon='+long + "&radius="+ radius +
+            let parameters = 'lat='+lat+'&lon='+lon + "&radius="+ radius +
                 '&extras=geo,url_t,url_z,views,path_alias';            
             this.sendRequest(flickrMethod.photoSearch, parameters)
             .then((data) => {                
                 let photos: GeoImage[] = [];                
-                for (let photo of (data as any).photos.photo) {                    
+                for (let photo of (data as any).photos.photo) {                                        
                     if ( !('url_z' in photo))
                         continue;                    
+                    
 
                     let details = "https://www.flickr.com/photos/"
                                   + photo.owner + "/" + photo.id
@@ -120,7 +126,7 @@ export class FlickrImageService extends GeoImageService {
                     photos.push(geoImage);
                 }
 
-                photos.sort((a, b) => a.views - b.views);
+                //photos.sort((a, b) => a.views - b.views);
                 resolve(photos);
             })
             .catch((e) => reject(e));

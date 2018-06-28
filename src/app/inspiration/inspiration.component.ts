@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
-import {  Vector3, TransformNode } from 'babylonjs';
+import {  Vector3, TransformNode, MeshBuilder } from 'babylonjs';
 import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
 import { HttpClient } from '@angular/common/http'; 
@@ -16,13 +16,14 @@ export class InspirationComponent implements OnInit {
   private imageServices: GeoImageService[] = []; 
   private minDistance = 0.1; // in km
   private loading:boolean = false;
-  private groupZones = 6; // device unit circel in N peaces to group images in zones
+  private groupZones = 8; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
   private zones = {};
   private zoneRange: number;
   private selectedImage = null;
   private displaySettings = false;
-  private radius = 10;
+  private radius = 5;
+  private usedSceneObjects = [];
 
   constructor(private http: HttpClient) {
     this.zoneRange = 360 / this.groupZones;
@@ -41,19 +42,23 @@ export class InspirationComponent implements OnInit {
   }
 
   private clearScene() {
-    this.arSphere.reset();
+    //this.arSphere.reset();        
+    for(let o of this.usedSceneObjects) {
+      o.dispose();
+    }    
   }
 
-  private applyFilter() {    
+  private applyFilter() {        
     this.clearScene();
     this.loadImages();
+    this.displaySettings = false;
   }
 
   private async loadImages() {
     this.loading = true;
     let photos: IGeoImage[] = [];
     for(let service of this.imageServices) {      
-      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.long, this.radius);      
+      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius);      
       photos = [...photos, ...p];
     }
 
@@ -67,17 +72,24 @@ export class InspirationComponent implements OnInit {
 
   private placeGroups() {
     let cam = this.arSphere.scene.activeCamera;    
-    for(let i in this.zones) {                    
-      let v1 = cam.position.clone();      
-      let v2 = v1.clone();
-      v2.normalize().multiplyInPlace(new Vector3(1.5, 0, 1.5));
+    console.log(this.zones);
 
-      let half = this.zoneRange / 2.0;
-      let deg = this.zoneRange * Number(i) + half;      
+    let startPoint = cam.position.clone();
+    let v1 = Vector3.Left();
+    let half = this.zoneRange / 2.0;
 
+    v1.normalize().multiplyInPlace(new Vector3(1.3, 0, 1.3)); 
+    
+
+    for(let i in this.zones) {                                
+      let deg = this.zoneRange * Number(i) + half;            
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
-      let pos = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);                        
+      let pos = BABYLON.Vector3.TransformCoordinates(v1, mat);          
+      pos = startPoint.add(pos);
+      console.log("zone: " + i + " at: " +deg+ "°");  
+      
+      //let pos = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);                        
 
       let plane:BABYLON.Mesh = BABYLON.MeshBuilder.CreatePlane("zone_"+i, {width: 0.2, height: 0.2}, this.arSphere.scene);                  
       plane.position = pos;            
@@ -105,7 +117,9 @@ export class InspirationComponent implements OnInit {
         placed = !placed;
       });      
 
-      imageTexture.addControl(button);      
+      imageTexture.addControl(button);     
+      
+      this.usedSceneObjects.push(plane, button, imageTexture);
     }
   }
 
@@ -152,15 +166,22 @@ export class InspirationComponent implements OnInit {
   private groupImage(photo:IGeoImage) {    
     let cam = this.arSphere.scene.activeCamera;               
 
-    let v1:Vector3 = cam.position.subtract(new Vector3(0,0,1));
-    v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
+    // let v1:Vector3 = cam.position.add(Vector3.Left());
+    // v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));   
 
-    let v2:Vector3 = photo.position.subtract(cam.position);
-    v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));       
+    // let v2:Vector3 = photo.position.subtract(cam.position);
+    // v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));           
     
-    let dot = v1.x * v2.x + v1.z * v2.z;    
-    let angle = dot / (v1.lengthSquared() * v2.lengthSquared());  
-    let angleDeg = BABYLON.Tools.ToDegrees(angle);
+    // let dot = Vector3.Dot(v1, v2);    
+    // let angle = dot / (v1.length() * v2.length());  
+    // let angleDeg = BABYLON.Tools.ToDegrees(angle);    
+
+    let angleDeg = Utils.angleFromCoords(
+      this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon,
+      photo.lat, photo.long
+    )
+
+    console.log(photo.equirectengularCoordinates(this.radius, this.arSphere.geoLocation))
         
     if(angleDeg < 0) angleDeg += 360;
 
@@ -171,38 +192,39 @@ export class InspirationComponent implements OnInit {
         break;
       }     
     }
+
+    console.log(z);
   
     if(!(this.zones[z] instanceof Array))
       this.zones[z] = []
 
-    this.zones[z].push(photo);
+    this.zones[z].push(photo);    
   }
 
   private debugZones() {
-    let cam = this.arSphere.scene.activeCamera;                   
-    let v1 = cam.position.clone();
-    v1.y -= 0.5;
+    let cam = this.arSphere.scene.activeCamera;                       
+    let startPoint = cam.position.clone();
+    let v1 = Vector3.Left();
+    
+    startPoint.y -= 0.5;        
+    v1.normalize().multiplyInPlace(new Vector3(4, 0, 4)); 
+     
 
-    let v2 = v1.clone();
-    v2.normalize().multiplyInPlace(new Vector3(4, 0, 4));        
-    
-    
     for(let i = 0; i < this.groupZones; i++) { 
-      let deg = i * this.zoneRange;
-      console.log(deg, this.arSphere.gyro.alpha, i * this.zoneRange);
-      deg -= this.arSphere.gyro.alpha
-      if(deg < 0) deg += 360;
+      let deg = i * this.zoneRange;            
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
-      let rv = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);    
+      let rv = BABYLON.Vector3.TransformCoordinates(v1, mat);      
+      rv.addInPlace(startPoint);    
       rv.y = cam.position.y;
+      
       let c = Utils.hueToColor3(i * this.zoneRange, 1.0, 1.0).toColor4();
-      console.log("deg: " + deg + " color: " + c);
       let options = {
-        points: [v1, rv],
+        points: [startPoint, rv],
         colors: [c, c]        
       };      
-      BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
+      let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
+      this.usedSceneObjects.push(line);
     }    
   }
 
@@ -231,6 +253,7 @@ export class InspirationComponent implements OnInit {
 
       BABYLON.Tags.EnableFor(plane);
       (plane as any).addTags("mesh_zone_" + zone);
+      
     
       let xAnimation = new BABYLON.Animation("plane_x"+ photo.title, "position.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
       let yAnimation = new BABYLON.Animation("plane_y"+ photo.title, "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -303,7 +326,7 @@ export class InspirationComponent implements OnInit {
         
         plane.visibility = 1;        
         this.arSphere.scene.beginAnimation(plane, 0, 30, false);
-
+        this.usedSceneObjects.push(plane, imageTexture, button);
       });
 
       p += step;
@@ -413,7 +436,7 @@ export class InspirationComponent implements OnInit {
     let img = this.selectedImage.photo as IGeoImage;
     let origin = this.arSphere.geoLocation;
     let url = "https://www.google.com/maps/dir/?api=1" + 
-              "&origin=" + origin.lat + "," + origin.long +
+              "&origin=" + origin.lat + "," + origin.lon +
               "&destination=" + img.lat + "," + img.long;
     window.open(url, "_blank");
   }

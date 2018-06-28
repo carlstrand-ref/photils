@@ -25,7 +25,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private camera: BABYLON.FreeCamera;
   public gyro : {alpha: number, beta: number, gamma: number } = {alpha: 0, beta: 0, gamma: 0};
   private initialPosition = undefined;  
-  public geoLocation: {lat: number, long: number};
+  public geoLocation: {lat: number, lon: number};
 
   constructor(
     private window: Window
@@ -84,12 +84,13 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       }    
 
       let position = await this.getPosition();
-      this.geoLocation = {lat: position.coords.latitude, long: position.coords.longitude};
+      this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
       let pos = Utils.latLonToXYZ(position.coords.latitude, position.coords.longitude);      
       this.initialPosition = new BABYLON.Vector3(
-        pos.x / 1000.0, 
-        pos.z / 1000.0, 
-        pos.y / 1000.0
+        // pos.x / 1000.0, 
+        // pos.z / 1000.0, 
+        // pos.y / 1000.0
+        0,0,0
       );
 
       await this.checkOrientationData();
