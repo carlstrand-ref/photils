@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { Aperture } from '../utils/clamping/aperture';
+import { clampToClosestValue } from '../utils/clamping/tools';
 
 @Component({
   selector: 'app-exposure',
@@ -14,7 +15,7 @@ export class ExposureComponent implements OnInit {
   public currentEV: number = -Infinity;
   public evLocked: boolean = false;
 
-  public constructor(private location: Location) {}
+  public constructor() {}
 
   public ngOnInit() {
     // Calculate initial exposure value of default settings
@@ -50,6 +51,7 @@ export class ExposureComponent implements OnInit {
   private updateCurrentFStop() {
     // Exposure time changed, update to equivalent f-stop
     this.currentFStop = ExposureComponent.calculateFStop(this.currentEV, this.currentISO, this.currentTime);
+    this.currentFStop = clampToClosestValue(this.currentFStop, Aperture.THIRD_STEP_ROW);
   }
 
   private updateCurrentTimeValue() {
