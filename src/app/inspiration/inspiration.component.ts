@@ -206,7 +206,7 @@ export class InspirationComponent implements OnInit {
     }
   
     if(!(this.zones[z] instanceof Array))
-      this.zones[z] = []
+      this.zones[z] = [];
 
     this.zones[z].push(photo);    
   }

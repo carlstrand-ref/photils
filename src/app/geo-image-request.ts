@@ -88,9 +88,7 @@ enum flickrMethod {
     photoSearch = "flickr.photos.search"
 }; 
 
-@Injectable({
-    providedIn: 'root',
-})
+
 export class FlickrImageService extends GeoImageService {
     private baseUrl =  'https://api.flickr.com/services/rest/?method=';
     private _currentPage: number = 1;
@@ -131,8 +129,7 @@ export class FlickrImageService extends GeoImageService {
 
             this.sendRequest(flickrMethod.photoSearch, parameters)
             .then((data: any) => {     
-                console.log("p:", page);                 
-                let photos: Array<IGeoImage> = new Array();  
+                let photos: Array<IGeoImage> = [];  
                 this._numPages = Number(data.photos.pages);
                 this._total = Number(data.photos.total);
                               

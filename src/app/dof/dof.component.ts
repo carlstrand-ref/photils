@@ -14,10 +14,10 @@ export class DofComponent {
   @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
-  public selectedModels:Array<any> = new Array<any>();
+  public selectedModels:Array<any> = [];
   public models: {} = {};
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
-  public apertures = Array();  
+  public apertures = [];  
   public visualize = false;
   private utils = Utils;
   public result:DofCalculation =  new DofCalculation();
