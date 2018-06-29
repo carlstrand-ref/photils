@@ -1,6 +1,8 @@
 import * as BABYLON from 'babylonjs';
 
 export class Utils {
+    static degtorad = Math.PI / 180; // Degree-to-Radian conversion
+
     public static colorToCss(color: BABYLON.Color3) : String {    
         return 'rgb( ' + color.r * 255.0 + ', ' + color.g * 255.0 + ', ' + color.b * 255.0 +')';
     }
@@ -76,5 +78,36 @@ export class Utils {
             case 5:
                 return new BABYLON.Color3(v, p, q);
         }
+    }
+
+    // https://stackoverflow.com/a/21829819/20838
+    // http://w3c.github.io/deviceorientation/spec-source-orientation.html#worked-example
+    public static compassHeading(alpha: number, beta: number, gamma: number) : number{
+        let _x = beta  ? beta  * this.degtorad : 0; // beta value
+        let _y = gamma ? gamma * this.degtorad : 0; // gamma value
+        let _z = alpha ? alpha * this.degtorad : 0; // alpha value
+
+        let cX = Math.cos( _x );
+        let cY = Math.cos( _y );
+        let cZ = Math.cos( _z );
+        let sX = Math.sin( _x );
+        let sY = Math.sin( _y );
+        let sZ = Math.sin( _z );
+
+        // Calculate Vx and Vy components
+        let Vx = - cZ * sY - sZ * sX * cY;
+        let Vy = - sZ * sY + cZ * sX * cY;
+
+        // Calculate compass heading
+        let compassHeading = Math.atan( Vx / Vy );
+
+        // Convert compass heading to use whole unit circle
+        if( Vy < 0 ) {
+            compassHeading += Math.PI;
+        } else if( Vx < 0 ) {
+            compassHeading += 2 * Math.PI;
+        }
+
+        return compassHeading * ( 180 / Math.PI ); // Compass Heading (in degrees)
     }
 }

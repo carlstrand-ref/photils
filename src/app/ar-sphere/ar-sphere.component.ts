@@ -19,13 +19,13 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   public hasOrientationData = false;
   public hasVideo = false;
   public isMobile:boolean = false;
-  public scene;   
+  public scene: BABYLON.Scene;   
   private videoPlane;
   private videoObject; 
   private canvas;
   private engine;  
   private camera: BABYLON.FreeCamera;
-  public gyro : {alpha: number, beta: number, gamma: number } = {alpha: 0, beta: 0, gamma: 0};
+  public heading: number;
   private initialPosition = undefined;  
   public geoLocation: {lat: number, lon: number};
 
@@ -47,7 +47,9 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   }    
 
   ngOnDestroy() {
-    this.stopVideo()
+    this.stopVideo()    
+    this.scene.dispose();
+    this.engine.dispose(); 
   }
 
   public reset() {
@@ -134,10 +136,11 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     this.canvas = document.getElementById('canvas');
     this.engine = new BABYLON.Engine(this.canvas, true);
     this.scene = this.createScene();
+    
 
     this.engine.runRenderLoop(() => {
       this.scene.render();
-    });   
+    });       
 
     this.onReady.emit();
   }
@@ -149,7 +152,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     this.camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);         
     this.camera.position =  this.initialPosition;    
     this.camera.minZ = 0.4;     
-    this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.gyro.alpha, this.gyro.beta, this.gyro.gamma));
+    this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(0));
     this.camera.attachControl(this.canvas, true);   
     
 
@@ -167,16 +170,16 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     
     new BABYLON.HemisphericLight("HemisphericLight", new BABYLON.Vector3(0, 1, 0), scene);
 
-    scene.onAfterCameraRenderObservable.add(() => {      
-      this.rotateNeedle(this.gyro.alpha);
+    scene.onAfterRenderObservable.add(() => {      
+      this.rotateNeedle(this.heading);
     });
 
     return scene;
   }
 
   private rotateNeedle(deg) {
-    deg -= 45; // 45deg = reset needle to north   
-    this.needle.nativeElement.setAttribute("transform", "rotate(" + deg + " 17 16)");
+    deg += 45; // 45deg = reset needle to north   
+    this.needle.nativeElement.setAttribute("transform", "rotate(" + -deg + " 17 16)");
   }
   
   @HostListener('window:deviceorientationabsolute', ["$event"]) 
@@ -184,8 +187,11 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     // https://developers.google.com/web/updates/2016/03/device-orientation-changes
     // values explained https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained    
     if(e.absolute && e.alpha !== null) {
-      this.gyro.alpha = e.alpha;        
+      
+      let heading = e.compassHeading || e.webkitCompassHeading || Utils.compassHeading(e.alpha, e.beta, e.gamma);            
+    
       this.hasOrientationData = true;
+      this.heading = heading;
 
       if(!this.isNorthDirection && this.initialPosition !== undefined) {                                 
         this.isNorthDirection = true;                        

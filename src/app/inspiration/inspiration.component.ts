@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
-import {  Vector3, TransformNode, MeshBuilder } from 'babylonjs';
+import {  Vector3, TransformNode, MeshBuilder, FreeCamera } from 'babylonjs';
 import { AdvancedDynamicTexture } from 'babylonjs-gui';
 import {FlickrImageService, GeoImageService, GeoImage, IGeoImage} from '../geo-image-request';
 import { HttpClient } from '@angular/common/http'; 
 import { PageEvent } from '@angular/material';
+import {MatSnackBar} from '@angular/material';
+
 
 @Component({
   selector: 'app-inspiration',
@@ -93,9 +95,10 @@ export class InspirationComponent implements OnInit {
 
     v1.normalize().multiplyInPlace(new Vector3(1.3, 0, 1.3)); 
     
+    let heading = 360 - this.arSphere.heading;
 
     for(let i in this.zones) {                                
-      let deg = this.zoneRange * Number(i) + half;            
+      let deg = heading + this.zoneRange * Number(i) + half;            
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
       let pos = BABYLON.Vector3.TransformCoordinates(v1, mat);          
@@ -193,9 +196,6 @@ export class InspirationComponent implements OnInit {
       photo.lat, photo.long
     )
 
-    //console.log(photo.equirectengularCoordinates(this.radius, this.arSphere.geoLocation))
-        
-    if(angleDeg < 0) angleDeg += 360;
 
     let z = undefined;
     for(let i = 0; i < this.groupZones; i++) {      
@@ -214,14 +214,16 @@ export class InspirationComponent implements OnInit {
   private debugZones() {
     let cam = this.arSphere.scene.activeCamera;                       
     let startPoint = cam.position.clone();
-    let v1 = Vector3.Left();
+    let v1 = Vector3.Left();    
     
     startPoint.y -= 0.5;        
     v1.normalize().multiplyInPlace(new Vector3(4, 0, 4)); 
-     
 
+    let heading = 360 - this.arSphere.heading;
+    
     for(let i = 0; i < this.groupZones; i++) { 
-      let deg = i * this.zoneRange;            
+      let deg = heading + i * this.zoneRange;       
+      console.log(deg);
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
       let rv = BABYLON.Vector3.TransformCoordinates(v1, mat);      
