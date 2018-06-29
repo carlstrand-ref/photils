@@ -1,10 +1,8 @@
 language: node_js
-os: linux
 dist: trusty
 addons:
   apt:
-    - update: true
-    - packages:
+    packages:
       - ncftp
 
 node_js:
