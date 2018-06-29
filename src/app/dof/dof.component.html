@@ -8,7 +8,7 @@
 <mat-card>
   <div>
     <mat-form-field>
-      <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor()">
+      <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor($event)">
         <mat-option *ngFor="let vendor of vendors" [value]="vendor">
           {{ vendor }}
         </mat-option>
@@ -16,7 +16,7 @@
     </mat-form-field>    
 
     <mat-form-field>
-      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel()">
+      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel($event)">
         <mat-option *ngFor="let model of selectedModels" [value]="model">
           {{ model.CameraModel }}
         </mat-option>

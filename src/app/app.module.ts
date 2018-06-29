@@ -73,8 +73,8 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     HttpClientModule
   ],
   providers: [
-    {provide: Window, useValue: window }, 
-    { provide: MatPaginatorIntl, useClass: PaginationProvider}
+    //{provide: Window, useValue: window }, 
+    {provide: MatPaginatorIntl, useClass: PaginationProvider}
   ],
   bootstrap: [AppComponent]
 })

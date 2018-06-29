@@ -18,7 +18,7 @@ export class DofComponent {
   public models: {} = {};
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
   public apertures = [];  
-  private visualize = false;
+  public visualize = false;
   private utils = Utils;
   public result:DofCalculation =  new DofCalculation();
 
@@ -44,7 +44,7 @@ export class DofComponent {
   }
 
 
-  private calculateDof() {    
+  public calculateDof() {    
     let camera = this.dataModel.model;
     let sh = camera['SensorHeight(mm)'];
     let sw = camera['SensorWidth(mm)'];    

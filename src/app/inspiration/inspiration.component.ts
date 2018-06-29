@@ -14,18 +14,19 @@ import { PageEvent } from '@angular/material';
 })
 export class InspirationComponent implements OnInit {
   @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
+  public loading:boolean = false;
+  public selectedImage = null;
+  public displaySettings = false;
+  public radius = 5;
+  public paginator: {page: number, pages: number, total: number, numItemsPerPages:number };
+
   private imageServices: GeoImageService[] = []; 
-  private minDistance = 0.1; // in km
-  private loading:boolean = false;
+  private minDistance = 0.1; // in km  
   private groupZones = 8; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
   private zones = {};
-  private zoneRange: number;
-  private selectedImage = null;
-  private displaySettings = false;
-  private radius = 5;
-  private usedSceneObjects = [];
-  private paginator: {page: number, pages: number, total: number, numItemsPerPages:number };
+  private zoneRange: number;  
+  private usedSceneObjects = [];  
 
   constructor(private http: HttpClient) {
     this.zoneRange = 360 / this.groupZones;
@@ -37,7 +38,7 @@ export class InspirationComponent implements OnInit {
     
   }
 
-  private sphereReady() {
+  public sphereReady() {
     console.log("ready!");    
     this.debugZones();
     this.loadImages();    
@@ -50,7 +51,7 @@ export class InspirationComponent implements OnInit {
     }    
   }
 
-  private applyFilter() {            
+  public applyFilter() {            
     this.zones = {};
     this.clearScene();    
     this.loadImages();
@@ -443,13 +444,14 @@ export class InspirationComponent implements OnInit {
     
     this.arSphere.scene.beginAnimation(plane, 0, 60, false);
   }
-  private changePage(e:PageEvent) {
+
+  public changePage(e:PageEvent) {
     console.log("change: " , e);
     this.paginator.page = e.pageIndex + 1;
     this.applyFilter();
   }
 
-  private openRoute() {
+  public openRoute() {
     let img = this.selectedImage.photo as IGeoImage;
     let origin = this.arSphere.geoLocation;
     let url = "https://www.google.com/maps/dir/?api=1" + 
@@ -458,7 +460,7 @@ export class InspirationComponent implements OnInit {
     window.open(url, "_blank");
   }
 
-  private openWebsite() {
+  public openWebsite() {
     let img = this.selectedImage.photo as IGeoImage;
     window.open(img.detailsUrl, "_blank");
   }

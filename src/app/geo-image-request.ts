@@ -81,7 +81,7 @@ export abstract class GeoImageService {
     abstract getNumPages(): number;
     abstract getTotal(): number;
     abstract getItemsPerPage(): number;
-    abstract async getImages(lat: number, long: number, radius: number, page?:number, units?:number) : Promise<IGeoImage[]>;    
+    abstract async getImages(lat: number, long: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>>;    
 }
 
 enum flickrMethod {
@@ -118,18 +118,21 @@ export class FlickrImageService extends GeoImageService {
 
 
 
-    public async getImages(lat: number, lon: number, radius: number, page?:number, units?:number) : Promise<IGeoImage[]> {        
+    public async getImages(lat: number, lon: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>> {        
         this._currentPage = page === undefined ? this._currentPage : page;   
-
-        return new Promise<IGeoImage[]>((resolve, reject) => {            
+        let minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 3);
+        
+        return new Promise<Array<IGeoImage>>((resolve, reject) => {            
             let parameters = 'lat='+lat+'&lon='+lon + "&radius="+ radius +
+                             '&min_taken_date=' + minDate.getTime() / 1000  +
                              '&extras=geo,url_t,url_z,views,path_alias' + 
                              '&page='+this._currentPage;
 
             this.sendRequest(flickrMethod.photoSearch, parameters)
             .then((data: any) => {     
                 console.log("p:", page);                 
-                let photos: GeoImage[] = [];  
+                let photos: Array<IGeoImage> = new Array();  
                 this._numPages = Number(data.photos.pages);
                 this._total = Number(data.photos.total);
                               

@@ -7,7 +7,7 @@ import { isDevMode } from '@angular/core';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit {
-  private isDevMode: boolean = isDevMode()
+  public isDevMode: boolean = isDevMode()
   constructor() { }
 
   ngOnInit() {
