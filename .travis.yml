@@ -15,7 +15,6 @@ script: # the build step
   - ng build --prod
 
 after_success:
-  dist/photils/
   - if [[ $TRAVIS_BRANCH == 'master' ]]; then
       cd 'dist/photils'
       ncftpput -R -v -u "$USERNAME" -p "$PASSWORD" "$HOST" /development .
