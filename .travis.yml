@@ -17,6 +17,13 @@ script: # the build step
   - npm install
   - ng build --prod
 
+after_success:
+  dist/photils/
+  - if [[ $TRAVIS_BRANCH == 'master' ]]; then
+      cd 'dist/photils'
+      ncftpput -R -v -u "$USERNAME" -p "$PASSWORD" "$HOST" /development .
+    fi
+
 notifications:
   email: # only receive email when the build status changes (someone broke the build!) 
     on_failure: change
