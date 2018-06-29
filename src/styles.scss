@@ -28,8 +28,7 @@ html, body {
 
 
 #canvas {
-    width: 100%;
-    height: calc(100vh - 56px);
+    width: 100%;    
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -38,4 +37,12 @@ html, body {
     user-select: none;
     outline: none;
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
+
+    @media screen and (max-width: 599px) {
+        height: calc(100vh - 64px);    
+    }
+
+    @media screen and (min-width: 600px) {
+        height: calc(100vh - 64px);
+    }
 }

@@ -187,4 +187,11 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     return false;
   }
+
+  @HostListener('window:resize')
+  handleResize() {
+    this.engine.resize();
+
+    return false;
+  }
 }
