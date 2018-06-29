@@ -1,3 +1,4 @@
+@import "../../themes";
 .container {
     position: relative;
 
@@ -8,6 +9,12 @@
         margin-left: -75px;
         margin-top: -75px;
     }
+}
+
+.mat-snack-bar-container {
+    &.error {
+        background-color: mat-color($dark-warn, 900) !important;
+    }    
 }
 
 .ui {

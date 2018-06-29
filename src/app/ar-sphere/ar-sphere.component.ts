@@ -25,7 +25,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private canvas;
   private engine;  
   private camera: BABYLON.FreeCamera;
-  public heading: number;
+  public heading: number = 0;
   private initialPosition = undefined;  
   public geoLocation: {lat: number, lon: number};
 
@@ -61,10 +61,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   }
 
   private async initSensors() {
-    try {      
-      if (!('ondeviceorientationabsolute' in window))
-        throw Error('The deviceorientationabsolute Event is not supported but requried');      
-
+    try {           
       let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: this.isMobile ? 'environment' : 'user' } };  
       this.videoObject = document.createElement('video');      
       this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraints);    
@@ -73,16 +70,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         this.hasVideo = true;
         this.videoObject.play();
         let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
-
-        // let verticalHalf = 0.5;
-        // let horizontalHalf = 0.5;
-
-        // let canvasAspect = (Math.max(this.canvas.width, this.canvas.height) / Math.min(this.canvas.width, this.canvas.height))
-        // if(this.canvas.width > this.canvas.height) {          
-        //   horizontalHalf = canvasAspect / 2.0;
-        // } else {          
-        //   verticalHalf = canvasAspect / 2.0;          
-        // }
       }    
 
       let position = await this.getPosition();
@@ -107,8 +94,9 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     return new Promise((resolve, reject) => {
       setTimeout(()=> {        
         try {
-          // if(!this.hasOrientationData)
-          //   throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
+          if(!this.hasOrientationData && this.isMobile)
+            throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
+
           resolve();
           this.initEngine(); 
         } catch (e) {          
@@ -117,6 +105,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       }, this.deviceOrientationDataTimeout);
     });
   }
+  
 
   private stopVideo() {
     if(this.hasVideo) {
@@ -170,10 +159,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     
     new BABYLON.HemisphericLight("HemisphericLight", new BABYLON.Vector3(0, 1, 0), scene);
 
-    scene.onAfterRenderObservable.add(() => {      
-      this.rotateNeedle(this.heading);
-    });
-
     return scene;
   }
 
@@ -182,20 +167,21 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     this.needle.nativeElement.setAttribute("transform", "rotate(" + -deg + " 17 16)");
   }
   
+  @HostListener('window:deviceorientation', ["$event"]) 
   @HostListener('window:deviceorientationabsolute', ["$event"]) 
   handleOrientation(e) {          
     // https://developers.google.com/web/updates/2016/03/device-orientation-changes
     // values explained https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained    
-    if(e.absolute && e.alpha !== null) {
+    if((e.compassHeading || e.webkitCompassHeading || e.absolute) && e.alpha !== null) {
       
-      let heading = e.compassHeading || e.webkitCompassHeading || Utils.compassHeading(e.alpha, e.beta, e.gamma);            
-    
-      this.hasOrientationData = true;
-      this.heading = heading;
+      let heading = e.compassHeading || e.webkitCompassHeading || Utils.compassHeading(e.alpha, e.beta, e.gamma);                  
+      this.hasOrientationData = true;      
+
+      this.rotateNeedle(heading);
 
       if(!this.isNorthDirection && this.initialPosition !== undefined) {                                 
         this.isNorthDirection = true;                        
-                       
+        this.heading = heading;
       }
     }
 

@@ -20,7 +20,8 @@ import {
   MatSlideToggleModule,  
   MatProgressSpinnerModule,
   MatPaginatorModule,
-  MatPaginatorIntl
+  MatPaginatorIntl,  
+  MatSnackBarModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -63,6 +64,7 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     MatCardModule,
     MatSelectModule,
     MatSliderModule,
+    MatSnackBarModule,
     MatInputModule,
     MatFormFieldModule,
     MatPaginatorModule,

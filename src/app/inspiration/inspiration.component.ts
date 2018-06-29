@@ -24,13 +24,13 @@ export class InspirationComponent implements OnInit {
 
   private imageServices: Array<GeoImageService> = []; 
   private minDistance = 0.1; // in km  
-  private groupZones = 8; // device unit circel in N peaces to group images in zones
+  private groupZones = 12; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
   private zones = {};
   private zoneRange: number;  
   private usedSceneObjects = [];  
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, public snackBar: MatSnackBar) {
     this.zoneRange = 360 / this.groupZones;
     let s = new FlickrImageService('686d968ee5fac542bb420630b04d9b87', http);    
     this.imageServices.push(s);
@@ -41,8 +41,7 @@ export class InspirationComponent implements OnInit {
   }
 
   public sphereReady() {
-    console.log("ready!");    
-    this.debugZones();
+    console.log("ready!");        
     this.loadImages();    
   }
 
@@ -64,9 +63,19 @@ export class InspirationComponent implements OnInit {
     let page = this.paginator === undefined ? 1 : this.paginator.page;
     this.loading = true;
     let photos: Array<IGeoImage> = [];
-    for(let service of this.imageServices) {      
-      let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius, page);      
-      photos = [...photos, ...p];
+    let error:Error = undefined;
+    for(let service of this.imageServices) { 
+      try {             
+        let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius, page);      
+        photos = [...photos, ...p];
+      } catch(e) { error = e };
+    }
+
+    // if we have images and an error ignore it otherwise not
+    if(photos.length === 0 && error) {
+      this.snackBar.open("We got an error: " + error.message, 'Damn!', {
+        duration: 10000, panelClass: 'error'
+      });
     }
 
     for(let photo of photos) {      
@@ -83,7 +92,9 @@ export class InspirationComponent implements OnInit {
       total: s.getTotal(),
       numItemsPerPages: s.getItemsPerPage()
     }
-    console.log(this.paginator);
+
+    this.debugZones();
+
     this.loading = false;
   }
 
@@ -236,7 +247,7 @@ export class InspirationComponent implements OnInit {
         colors: [c, c]        
       };      
       let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
-      //this.usedSceneObjects.push(line);
+      this.usedSceneObjects.push(line);
     }    
   }
 
