@@ -16,8 +16,8 @@ script: # the build step
 
 after_success:
   - if [[ $TRAVIS_BRANCH == 'master' ]]; then
-      cd 'dist/photils'
-      ncftpput -R -v -u "$USERNAME" -p "$PASSWORD" "$HOST" /development .
+      cd 'dist/photils';
+      ncftpput -R -v -u "$USERNAME" -p "$PASSWORD" "$HOST" /development . ;
     fi
 
 notifications:
