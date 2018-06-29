@@ -29,6 +29,7 @@ import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.comp
 import { ArSphereComponent } from './ar-sphere/ar-sphere.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
 import { HttpClientModule } from '@angular/common/http';
+import { SunComponent } from './sun/sun.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { HttpClientModule } from '@angular/common/http';
     MainComponent,
     DofVisualizerComponent,
     ArSphereComponent,
-    InspirationComponent
+    InspirationComponent,
+    SunComponent
   ],
   imports: [          
     BrowserAnimationsModule,  
