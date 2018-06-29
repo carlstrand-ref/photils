@@ -15,6 +15,7 @@ script: # the build step
   - ng build
 
 after_success:
+  # upload master build to http://photils.app/development for user testing
   - [ $TRAVIS_BRANCH == 'master' ] && ncftpput -R -v -u "$user" -p "$pass" "$host" /development . dist/photils/*    
 
 notifications:
