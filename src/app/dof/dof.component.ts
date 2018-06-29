@@ -17,7 +17,7 @@ export class DofComponent {
   public selectedModels:Array<any> = new Array<any>();
   public models: {} = {};
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
-  public apertures = [];  
+  public apertures = Array();  
   public visualize = false;
   private utils = Utils;
   public result:DofCalculation =  new DofCalculation();

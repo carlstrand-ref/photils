@@ -20,7 +20,7 @@ export class InspirationComponent implements OnInit {
   public radius = 5;
   public paginator: {page: number, pages: number, total: number, numItemsPerPages:number };
 
-  private imageServices: GeoImageService[] = []; 
+  private imageServices: Array<GeoImageService> = []; 
   private minDistance = 0.1; // in km  
   private groupZones = 8; // device unit circel in N peaces to group images in zones
   private maxImagesPerGroupd = 20; // it's not an image gallery app so limit the number of groups
@@ -61,7 +61,7 @@ export class InspirationComponent implements OnInit {
   private async loadImages() {
     let page = this.paginator === undefined ? 1 : this.paginator.page;
     this.loading = true;
-    let photos: IGeoImage[] = [];
+    let photos: Array<IGeoImage> = [];
     for(let service of this.imageServices) {      
       let p = await service.getImages(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon, this.radius, page);      
       photos = [...photos, ...p];
