@@ -33,7 +33,7 @@
     </mat-form-field>
 
     <mat-form-field>
-        <input matInput type="number" placeholder="Focal legnth " [(ngModel)]="dataModel.focalLength" 
+        <input matInput type="number" placeholder="Focal length " [(ngModel)]="dataModel.focalLength" 
         (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
         <span matSuffix>mm</span>          
     </mat-form-field>
