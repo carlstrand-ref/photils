@@ -2,6 +2,8 @@ import { Component, ElementRef, EventEmitter, OnInit, OnDestroy, HostListener, O
 import { Utils } from '../utils';
 import { CustomFreeCameraDeviceOrientationInput } from './freeCameraDeviceOrientationInputCustom';
 
+declare const window: any;
+
 @Component({
   selector: 'app-ar-sphere',
   templateUrl: './ar-sphere.component.html',
@@ -27,9 +29,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private initialPosition = undefined;  
   public geoLocation: {lat: number, lon: number};
 
-  constructor(
-    private window: Window
-  ) {
+  constructor() {
     this.isMobile = navigator.userAgent.indexOf("Mobile") !== -1;
   }
 
@@ -60,7 +60,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   private async initSensors() {
     try {      
-      if (!('ondeviceorientationabsolute' in this.window))
+      if (!('ondeviceorientationabsolute' in window))
         throw Error('The deviceorientationabsolute Event is not supported but requried');      
 
       let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: this.isMobile ? 'environment' : 'user' } };  
