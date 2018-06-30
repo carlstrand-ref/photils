@@ -1,3 +1,4 @@
+@import "../../themes";
 .app-menu {
     padding: 20px;
 }
@@ -19,4 +20,14 @@
 .mat-card .mat-icon {
     width: 100%;
     font-size: 5em;    
+}
+
+.warning{
+    background-color: mat-color($dark-warn, 500);
+    position: absolute;
+    bottom: 0px;
+    padding: 10px;
+    opacity: 0.8;
+    width: calc(100% - 20px);
+    text-align: center;
 }

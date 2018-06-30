@@ -4,6 +4,14 @@ canvas {
     width: 100%;
 }
 
+#fpsCounter {
+    position: absolute;
+    z-index: 10;
+    left: 5px;
+    bottom: 5px;
+    font-weight: bold;
+}
+
 .wrapper {
     position: relative;    
 }

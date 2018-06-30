@@ -15,9 +15,9 @@ export class CustomFreeCameraDeviceOrientationInput implements BABYLON.ICameraIn
     private _initial_gamma: number = 0;
 
     constructor(alpha?: number, beta?: number, gamma?: number) {
-        this._initial_alpha = alpha;
-        this._initial_beta = beta;
-        this._initial_gamma = gamma;
+        this._initial_alpha = alpha ? alpha : 0;
+        this._initial_beta = beta ? beta : 0;
+        this._initial_gamma = gamma ? gamma : 0;
 
         this._constantTranform = new BABYLON.Quaternion(- Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
         this._orientationChanged();

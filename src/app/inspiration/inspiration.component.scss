@@ -1,15 +1,82 @@
+@import "../../themes";
 .container {
     position: relative;
+
+    .mat-progress-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-left: -75px;
+        margin-top: -75px;
+    }
+}
+
+.mat-snack-bar-container {
+    &.error {
+        background-color: mat-color($dark-warn, 900) !important;
+    }    
 }
 
 .ui {
+    position: absolute;    
+    background: rgba(0, 0, 0, 0.8);   
+    color: mat-color($dark-primary, 500);
+
+    &.controls {
+        top: 0;
+        left: 50%;
+        width: 90%;
+        max-width: 500px;
+        min-height: 40px;
+        padding: 4px;
+        text-align: center;
+        -webkit-transform: translateX(-50%);
+        transform: translateX(-50%);    
+
+        dl {
+            font-size: 10pt;
+            display: flex;
+            flex-wrap: wrap;
+            text-align: left;            
+        }
+        dt {
+            width: 20%;
+        }
+        dd {
+            margin-left: auto;
+            width: 80%;
+        }
+    }
+
+    &.mat-paginator {
+        width: 100%;
+        bottom: 0px;
+        left: 0px;
+        top: auto;
+        margin: 0 auto;        
+    }
+}
+
+.settings.sidebar {
     position: absolute;
+    display: none;
     top: 0px;
-    width: 250px;
-    height: 40px;
-    padding: 10px;
-    text-align: center;
+    right: 0px;
+    width: 0px;
+    height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    margin-left: -125px;
-    left: 50%;
+    -webkit-transition: width 0.5s; /* Safari */
+    transition: width 0.5s;    
+
+    &.opened {
+        display: block;
+        padding: 10px;
+        width: 80px;     
+        text-align: center;   
+    }
+
+    .mat-raised-button {
+        max-width: 70px;
+        min-width: 50px;
+    }
 }

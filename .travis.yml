@@ -1,0 +1,24 @@
+language: node_js
+dist: trusty
+addons:
+  apt:
+    packages:
+      - ncftp
+
+node_js:
+  - node # will use latest node
+before_script: # commands to run before the build step
+  - npm install -g --silent @angular/cli
+
+script: # the build step
+  - npm install
+  - ng build --prod
+
+after_success:
+  # upload master build to http://photils.app/development for user testing
+  - if [ $TRAVIS_BRANCH == 'master' ]; then ncftpput -R -v -u $user -p $pass $host /development dist/photils/*; fi
+
+notifications:
+  email: # only receive email when the build status changes (someone broke the build!) 
+    on_failure: change
+    on_success: change   

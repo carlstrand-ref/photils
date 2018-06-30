@@ -1,18 +1,56 @@
 <mat-toolbar color="primary">    
     <button mat-icon-button routerLink="/">
-        <mat-icon aria-label="Example icon-button with a heart icon">chevron_left</mat-icon>
+        <mat-icon aria-label="icon-button with a back icon">chevron_left</mat-icon>
     </button>
-    <span>AR Inspiration</span>    
+    <span>AR Inspiration</span> 
+    <span class="spacer"></span>
+    <button mat-icon-button
+        class="gui settings button" (click)="displaySettings = !displaySettings">
+        <mat-icon aria-label="icon-button with a settings icon">settings</mat-icon>
+    </button>    
 </mat-toolbar>
 
 <div class="container">
-    <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>    
-    <div *ngIf="selectedImage !== null" class="ui">
-        <button mat-button color="primary" (click)="openRoute()">Route
-            <mat-icon aria-label="Example icon-button with a heart icon">directions</mat-icon>
-        </button>
-        <button mat-button color="primary" (click)="openWebsite()">Vist Website
-            <mat-icon aria-label="Example icon-button with a heart icon">link</mat-icon>
+    <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>        
+    <mat-progress-spinner mode="indeterminate" color="warn" *ngIf="loading"></mat-progress-spinner>
+    <div *ngIf="selectedImage !== null" class="ui controls">
+        <dl class="infos">
+            <dt>Title: </dt> <dd>{{this.selectedImage.photo.title}}</dd>
+            <dt>Beeline: </dt> <dd>{{this.selectedImage.photo.distance.toFixed(2)}} km</dd>            
+        </dl>
+        <mat-divider></mat-divider>
+        <div class="buttonbar">
+            <button mat-button color="primary" (click)="openRoute()">Route
+                <mat-icon aria-label="icon-button with a directions icon">directions</mat-icon>
+            </button>
+            <button mat-button color="primary" (click)="openWebsite()">Vist Website
+                <mat-icon aria-label="icon-button with a link icon">link</mat-icon>
+            </button>
+        </div>
+    </div>
+    <div class="settings sidebar" [ngClass]="{'opened': displaySettings}">
+        Radius
+        <mat-slider      
+            [(ngModel)]="radius"                  
+            max="30"
+            min="1"
+            step="1"
+            thumbLabel        
+            tickInterval="5"  
+            vertical>
+        </mat-slider>
+        <button mat-raised-button color="primary"
+        (click)="applyFilter()">
+            {{radius}} km <br />
+            <mat-icon>done</mat-icon>
         </button>
     </div>
+
+    <mat-paginator *ngIf="paginator" class="ui" 
+        hidePageSize
+        [length]="paginator.total"
+        [pageIndex] = "paginator.page - 1"
+        [pageSize]="paginator.numItemsPerPages"        
+        (page)="changePage($event)">
+    </mat-paginator>
 </div>
