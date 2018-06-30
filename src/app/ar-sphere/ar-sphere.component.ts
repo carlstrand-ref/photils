@@ -1,6 +1,8 @@
 import { Component, ElementRef, EventEmitter, OnInit, OnDestroy, HostListener, Output, ViewChild} from '@angular/core';
 import { Utils } from '../utils';
 import { CustomFreeCameraDeviceOrientationInput } from './freeCameraDeviceOrientationInputCustom';
+import { Engine } from 'babylonjs';
+import { AbsoluteDeviceOrientationService, AbsoluteDeviceOrientationResult } from '../absolute-device-orientation.service'
 
 declare const window: any;
 
@@ -12,6 +14,7 @@ declare const window: any;
 export class ArSphereComponent implements OnInit , OnDestroy {
   @Output() onReady: EventEmitter<any> = new EventEmitter();
   @ViewChild('needle') needle: ElementRef;
+  @ViewChild("fpsCounter") fpsCounter: ElementRef;
   
   private deviceOrientationDataTimeout:number = 2000;
   public error:string = undefined;  
@@ -23,14 +26,15 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private videoPlane;
   private videoObject; 
   private canvas;
-  private engine;  
+  private engine:BABYLON.Engine;  
   private camera: BABYLON.FreeCamera;
   public heading: number = 0;
   private initialPosition = undefined;  
   public geoLocation: {lat: number, lon: number};
+  public showFps: boolean = true;
 
-  constructor() {
-    this.isMobile = navigator.userAgent.indexOf("Mobile") !== -1;
+  constructor(public deviceOrientation: AbsoluteDeviceOrientationService) {
+    this.isMobile = Utils.isMobile;
   }
 
   ngOnInit() {    
@@ -69,43 +73,32 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.videoObject.onloadedmetadata = () => {
         this.hasVideo = true;
         this.videoObject.play();
-        let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
+        //let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
       }    
 
       let position = await this.getPosition();
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
-      let pos = Utils.latLonToXYZ(position.coords.latitude, position.coords.longitude);      
-      this.initialPosition = new BABYLON.Vector3(
-        // pos.x / 1000.0, 
-        // pos.z / 1000.0, 
-        // pos.y / 1000.0
-        0,0,0
-      );
+      this.initialPosition = new BABYLON.Vector3( 0,0,0 );
+            
+      let result = await this.deviceOrientation.deviceOrientationReady.toPromise();
+      this.deviceOrientation.deviceOrientationChanged.subscribe((e:AbsoluteDeviceOrientationResult) => {
+        this.rotateNeedle(e.alpha);
+      });
+      
+      this.initEngine(); 
 
-      await this.checkOrientationData();
-
-    } catch(ex) {      
-      this.error = ex.name + ": " + ex.message;
-      this.stopVideo();
+    } catch(ex) {   
+      if(Utils.isMobile) {   
+        this.error = ex.name + ": " + ex.message;
+        this.stopVideo();
+      } else {
+        // ugly but for testing issues
+        // if we have desktop without sensor
+        // still init engine 
+        this.initEngine();
+      }
     }
   }
-
-  private async checkOrientationData() : Promise<any> {
-    return new Promise((resolve, reject) => {
-      setTimeout(()=> {        
-        try {
-          if(!this.hasOrientationData && this.isMobile)
-            throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
-
-          resolve();
-          this.initEngine(); 
-        } catch (e) {          
-          reject(e)
-        }
-      }, this.deviceOrientationDataTimeout);
-    });
-  }
-  
 
   private stopVideo() {
     if(this.hasVideo) {
@@ -123,12 +116,13 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   private initEngine() {
     this.canvas = document.getElementById('canvas');
-    this.engine = new BABYLON.Engine(this.canvas, true);
+    this.engine = new BABYLON.Engine(this.canvas, true, {doNotHandleContextLost: true});
     this.scene = this.createScene();
     
 
     this.engine.runRenderLoop(() => {
       this.scene.render();
+      this.fpsCounter.nativeElement.innerHTML = this.engine.getFps().toFixed(0) + " FPS";
     });       
 
     this.onReady.emit();
@@ -146,7 +140,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     
 
     // remove unused inputs for mobile
-    if(this.isMobile) {
+    if(Utils.isMobile) {
       this.camera.inputs.removeByType("FreeCameraTouchInput");
       this.camera.inputs.removeByType("FreeCameraKeyboardMoveInput");
       this.camera.inputs.removeByType("FreeCameraMouseInput");
@@ -165,27 +159,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   private rotateNeedle(deg) {
     deg += 45; // 45deg = reset needle to north   
     this.needle.nativeElement.setAttribute("transform", "rotate(" + -deg + " 17 16)");
-  }
-  
-  @HostListener('window:deviceorientation', ["$event"]) 
-  @HostListener('window:deviceorientationabsolute', ["$event"]) 
-  handleOrientation(e) {          
-    // https://developers.google.com/web/updates/2016/03/device-orientation-changes
-    // values explained https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained    
-    if((e.compassHeading || e.webkitCompassHeading || e.absolute) && e.alpha !== null) {
-      
-      let heading = e.compassHeading || e.webkitCompassHeading || Utils.compassHeading(e.alpha, e.beta, e.gamma);                  
-      this.hasOrientationData = true;      
-
-      this.rotateNeedle(heading);
-
-      if(!this.isNorthDirection && this.initialPosition !== undefined) {                                 
-        this.isNorthDirection = true;                        
-        this.heading = heading;
-      }
-    }
-
-    return false;
   }
 
   @HostListener('window:resize')

@@ -19,16 +19,33 @@
 
 .ui {
     position: absolute;    
-    background: rgba(0, 0, 0, 0.8);    
+    background: rgba(0, 0, 0, 0.8);   
+    color: mat-color($dark-primary, 500);
 
     &.controls {
-        top: 0px;
-        width: 250px;
-        height: 40px;
-        padding: 10px;
-        text-align: center;
-        margin-left: -125px;
+        top: 0;
         left: 50%;
+        width: 90%;
+        max-width: 500px;
+        min-height: 40px;
+        padding: 4px;
+        text-align: center;
+        -webkit-transform: translateX(-50%);
+        transform: translateX(-50%);    
+
+        dl {
+            font-size: 10pt;
+            display: flex;
+            flex-wrap: wrap;
+            text-align: left;            
+        }
+        dt {
+            width: 20%;
+        }
+        dd {
+            margin-left: auto;
+            width: 80%;
+        }
     }
 
     &.mat-paginator {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, isDevMode } from '@angular/core';
 import { Utils } from '../utils';
 import { ArSphereComponent } from '../ar-sphere/ar-sphere.component';
 import {  Vector3, TransformNode, MeshBuilder, FreeCamera } from 'babylonjs';
@@ -15,7 +15,7 @@ import {MatSnackBar} from '@angular/material';
   styleUrls: ['./inspiration.component.scss']
 })
 export class InspirationComponent implements OnInit {
-  @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;
+  @ViewChild(ArSphereComponent) arSphere: ArSphereComponent;  
   public loading:boolean = false;
   public selectedImage = null;
   public displaySettings = false;
@@ -29,6 +29,8 @@ export class InspirationComponent implements OnInit {
   private zones = {};
   private zoneRange: number;  
   private usedSceneObjects = [];  
+  private groupPlane:BABYLON.Mesh;
+  private imagePlane:BABYLON.Mesh;
 
   constructor(private http: HttpClient, public snackBar: MatSnackBar) {
     this.zoneRange = 360 / this.groupZones;
@@ -41,7 +43,9 @@ export class InspirationComponent implements OnInit {
   }
 
   public sphereReady() {
-    console.log("ready!");        
+    console.log("ready!");    
+    this.groupPlane = BABYLON.MeshBuilder.CreatePlane("zone", {width: 0.2, height: 0.2}, this.arSphere.scene);
+    this.imagePlane = BABYLON.MeshBuilder.CreatePlane("image_zone_", {width: 0.1, height: 0.1}, this.arSphere.scene);            
     this.loadImages();    
   }
 
@@ -50,6 +54,7 @@ export class InspirationComponent implements OnInit {
     for(let o of this.usedSceneObjects) {
       o.dispose();
     }    
+    
   }
 
   public applyFilter() {            
@@ -108,16 +113,18 @@ export class InspirationComponent implements OnInit {
     
     let heading = 360 - this.arSphere.heading;
 
+    
+
     for(let i in this.zones) {                                
       let deg = heading + this.zoneRange * Number(i) + half;            
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
       let pos = BABYLON.Vector3.TransformCoordinates(v1, mat);          
       pos = startPoint.add(pos);
-      
+    
       //let pos = BABYLON.Vector3.TransformCoordinates(v2, mat).add(v1);                        
-
-      let plane:BABYLON.Mesh = BABYLON.MeshBuilder.CreatePlane("zone_"+i, {width: 0.2, height: 0.2}, this.arSphere.scene);                  
+      let plane = this.groupPlane.clone("zone_"+i);
+      
       plane.position = pos;            
       plane.lookAt(cam.position);                     
 
@@ -233,8 +240,7 @@ export class InspirationComponent implements OnInit {
     let heading = 360 - this.arSphere.heading;
     
     for(let i = 0; i < this.groupZones; i++) { 
-      let deg = heading + i * this.zoneRange;       
-      console.log(deg);
+      let deg = heading + i * this.zoneRange;             
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);  
       let rv = BABYLON.Vector3.TransformCoordinates(v1, mat);      
@@ -271,7 +277,7 @@ export class InspirationComponent implements OnInit {
       let x = r * Math.sin(p);
       let y = r * Math.cos(p);
 
-      let plane = BABYLON.MeshBuilder.CreatePlane("image_zone_"+zone+"_"+photo.id, {width: 0.1, height: 0.1}, this.arSphere.scene);            
+      let plane = this.imagePlane.clone("image_plane"+zone+"_"+photo.id);
       plane.parent = node;      
       plane.position = new BABYLON.Vector3(0, 0, 0);  
       plane.visibility = 0;

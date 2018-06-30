@@ -1,16 +1,19 @@
 import * as BABYLON from 'babylonjs';
 
+declare const window: any;
+
 export class Utils {
     static degtorad = Math.PI / 180; // Degree-to-Radian conversion
-
+    static isMobile = navigator.userAgent.indexOf("Mobile") !== -1;
+    
     public static colorToCss(color: BABYLON.Color3) : String {    
         return 'rgb( ' + color.r * 255.0 + ', ' + color.g * 255.0 + ', ' + color.b * 255.0 +')';
     }
 
     public static latLonToXYZ(lat, lon) : BABYLON.Vector3 {        
-        const r = 6378137; // meter                    
-        lat = lat * Math.PI / 180.0;
-        lon = lon * Math.PI / 180.0;
+        const r = 6371; // km                    
+        lat = lat * this.degtorad;
+        lon = lon * this.degtorad;
         
         let x = r * Math.cos(lat) * Math.cos(lon);
         let y = r * Math.cos(lat) * Math.sin(lon);
@@ -31,6 +34,17 @@ export class Utils {
 
         return brng
     }
+
+    // https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula?answertab=votes#tab-top
+    public static getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+        let p = this.degtorad;    // Math.PI / 180
+        let c = Math.cos;
+        let a = 0.5 - c((lat2 - lat1) * p)/2 + 
+                c(lat1 * p) * c(lat2 * p) * 
+                (1 - c((lon2 - lon1) * p))/2;
+
+        return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+      }
 
     public static angleBetweenVector3(v1:BABYLON.Vector3, v2:BABYLON.Vector3) {
         let dot = BABYLON.Vector3.Dot(v1, v2);    
@@ -110,4 +124,25 @@ export class Utils {
 
         return compassHeading * ( 180 / Math.PI ); // Compass Heading (in degrees)
     }
+
+    // https://gist.github.com/mikaelbr/0fed772d49fe655186a4e6ef4b270481
+    public static getKeyFromUserAgent(ua?) {
+        let userAgent = ua || window.navigator.userAgent;
+        // IOS uses a special property
+        if (userAgent.match(/(iPad|iPhone|iPod)/i)) {
+          return 'ios';
+        } else if (userAgent.match(/Firefox/i)) {
+          return 'firefox';
+        } else if (userAgent.match(/Opera/i)) {
+          return 'opera';
+        } else if (userAgent.match(/Android/i)) {
+          if (window.chrome) {
+            return 'android_chrome';
+          } else {
+            return 'android_stock';
+          }
+        } else {
+          return 'unknown';
+        }
+    }2
 }

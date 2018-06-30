@@ -15,12 +15,14 @@ export interface IGeoImage {
     views: number,    
     thumbnail:Observable<{width: number, height:number}>,
     image:Observable<{width: number, height:number}>
+    distance?:number
     //position: Vector3;
     equirectengularCoordinates(radius: number, origin:{lat: number, lon:number}):Vector2;
 }
 
 export class GeoImage implements IGeoImage {
     public position: Vector3;
+    public distance?: number;
     private cache:any = {};
 
     constructor (public id:number, public title: string, public thumbnailUrl: string, 
@@ -28,7 +30,7 @@ export class GeoImage implements IGeoImage {
         public views: number, private http: HttpClient) {
             //let pos = Utils.latLonToXYZ(lat, long);            
             //pos.divideInPlace(new Vector3(1000.0, 1000.0, 1000.0));
-            //this.position = new Vector3(pos.x, pos.z, pos.y);
+            //this.position = new Vector3(pos.x, pos.z, pos.y);            
         };
 
     thumbnail = new Observable<{objUrl:string, width: number, height:number}>( observer => {        
@@ -145,7 +147,12 @@ export class FlickrImageService extends GeoImageService {
                         photo.id,
                         photo.title, photo.url_t, photo.url_z, details,
                         Number(photo.latitude), Number(photo.longitude),
-                        Number(photo.views), this.http )
+                        Number(photo.views), this.http );
+                    
+                    geoImage.distance = Utils.getDistanceFromLatLon(
+                        lat, lon, photo.latitude, photo.longitude
+                    );
+                        
 
                     photos.push(geoImage);
                 }

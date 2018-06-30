@@ -14,12 +14,19 @@
     <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>        
     <mat-progress-spinner mode="indeterminate" color="warn" *ngIf="loading"></mat-progress-spinner>
     <div *ngIf="selectedImage !== null" class="ui controls">
-        <button mat-button color="primary" (click)="openRoute()">Route
-            <mat-icon aria-label="icon-button with a directions icon">directions</mat-icon>
-        </button>
-        <button mat-button color="primary" (click)="openWebsite()">Vist Website
-            <mat-icon aria-label="icon-button with a link icon">link</mat-icon>
-        </button>
+        <dl class="infos">
+            <dt>Title: </dt> <dd>{{this.selectedImage.photo.title}}</dd>
+            <dt>Beeline: </dt> <dd>{{this.selectedImage.photo.distance.toFixed(2)}} km</dd>            
+        </dl>
+        <mat-divider></mat-divider>
+        <div class="buttonbar">
+            <button mat-button color="primary" (click)="openRoute()">Route
+                <mat-icon aria-label="icon-button with a directions icon">directions</mat-icon>
+            </button>
+            <button mat-button color="primary" (click)="openWebsite()">Vist Website
+                <mat-icon aria-label="icon-button with a link icon">link</mat-icon>
+            </button>
+        </div>
     </div>
     <div class="settings sidebar" [ngClass]="{'opened': displaySettings}">
         Radius
