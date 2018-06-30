@@ -2,8 +2,8 @@ import * as Leaflet from 'leaflet';
 
 export class OSMProvider { 
   public static DEFAULT_LAT_LNG: Array<number> = [52.5200, 13.4050];
-  public static OTS_TILE_API: string = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  private static OTS_API_KEY: string = null;
+  public static OSM_TILE_API: string = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  private static OSM_API_KEY: string = null;
 
   public map: Leaflet.Map;
   public readonly enableHighAccuracy: boolean;
@@ -58,7 +58,7 @@ export class OSMProvider {
 
   private loadMapTiles() {
     // Fetch map data from API
-    Leaflet.tileLayer(OSMProvider.OTS_TILE_API, {
+    Leaflet.tileLayer(OSMProvider.OSM_TILE_API, {
       attribution: 'Map data provided by OpenStreetMap'
     }).addTo(this.map);
   }
