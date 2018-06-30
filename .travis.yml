@@ -16,7 +16,12 @@ script: # the build step
 
 after_success:
   # upload master build to http://photils.app/development for user testing
-  - if [ $TRAVIS_BRANCH == 'master' ]; then ncftpput -R -v -u $user -p $pass $host /development dist/photils/*; fi
+  - if [ $TRAVIS_BRANCH == 'master' ]; then 
+    ncftp -u $user -p $pass $host;
+    rm -rf /development/*;
+    quit;
+    ncftpput -R -v -u $user -p $pass $host /development dist/photils/*;     
+    fi
 
 notifications:
   email: # only receive email when the build status changes (someone broke the build!) 
