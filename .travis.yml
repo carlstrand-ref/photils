@@ -15,7 +15,7 @@ script: # the build step
   - ng build --prod
 
 after_success:
-  # upload master build to http://photils.app/development for user testing
+  # upload master build to http://dev.photils.app for user testing
   - chmod +x deploy.sh
   - ./deploy.sh
 

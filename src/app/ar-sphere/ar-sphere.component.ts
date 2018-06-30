@@ -91,8 +91,12 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         this.stopVideo();
       } else {
         // ugly but for testing issues
-        // if we have desktop without sensor
+        // if we have a desktop without sensors
         // still init engine 
+        console.log(ex);
+        this.orientationResult = new AbsoluteDeviceOrientationResult(
+          new DeviceOrientationEvent("")
+        );
         this.initEngine();
       }
     }
