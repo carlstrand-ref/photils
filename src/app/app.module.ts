@@ -7,20 +7,20 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatSelectModule } from '@angular/material/select';
-import { 
-  MatCardModule, 
-  MatDividerModule, 
-  MatFormFieldModule, 
-  MatInputModule, 
-  MatGridListModule, 
+import {
+  MatCardModule,
+  MatDividerModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatGridListModule,
   MatToolbarModule,
   MatIconModule,
   MatButtonModule,
   MatSliderModule,
-  MatSlideToggleModule,  
+  MatSlideToggleModule,
   MatProgressSpinnerModule,
   MatPaginatorModule,
-  MatPaginatorIntl,  
+  MatPaginatorIntl,
   MatSnackBarModule
 } from '@angular/material';
 
@@ -35,7 +35,9 @@ import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.comp
 import { ArSphereComponent } from './ar-sphere/ar-sphere.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
 import { HttpClientModule } from '@angular/common/http';
+import { SunComponent } from './sun/sun.component';
 import { PaginationProvider } from './inspiration/paginationProvider';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -44,10 +46,11 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     MainComponent,
     DofVisualizerComponent,
     ArSphereComponent,
-    InspirationComponent
+    InspirationComponent,
+    SunComponent
   ],
-  imports: [          
-    BrowserModule,    
+  imports: [
+    BrowserModule,
     BrowserAnimationsModule,
     CommonModule,
     MatSlideToggleModule,
@@ -55,7 +58,7 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     MatIconModule,
     MatToolbarModule,
     MatInputModule,
-    MatDividerModule,            
+    MatDividerModule,
     FormsModule,
     MatDividerModule,
     MatGridListModule,
@@ -69,14 +72,14 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     MatFormFieldModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    FlexLayoutModule,      
+    FlexLayoutModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
     HttpClientModule
   ],
   providers: [
     //{provide: Window, useValue: window }, 
-    {provide: MatPaginatorIntl, useClass: PaginationProvider}
+    { provide: MatPaginatorIntl, useClass: PaginationProvider }
   ],
   bootstrap: [AppComponent]
 })
