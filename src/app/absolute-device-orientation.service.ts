@@ -13,13 +13,13 @@ export class AbsoluteDeviceOrientationService {
   private deviceOrientationDataTimeout:number = 2000;
 
   private  _orientationReadyObserver:Observer<AbsoluteDeviceOrientationResult>;
-  readonly deviceOrientationReady = new Observable((observer) => {    
+  readonly deviceOrientationReady = new Observable<AbsoluteDeviceOrientationResult>((observer) => {    
     if(!this.isActive) this.addListener();
     this._orientationReadyObserver = observer;
   });
 
   private _orientationChangedObserver:Observer<AbsoluteDeviceOrientationResult>;
-  readonly deviceOrientationChanged = new Observable((observer) => {
+  readonly deviceOrientationChanged = new Observable<AbsoluteDeviceOrientationResult>((observer) => {
     if(!this.isActive) this.addListener();
     this._orientationChangedObserver = observer;
   });
@@ -78,11 +78,14 @@ export class AbsoluteDeviceOrientationService {
 }
 
 export class AbsoluteDeviceOrientationResult {  
-  readonly alpha: number;
-  readonly beta: number; 
-  readonly gamma:number;
+  readonly alpha: number = 0;
+  readonly beta: number = 0; 
+  readonly gamma:number = 0;
 
   constructor(e: any ) {
+    if(!e.alpha)
+      return;
+
     let heading = e.compassHeading || e.webkitCompassHeading || Utils.compassHeading(e.alpha, e.beta, e.gamma);
     this.alpha = heading;
     this.beta = e.beta;

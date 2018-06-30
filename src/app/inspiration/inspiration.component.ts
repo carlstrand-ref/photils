@@ -111,9 +111,8 @@ export class InspirationComponent implements OnInit {
 
     v1.normalize().multiplyInPlace(new Vector3(1.3, 0, 1.3)); 
     
-    let heading = 360 - this.arSphere.heading;
-
-    
+    let heading = 360 - this.arSphere.orientationResult.alpha;
+    console.log("hä", this.arSphere.orientationResult.alpha);
 
     for(let i in this.zones) {                                
       let deg = heading + this.zoneRange * Number(i) + half;            
@@ -237,7 +236,7 @@ export class InspirationComponent implements OnInit {
     startPoint.y -= 0.5;        
     v1.normalize().multiplyInPlace(new Vector3(4, 0, 4)); 
 
-    let heading = 360 - this.arSphere.heading;
+    let heading = 360 - this.arSphere.orientationResult.alpha;
     
     for(let i = 0; i < this.groupZones; i++) { 
       let deg = heading + i * this.zoneRange;             

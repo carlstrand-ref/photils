@@ -16,19 +16,17 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   @ViewChild('needle') needle: ElementRef;
   @ViewChild("fpsCounter") fpsCounter: ElementRef;
   
-  private deviceOrientationDataTimeout:number = 2000;
   public error:string = undefined;  
   public isNorthDirection = false;
   public hasOrientationData = false;
   public hasVideo = false;
   public isMobile:boolean = false;
   public scene: BABYLON.Scene;   
-  private videoPlane;
   private videoObject; 
   private canvas;
   private engine:BABYLON.Engine;  
   private camera: BABYLON.FreeCamera;
-  public heading: number = 0;
+  public orientationResult: AbsoluteDeviceOrientationResult;
   private initialPosition = undefined;  
   public geoLocation: {lat: number, lon: number};
   public showFps: boolean = true;
@@ -80,7 +78,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
       this.initialPosition = new BABYLON.Vector3( 0,0,0 );
             
-      let result = await this.deviceOrientation.deviceOrientationReady.toPromise();
+      this.orientationResult = await this.deviceOrientation.deviceOrientationReady.toPromise();
       this.deviceOrientation.deviceOrientationChanged.subscribe((e:AbsoluteDeviceOrientationResult) => {
         this.rotateNeedle(e.alpha);
       });
