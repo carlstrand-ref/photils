@@ -106,16 +106,14 @@ export class InspirationComponent implements OnInit {
   private placeGroups() {
     let cam = this.arSphere.scene.activeCamera;
     let startPoint = cam.position.clone();
-    let v1 = Vector3.Left();
+    let v1 = Vector3.Right();
     let half = this.zoneRange / 2.0;
 
     v1.normalize().multiplyInPlace(new Vector3(1.3, 0, 1.3));
 
-    let heading = 360 - this.arSphere.orientationResult.alpha;
-    console.log("hä", this.arSphere.orientationResult.alpha);
-
+    let node = new BABYLON.TransformNode("root", this.arSphere.scene);
     for(let i in this.zones) {
-      let deg = heading + this.zoneRange * Number(i) + half;
+      let deg = this.zoneRange * Number(i) + half;
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);
       let pos = BABYLON.Vector3.TransformCoordinates(v1, mat);
@@ -153,6 +151,9 @@ export class InspirationComponent implements OnInit {
 
       this.usedSceneObjects.push(plane, button, imageTexture);
     }
+
+    node.rotation.y = BABYLON.Tools.ToRadians(180 - this.arSphere.orientationResult.alpha);
+    this.usedSceneObjects.push(node);
   }
 
   private removeImages(zone:number, position: BABYLON.Vector3) {
@@ -231,15 +232,14 @@ export class InspirationComponent implements OnInit {
   private debugZones() {
     let cam = this.arSphere.scene.activeCamera;
     let startPoint = cam.position.clone();
-    let v1 = Vector3.Left();
+    let v1 = Vector3.Right();
 
     startPoint.y -= 0.5;
     v1.normalize().multiplyInPlace(new Vector3(4, 0, 4));
-
-    let heading = 360 - this.arSphere.orientationResult.alpha;
+    let node = new BABYLON.TransformNode("center", this.arSphere.scene);
 
     for(let i = 0; i < this.groupZones; i++) {
-      let deg = heading + i * this.zoneRange;
+      let deg = i * this.zoneRange;
       let rad = BABYLON.Tools.ToRadians(deg);
       let mat = BABYLON.Matrix.RotationY(rad);
       let rv = BABYLON.Vector3.TransformCoordinates(v1, mat);
@@ -252,8 +252,12 @@ export class InspirationComponent implements OnInit {
         colors: [c, c]
       };
       let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
+      line.parent = node;
       this.usedSceneObjects.push(line);
     }
+
+    node.rotation.y = BABYLON.Tools.ToRadians(180 - this.arSphere.orientationResult.alpha);
+    this.usedSceneObjects.push(node);
   }
 
   private placeImages(zone:number, position: BABYLON.Vector3) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Utils } from './utils';
-import { Observer, Observable } from 'rxjs';
+import { Observer, Observable, Subject } from 'rxjs';
 
 
 declare const window: any;
@@ -12,23 +12,16 @@ export class AbsoluteDeviceOrientationService {
   private isReady = false;
   private deviceOrientationDataTimeout:number = 2000;
 
-  private  _orientationReadyObserver:Observer<AbsoluteDeviceOrientationResult>;
-  readonly deviceOrientationReady = new Observable<AbsoluteDeviceOrientationResult>((observer) => {    
+  readonly deviceOrientationReady = new Subject<AbsoluteDeviceOrientationResult>();
+  readonly deviceOrientationChanged = new Subject<AbsoluteDeviceOrientationResult>()
+
+
+  constructor() {
     if(!this.isActive) this.addListener();
-    this._orientationReadyObserver = observer;
-  });
+  }
 
-  private _orientationChangedObserver:Observer<AbsoluteDeviceOrientationResult>;
-  readonly deviceOrientationChanged = new Observable<AbsoluteDeviceOrientationResult>((observer) => {
-    if(!this.isActive) this.addListener();
-    this._orientationChangedObserver = observer;
-  });
-  
-
-  constructor() {}
-
-  private addListener() {    
-    if (window.DeviceOrientationEvent) {      
+  private addListener() {
+    if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (e) => { this.handleChange(e)}, false);
       window.addEventListener('deviceorientationabsolute', (e) => { this.handleChange(e)}, false);
       this.checkOrientationData();
@@ -43,43 +36,39 @@ export class AbsoluteDeviceOrientationService {
   }
 
   private checkOrientationData() {
-    setTimeout(()=> {        
+    setTimeout(()=> {
       try {
         if(!this.isReady)
-          throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');      
+          throw Error('Timeout in deviceorientationabsolute Event. No orientation data were received.');
 
-      } catch (e) {          
-        if(this._orientationReadyObserver)
-          this._orientationReadyObserver.error(e);
-
-        if(this._orientationChangedObserver)
-          this._orientationChangedObserver.error(e);        
+      } catch (e) {
+        this.deviceOrientationReady.error(e);
+        this.deviceOrientationChanged.error(e);
       }
     }, this.deviceOrientationDataTimeout);
   }
 
-  private handleChange(e) {     
+  private handleChange(e) {
     // https://developers.google.com/web/updates/2016/03/device-orientation-changes
-    // values explained https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained    
+    // values explained https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained
     if((e.compassHeading || e.webkitCompassHeading || e.absolute) && e.alpha !== null) {
-      this.isReady = true;
       let evt = new AbsoluteDeviceOrientationResult(e);
 
-      if(this._orientationReadyObserver) {        
-        this._orientationReadyObserver.next(evt);
-        this._orientationReadyObserver.complete();
+
+      if(!this.isReady) {
+        this.deviceOrientationReady.next(evt);
+        this.deviceOrientationReady.complete();
       }
 
-      if(this._orientationChangedObserver) {
-        this._orientationChangedObserver.next(evt);
-      }
+      this.deviceOrientationChanged.next(evt);
+      this.isReady = true;
     }
   }
 }
 
-export class AbsoluteDeviceOrientationResult {  
+export class AbsoluteDeviceOrientationResult {
   readonly alpha: number = 0;
-  readonly beta: number = 0; 
+  readonly beta: number = 0;
   readonly gamma:number = 0;
 
   constructor(e: any ) {
@@ -96,7 +85,7 @@ export class AbsoluteDeviceOrientationResult {
 
   private normalize() : number {
     let key = Utils.getKeyFromUserAgent();
-    let normalizedAlpha:number;    
+    let normalizedAlpha:number;
     switch(key) {
       case "ios":
       case "firefox":
@@ -107,7 +96,7 @@ export class AbsoluteDeviceOrientationResult {
       normalizedAlpha = (normalizedAlpha + 270) % 360;
       break;
 
-      case "android_chrome":    
+      case "android_chrome":
       case "opera":
       case "unknown":
       default:

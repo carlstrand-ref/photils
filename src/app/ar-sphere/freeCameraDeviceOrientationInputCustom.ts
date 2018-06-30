@@ -1,23 +1,17 @@
+import { AbsoluteDeviceOrientationResult, AbsoluteDeviceOrientationService } from '../absolute-device-orientation.service'
 export class CustomFreeCameraDeviceOrientationInput implements BABYLON.ICameraInput<BABYLON.FreeCamera> {
     private _camera: BABYLON.FreeCamera;
 
     private _screenOrientationAngle: number = 0;
-
+    private _orientation: AbsoluteDeviceOrientationResult;
     private _constantTranform: BABYLON.Quaternion;
     private _screenQuaternion: BABYLON.Quaternion = new BABYLON.Quaternion();
 
-    private _alpha: number = 0;
-    private _beta: number = 0;
-    private _gamma: number = 0;
-
-    private _initial_alpha: number = 0;
-    private _initial_beta: number = 0;
-    private _initial_gamma: number = 0;
-
-    constructor(alpha?: number, beta?: number, gamma?: number) {
-        this._initial_alpha = alpha ? alpha : 0;
-        this._initial_beta = beta ? beta : 0;
-        this._initial_gamma = gamma ? gamma : 0;
+    constructor(private absoluteOrientation: AbsoluteDeviceOrientationService ) {
+        absoluteOrientation.deviceOrientationChanged.subscribe((orientation) => {
+            console.log("get orientation");
+            this._orientation = orientation;
+        });
 
         this._constantTranform = new BABYLON.Quaternion(- Math.sqrt(0.5), 0, 0, Math.sqrt(0.5));
         this._orientationChanged();
@@ -28,15 +22,14 @@ export class CustomFreeCameraDeviceOrientationInput implements BABYLON.ICameraIn
     }
 
     public set camera(camera: BABYLON.FreeCamera) {
-        this._camera = camera;        
-        if (this._camera != null && !this._camera.rotationQuaternion) {            
+        this._camera = camera;
+        if (this._camera != null && !this._camera.rotationQuaternion) {
             this._camera.rotationQuaternion = new BABYLON.Quaternion();
         }
     }
 
     attachControl(element: HTMLElement, noPreventDefault?: boolean) {
         window.addEventListener("orientationchange", this._orientationChanged);
-        window.addEventListener("deviceorientation", this._deviceOrientation);
         //In certain cases, the attach control is called AFTER orientation was changed,
         //So this is needed.
         this._orientationChanged();
@@ -48,25 +41,18 @@ export class CustomFreeCameraDeviceOrientationInput implements BABYLON.ICameraIn
         this._screenQuaternion.copyFromFloats(0, Math.sin(this._screenOrientationAngle), 0, Math.cos(this._screenOrientationAngle));
     }
 
-    private _deviceOrientation = (evt: DeviceOrientationEvent) => {
-        this._alpha = evt.alpha !== null ? evt.alpha : 0;
-        this._beta = evt.beta !== null ? evt.beta : 0;
-        this._gamma = evt.gamma !== null ? evt.gamma : 0;
-    }
-
     detachControl(element: BABYLON.Nullable<HTMLElement>) {
         window.removeEventListener("orientationchange", this._orientationChanged);
-        window.removeEventListener("deviceorientation", this._deviceOrientation);
     }
 
     public checkInputs() {
         //if no device orientation provided, don't update the rotation.
         //Only testing against alpha under the assumption thatnorientation will never be so exact when set.
-        if (!this._alpha) return;
+        if (!this._orientation || !this._orientation.alpha) return;
         BABYLON.Quaternion.RotationYawPitchRollToRef(
-            BABYLON.Tools.ToRadians(this._alpha + this._initial_alpha), 
-            BABYLON.Tools.ToRadians(this._beta + this._initial_beta), 
-            -BABYLON.Tools.ToRadians(this._gamma + this._initial_gamma), 
+            BABYLON.Tools.ToRadians(this._orientation.alpha * -1),
+            BABYLON.Tools.ToRadians(this._orientation.beta),
+            -BABYLON.Tools.ToRadians(this._orientation.gamma),
             this.camera.rotationQuaternion);
         this._camera.rotationQuaternion.multiplyInPlace(this._screenQuaternion);
         this._camera.rotationQuaternion.multiplyInPlace(this._constantTranform);
