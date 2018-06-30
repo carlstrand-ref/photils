@@ -17,9 +17,11 @@ script: # the build step
 after_success:
   # upload master build to http://photils.app/development for user testing
   - if [ $TRAVIS_BRANCH == 'master' ]; then 
-    ncftp -u $user -p $pass $host;
-    rm -rf /development/*;
-    quit;
+    ncftp << EOF 
+    open -u $user -p $pass $host
+    rm -rf /development/*
+    bye
+    EOF;
     ncftpput -R -v -u $user -p $pass $host /development dist/photils/*;     
     fi
 
