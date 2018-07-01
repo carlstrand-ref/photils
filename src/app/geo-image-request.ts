@@ -12,11 +12,11 @@ export interface IGeoImage {
     detailsUrl: string,
     lat: number,
     long: number,
-    views: number,    
+    views: number,
     thumbnail:Observable<{width: number, height:number}>,
     image:Observable<{width: number, height:number}>
     distance?:number
-    //position: Vector3;
+    position: Vector3;
     equirectengularCoordinates(radius: number, origin:{lat: number, lon:number}):Vector2;
 }
 
@@ -25,15 +25,13 @@ export class GeoImage implements IGeoImage {
     public distance?: number;
     private cache:any = {};
 
-    constructor (public id:number, public title: string, public thumbnailUrl: string, 
+    constructor (public id:number, public title: string, public thumbnailUrl: string,
         public imageUrl:string,public detailsUrl:string, public lat:number, public long: number,
         public views: number, private http: HttpClient) {
-            //let pos = Utils.latLonToXYZ(lat, long);            
-            //pos.divideInPlace(new Vector3(1000.0, 1000.0, 1000.0));
-            //this.position = new Vector3(pos.x, pos.z, pos.y);            
+            this.position = Utils.latLonToXYZ(lat, long);
         };
 
-    thumbnail = new Observable<{objUrl:string, width: number, height:number}>( observer => {        
+    thumbnail = new Observable<{objUrl:string, width: number, height:number}>( observer => {
         if ('thumbnail' in this.cache && this.cache.thumbnail !== null) {
             let t = this.cache.thumbnail;
             observer.next({objUrl: t.src, width: t.width, height: t.height});
@@ -49,33 +47,33 @@ export class GeoImage implements IGeoImage {
                 observer.next({objUrl: data, width: img.width, height: img.height});
                 observer.complete();
             }
-            
-        });        
-    });    
+
+        });
+    });
 
     image = new Observable<{objUrl:string,width: number, height:number}>( observer => {
         if ('image' in this.cache && this.cache.image !== null) {
             let t = this.cache.image;
             observer.next({objUrl: t.src, width: t.width, height: t.height});
-            return observer.complete();            
+            return observer.complete();
         }
 
         this.http.get(this.imageUrl, { responseType: 'blob' }).subscribe((response) => {
-            let data = window.URL.createObjectURL(response);            
+            let data = window.URL.createObjectURL(response);
             let img = new Image();
-            img.src = data;       
+            img.src = data;
             img.onload = () => {
                 this.cache.image = img;
                 observer.next({objUrl: data, width: img.width, height: img.height});
                 observer.complete();
             }
-        });    
-    }); 
+        });
+    });
 
     equirectengularCoordinates(radius:number, origin:{lat: number, lon:number}) : Vector2 {
-        return Utils.latLonToEquirectengular(radius, {lat: this.lat, lon: this.long}, origin).divideInPlace(new Vector2(1000.0, 1000.0));
+        return Utils.latLonToEquirectengular(radius, {lat: this.lat, lon: this.long}, origin);
     }
-    
+
 }
 
 export abstract class GeoImageService {
@@ -83,12 +81,12 @@ export abstract class GeoImageService {
     abstract getNumPages(): number;
     abstract getTotal(): number;
     abstract getItemsPerPage(): number;
-    abstract async getImages(lat: number, long: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>>;    
+    abstract async getImages(lat: number, long: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>>;
 }
 
 enum flickrMethod {
     photoSearch = "flickr.photos.search"
-}; 
+};
 
 
 export class FlickrImageService extends GeoImageService {
@@ -100,45 +98,45 @@ export class FlickrImageService extends GeoImageService {
     public getCurrentPage(): number { return this._currentPage };
     public getNumPages(): number { return this._numPages };
     public getTotal(): number { return this._total };
-    public getItemsPerPage() : number { return this._itemsPerPage };         
-    
+    public getItemsPerPage() : number { return this._itemsPerPage };
+
     constructor(private apiKey: string, private http: HttpClient) {
-        super();        
+        super();
     };
 
     private sendRequest(method: flickrMethod, parameters:string) {
-        let url = this.baseUrl + 
+        let url = this.baseUrl +
             method +
             '&nojsoncallback=1' +
-            '&per_page=' + this._itemsPerPage +             
-            '&api_key=' + this.apiKey + 
+            '&per_page=' + this._itemsPerPage +
+            '&api_key=' + this.apiKey +
             '&format=json&' + parameters;
         return this.http.get(url).toPromise();
     }
 
 
 
-    public async getImages(lat: number, lon: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>> {        
-        this._currentPage = page === undefined ? this._currentPage : page;   
+    public async getImages(lat: number, lon: number, radius: number, page?:number, units?:number) : Promise<Array<IGeoImage>> {
+        this._currentPage = page === undefined ? this._currentPage : page;
         let minDate = new Date();
         minDate.setFullYear(minDate.getFullYear() - 3);
-        
-        return new Promise<Array<IGeoImage>>((resolve, reject) => {            
+
+        return new Promise<Array<IGeoImage>>((resolve, reject) => {
             let parameters = 'lat='+lat+'&lon='+lon + "&radius="+ radius +
                              '&min_taken_date=' + minDate.getTime() / 1000  +
-                             '&extras=geo,url_t,url_z,views,path_alias' + 
+                             '&extras=geo,url_t,url_z,views,path_alias' +
                              '&page='+this._currentPage;
 
             this.sendRequest(flickrMethod.photoSearch, parameters)
-            .then((data: any) => {     
-                let photos: Array<IGeoImage> = [];  
+            .then((data: any) => {
+                let photos: Array<IGeoImage> = [];
                 this._numPages = Number(data.photos.pages);
                 this._total = Number(data.photos.total);
-                              
-                for (let photo of (data as any).photos.photo) {                                        
+
+                for (let photo of (data as any).photos.photo) {
                     if ( !('url_z' in photo))
-                        continue;                    
-                    
+                        continue;
+
 
                     let details = "https://www.flickr.com/photos/"
                                   + photo.owner + "/" + photo.id
@@ -148,11 +146,11 @@ export class FlickrImageService extends GeoImageService {
                         photo.title, photo.url_t, photo.url_z, details,
                         Number(photo.latitude), Number(photo.longitude),
                         Number(photo.views), this.http );
-                    
+
                     geoImage.distance = Utils.getDistanceFromLatLon(
                         lat, lon, photo.latitude, photo.longitude
                     );
-                        
+
 
                     photos.push(geoImage);
                 }

@@ -102,8 +102,6 @@ export class AbsoluteDeviceOrientationResult {
         break;
     }
 
-
-    console.log("norm", normalizedAlpha);
     return normalizedAlpha;
   }
 }

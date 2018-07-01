@@ -5,21 +5,21 @@ declare const window: any;
 export class Utils {
     static degtorad = Math.PI / 180; // Degree-to-Radian conversion
     static isMobile = navigator.userAgent.indexOf("Mobile") !== -1;
-    
-    public static colorToCss(color: BABYLON.Color3) : String {    
+
+    public static colorToCss(color: BABYLON.Color3) : String {
         return 'rgb( ' + color.r * 255.0 + ', ' + color.g * 255.0 + ', ' + color.b * 255.0 +')';
     }
 
-    public static latLonToXYZ(lat, lon) : BABYLON.Vector3 {        
-        const r = 6371; // km                    
+    public static latLonToXYZ(lat, lon) : BABYLON.Vector3 {
+        const r = 6371; // km
         lat = lat * this.degtorad;
         lon = lon * this.degtorad;
-        
+
         let x = r * Math.cos(lat) * Math.cos(lon);
         let y = r * Math.cos(lat) * Math.sin(lon);
         let z = r * Math.sin(lat);
 
-        return new BABYLON.Vector3(x,y,z);
+        return new BABYLON.Vector3(x,z,y);
     }
 
     public static angleFromCoords(lat1, lon1, lat2, lon2) {
@@ -39,28 +39,28 @@ export class Utils {
     public static getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
         let p = this.degtorad;    // Math.PI / 180
         let c = Math.cos;
-        let a = 0.5 - c((lat2 - lat1) * p)/2 + 
-                c(lat1 * p) * c(lat2 * p) * 
+        let a = 0.5 - c((lat2 - lat1) * p)/2 +
+                c(lat1 * p) * c(lat2 * p) *
                 (1 - c((lon2 - lon1) * p))/2;
 
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
       }
 
     public static angleBetweenVector3(v1:BABYLON.Vector3, v2:BABYLON.Vector3) {
-        let dot = BABYLON.Vector3.Dot(v1, v2);    
-        let angle = dot / (v1.length() * v2.length());  
+        let dot = BABYLON.Vector3.Dot(v1, v2);
+        let angle = dot / (v1.length() * v2.length());
         return BABYLON.Tools.ToDegrees(angle);
     }
 
     public static angleBetweenVector2(v1:BABYLON.Vector2, v2:BABYLON.Vector2) {
-        let dot = BABYLON.Vector2.Dot(v1, v2);    
-        let angle = dot / (v1.length() * v2.length());  
+        let dot = BABYLON.Vector2.Dot(v1, v2);
+        let angle = dot / (v1.length() * v2.length());
         return BABYLON.Tools.ToDegrees(angle);
     }
 
-    public static latLonToEquirectengular(radius:number, coord:{lat: number, lon:number}, center:{lat: number, lon:number}) {        
-        let x = radius * coord.lat * Math.cos(center.lat);
-        let y = radius * coord.lon;
+    public static latLonToEquirectengular(radius:number, coord:{lat: number, lon:number}, center:{lat: number, lon:number}) {
+        let x = radius * (coord.lon * this.degtorad) * Math.cos(center.lat * this.degtorad);
+        let y = radius * (coord.lat * this.degtorad);
 
         return new BABYLON.Vector2(x, y);
     }

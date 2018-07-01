@@ -160,38 +160,23 @@ export class InspirationComponent implements OnInit {
 
   private removeImages(zone:number, position: BABYLON.Vector3) {
     for(let child of this.arSphere.scene.getMeshesByTags('mesh_zone_' + zone)) {
-      let xAnimation = BABYLON.Animation.CreateAnimation(
-        'position.x',
-        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+      let posAnimation = BABYLON.Animation.CreateAnimation(
+        'position',
+        BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
         120, new BABYLON.QuadraticEase()
       );
 
-      let yAnimation = BABYLON.Animation.CreateAnimation(
-        'position.y',
-        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-        120, new BABYLON.QuadraticEase()
-      );
-
-      let xKeys = [{
+      let posKeys = [{
           frame : 0,
-          value : child.position.x
+          value : child.position
         }, {
           frame : 30,
-          value : 0
+          value : Vector3.Zero()
         }];
 
-      let yKeys = [{
-          frame : 0,
-          value : child.position.y
-      }, {
-          frame : 30,
-          value : 0
-      }];
+      posAnimation.setKeys(posKeys);
 
-      xAnimation.setKeys(xKeys);
-      yAnimation.setKeys(yKeys);
-
-      child.animations = [xAnimation, yAnimation];
+      child.animations = [posAnimation];
       this.arSphere.scene.beginAnimation(child, 0, 60, false, 1.0, () => {
         child.dispose();
       });
@@ -199,22 +184,21 @@ export class InspirationComponent implements OnInit {
   }
 
   private groupImage(photo:IGeoImage) {
-    //let cam = this.arSphere.scene.activeCamera;
+    // let cam = this.arSphere.scene.activeCamera;
+    // let pos = Utils.latLonToXYZ(this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon);
+    // let v1:Vector3 = Vector3.Forward();
+    // let v2:Vector3 = photo.position.subtract(pos);
+    // v2.normalize().multiplyInPlace(new Vector3(1, 1, 1));
 
-    // let v1:Vector3 = cam.position.add(Vector3.Left());
-    // v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));
-
-    // let v2:Vector3 = photo.position.subtract(cam.position);
-    // v2.normalize().multiplyInPlace(new Vector3(1, 0, 1));
-
-    // let dot = Vector3.Dot(v1, v2);
-    // let angle = dot / (v1.length() * v2.length());
-    // let angleDeg = BABYLON.Tools.ToDegrees(angle);
+    // console.log(Utils.angleBetweenVector3(v1, v2));
+    //if(angleDeg < 0) angleDeg += 360;
 
     let angleDeg = Utils.angleFromCoords(
       this.arSphere.geoLocation.lat, this.arSphere.geoLocation.lon,
       photo.lat, photo.long
     )
+
+    // console.log(angleDeg + "==" + bla, Vector3.DistanceSquared(v1, v2));
 
 
     let z = undefined;
@@ -274,6 +258,7 @@ export class InspirationComponent implements OnInit {
 
     this.usedSceneObjects.push(node);
 
+
     for (let i = 0; i < maxImages; i++) {
       let photo = photos[i];
       let x = r * Math.sin(p);
@@ -287,35 +272,23 @@ export class InspirationComponent implements OnInit {
       BABYLON.Tags.EnableFor(plane);
       (plane as any).addTags("mesh_zone_" + zone);
 
-
-      let xAnimation = new BABYLON.Animation("plane_x"+ photo.title, "position.x", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-      let yAnimation = new BABYLON.Animation("plane_y"+ photo.title, "position.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-
-      let xKeys = [{
+      let target = new Vector3(x, y, 0);
+      let animation = new BABYLON.Animation("plane_position"+ photo.title, "position", 120, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+      let positionKeys = [{
           frame : 0,
-          value : 0
+          value :  plane.position
       }, {
-          frame : 30,
-          value : x
+          frame : 60,
+          value : target
       }];
 
-      let yKeys = [{
-        frame : 0,
-        value : 0
-      }, {
-          frame : 30,
-          value : y
-      }];
-
-      xAnimation.setKeys(xKeys);
-      yAnimation.setKeys(yKeys);
+      animation.setKeys(positionKeys);
 
       let easeFnc = new BABYLON.ElasticEase(2, 3);
       easeFnc.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
+      animation.setEasingFunction(easeFnc);
 
-      xAnimation.setEasingFunction(easeFnc);
-      yAnimation.setEasingFunction(easeFnc);
-      plane.animations = [xAnimation, yAnimation];
+      plane.animations = [animation];
 
       photo.image.subscribe( (img:{objUrl: string, width: number, height: number}) => {
         let ratio = Math.max(img.width, img.height) / Math.min(img.width, img.height);
@@ -358,7 +331,7 @@ export class InspirationComponent implements OnInit {
         imageTexture.addControl(button);
 
         plane.visibility = 1;
-        this.arSphere.scene.beginAnimation(plane, 0, 30, false);
+        this.arSphere.scene.beginAnimation(plane, 0, 60, false);
         this.usedSceneObjects.push(imageTexture, button);
       });
 
@@ -368,97 +341,55 @@ export class InspirationComponent implements OnInit {
   }
 
   deselectImage() {
-    let xScaleAnimation = new BABYLON.Animation("plane-scale-x", "scaling.x", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let yScaleAnimation = new BABYLON.Animation("plane-scale-y", "scaling.y", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let xAnimation = new BABYLON.Animation("plane-x", "position.x", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let yAnimation = new BABYLON.Animation("plane-y", "position.y", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    let scaleAnimation = new BABYLON.Animation("plane-scale", "scaling", 120, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    let posAnimation = new BABYLON.Animation("plane-x", "position", 120, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-    let xKeys = [{
+    let posKeys = [{
       frame : 0,
-      value : 0
+      value : Vector3.Zero()
     },{
         frame : 30,
-        value : this.selectedImage.srcPos.x
+        value : new Vector3(this.selectedImage.srcPos.x, this.selectedImage.srcPos.y, this.selectedImage.srcPos.z)
     }];
 
-    let yKeys = [{
+    let scaleKeys = [{
       frame : 0,
-      value : 0
+      value : this.selectedImage.image.scaling
     },{
-        frame : 30,
-        value : this.selectedImage.srcPos.y
+        frame : 60,
+        value : this.selectedImage.image.scaling.divide(new Vector3( 2.5,  2.5, 1))
     }];
 
-    let xScaleKeys = [{
-      frame : 0,
-      value : this.selectedImage.image.scaling.x
-    },{
-        frame : 30,
-        value : this.selectedImage.image.scaling.x / 2.5
-    }];
+    posAnimation.setKeys(posKeys);
+    scaleAnimation.setKeys(scaleKeys);
 
-    let yScaleKeys = [{
-      frame : 0,
-      value : this.selectedImage.image.scaling.y
-    },{
-        frame : 30,
-        value : this.selectedImage.image.scaling.y / 2.5
-    }];
-
-    xAnimation.setKeys(xKeys);
-    yAnimation.setKeys(yKeys);
-    xScaleAnimation.setKeys(xScaleKeys);
-    yScaleAnimation.setKeys(yScaleKeys);
-
-    this.selectedImage.image.animations = [xAnimation, yAnimation, xScaleAnimation, yScaleAnimation];
+    this.selectedImage.image.animations = [posAnimation, scaleAnimation];
     this.arSphere.scene.beginAnimation(this.selectedImage.image, 0, 60, false);
   }
 
   selectImage(plane: BABYLON.Mesh, photo:IGeoImage) {
-    let xAnimation = new BABYLON.Animation("plane-x"+ photo.title, "position.x", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let yAnimation = new BABYLON.Animation("plane-y"+ photo.title, "position.y", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let xScaleAnimation = new BABYLON.Animation("plane-scale-x"+ photo.title, "scaling.x", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-    let yScaleAnimation = new BABYLON.Animation("plane-scale-y"+ photo.title, "scaling.y", 120, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    let posAnimation = new BABYLON.Animation("plane_pos"+ photo.title, "position", 120, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    let scaleAnimation = new BABYLON.Animation("plane_scale"+ photo.title, "scaling", 120, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-    let xKeys = [{
+    let posKeys = [{
       frame : 0,
-      value : plane.position.x
+      value : plane.position
     },{
         frame : 30,
-        value : 0
+        value : Vector3.Zero()
     }];
 
-    let yKeys = [{
+    let scaleKeys = [{
       frame : 0,
-      value : plane.position.y
+      value : Vector3.One()
     },{
         frame : 30,
-        value : 0
+        value :plane.scaling.multiply(new Vector3( 2.5, 2.5, 1))
     }];
 
-    let xScaleKeys = [{
-      frame : 0,
-      value : 1
-    },{
-        frame : 30,
-        value : 2.5 * plane.scaling.x
-    }];
-
-    let yScaleKeys = [{
-      frame : 0,
-      value : 1
-    },{
-        frame : 30,
-        value : 2.5 * plane.scaling.y
-    }];
-
-    xAnimation.setKeys(xKeys);
-    yAnimation.setKeys(yKeys);
-
-    xScaleAnimation.setKeys(xScaleKeys);
-    yScaleAnimation.setKeys(yScaleKeys);
-
-    plane.animations = [xAnimation, yAnimation, xScaleAnimation, yScaleAnimation];
+    posAnimation.setKeys(posKeys);
+    scaleAnimation.setKeys(scaleKeys);
+    plane.animations = [posAnimation, scaleAnimation];
 
     for(let a of plane.animations)
       a.setEasingFunction(new BABYLON.QuadraticEase());
