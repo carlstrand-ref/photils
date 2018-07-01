@@ -85,9 +85,8 @@ export class AbsoluteDeviceOrientationResult {
 
   private normalize() : number {
     let key = Utils.getKeyFromUserAgent();
-    let normalizedAlpha:number;
+    let normalizedAlpha:number = this.alpha;
     switch(key) {
-      case "ios":
       case "firefox":
       normalizedAlpha *= -1;
       break;
@@ -100,9 +99,11 @@ export class AbsoluteDeviceOrientationResult {
       case "opera":
       case "unknown":
       default:
-        normalizedAlpha = this.alpha;
+        break;
     }
 
+
+    console.log("norm", normalizedAlpha);
     return normalizedAlpha;
   }
 }

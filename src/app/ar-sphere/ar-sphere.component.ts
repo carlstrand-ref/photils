@@ -72,16 +72,13 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       let position = await this.getPosition();
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
 
-      let reseted = false;
-
-      let err = (err) => {throw err; }
-
       this.deviceOrientation.deviceOrientationChanged.subscribe((e:AbsoluteDeviceOrientationResult) => {
+        console.log(e);
         if(!this.orientationResult) {
+          console.log("init engine");
           this.orientationResult = e;
           this.initEngine();
         }
-
         this.rotateNeedle(e.alpha);
       }, (err) => {
         if(!Utils.isMobile) {
@@ -96,6 +93,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     } catch(ex) {
       this.error = ex.name + ": " + ex.message;
+      console.log("ex", ex);
       this.stopVideo();
     }
   }
