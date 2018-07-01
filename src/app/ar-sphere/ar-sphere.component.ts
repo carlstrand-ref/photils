@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, OnInit, OnDestroy, HostListener, Output, ViewChild} from '@angular/core';
 import { Utils } from '../utils';
 import { CustomFreeCameraDeviceOrientationInput } from './freeCameraDeviceOrientationInputCustom';
-import { Engine, Vector2, Vector3, QuadraticEase, Quaternion } from 'babylonjs';
+import { Engine, Vector2, Vector3, QuadraticEase, Quaternion, Tools } from 'babylonjs';
 import { AbsoluteDeviceOrientationService, AbsoluteDeviceOrientationResult } from '../absolute-device-orientation.service'
 
 declare const window: any;
@@ -17,23 +17,18 @@ export class ArSphereComponent implements OnInit , OnDestroy {
   @ViewChild("fpsCounter") fpsCounter: ElementRef;
 
   public error:string = undefined;
-  public isNorthDirection = false;
-  public hasOrientationData = false;
   public hasVideo = false;
-  public isMobile:boolean = false;
   public scene: BABYLON.Scene;
   private videoObject;
   private canvas;
   private engine:BABYLON.Engine;
   private camera: BABYLON.DeviceOrientationCamera;
-  public orientationResult: AbsoluteDeviceOrientationResult;
-  private initialPosition = undefined;
+  public orientationResult: AbsoluteDeviceOrientationResult; // initial orientation for placing objects in the world
+  public cameraOffset: Vector3; // offset angle from forward vector after DeviceOrientation initialization
   public geoLocation: {lat: number, lon: number};
   public showFps: boolean = true;
 
-  constructor(public deviceOrientation: AbsoluteDeviceOrientationService) {
-    this.isMobile = Utils.isMobile;
-  }
+  constructor(public deviceOrientation: AbsoluteDeviceOrientationService) { }
 
   ngOnInit() {
     this.initSensors();
@@ -64,7 +59,7 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   private async initSensors() {
     try {
-      let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: this.isMobile ? 'environment' : 'user' } };
+      let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: Utils.isMobile ? 'environment' : 'user' } };
       this.videoObject = document.createElement('video');
       this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
 
@@ -76,7 +71,10 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
       let position = await this.getPosition();
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
-      this.initialPosition = new BABYLON.Vector3( 0,0,0 );
+
+      let reseted = false;
+
+      let err = (err) => {throw err; }
 
       this.deviceOrientation.deviceOrientationChanged.subscribe((e:AbsoluteDeviceOrientationResult) => {
         if(!this.orientationResult) {
@@ -85,24 +83,20 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         }
 
         this.rotateNeedle(e.alpha);
+      }, (err) => {
+        if(!Utils.isMobile) {
+          this.orientationResult = new AbsoluteDeviceOrientationResult(
+            new DeviceOrientationEvent("")
+          );
+          this.initEngine();
+        }
       });
 
 
 
     } catch(ex) {
-      if(Utils.isMobile) {
-        this.error = ex.name + ": " + ex.message;
-        this.stopVideo();
-      } else {
-        // ugly but for testing issues
-        // if we have a desktop without sensors
-        // still init engine
-        console.log(ex);
-        this.orientationResult = new AbsoluteDeviceOrientationResult(
-          new DeviceOrientationEvent("")
-        );
-        this.initEngine();
-      }
+      this.error = ex.name + ": " + ex.message;
+      this.stopVideo();
     }
   }
 
@@ -130,8 +124,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.scene.render();
       this.fpsCounter.nativeElement.innerHTML = this.engine.getFps().toFixed(0) + " FPS";
     });
-
-    this.onReady.emit();
   }
 
   private createScene() {
@@ -139,7 +131,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     scene.ambientColor = new BABYLON.Color3(1, 1, 1);
 
     this.camera = new BABYLON.DeviceOrientationCamera("camera1", new BABYLON.Vector3(0, 0, 0.0), scene);
-    this.camera.position =  this.initialPosition;
     this.camera.minZ = 0.4;
     //this.camera.inputs.add(new CustomFreeCameraDeviceOrientationInput(this.deviceOrientation));
     this.camera.attachControl(this.canvas, true);
@@ -158,6 +149,19 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
     new BABYLON.HemisphericLight("HemisphericLight", new BABYLON.Vector3(0, 1, 0), scene);
 
+    scene.onAfterCameraRenderObservable.add(() => {
+      if(
+        !this.camera.rotationQuaternion.equals(new Quaternion(0, 0, 0, 1)) &&
+        !this.cameraOffset
+      ) {
+        console.log("time to reset", this.camera.rotationQuaternion);
+        this.cameraOffset = this.camera.rotationQuaternion.toEulerAngles();;
+        let d = this.cameraOffset;
+        console.log("eula", Tools.ToDegrees(d.x), Tools.ToDegrees(d.y), Tools.ToDegrees(d.z) )
+        this.onReady.emit();
+      }
+    })
+
     return scene;
   }
 
@@ -166,10 +170,9 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     this.needle.nativeElement.setAttribute("transform", "rotate(" + -deg + " 17 16)");
   }
 
-  @HostListener('window:resize')
-  handleResize() {
-    this.engine.resize();
-
-    return false;
-  }
+  // @HostListener('$window:resize')
+  // handleResize() {
+  //   this.engine.resize();
+  //   return false;
+  // }
 }

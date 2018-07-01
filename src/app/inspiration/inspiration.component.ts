@@ -31,6 +31,7 @@ export class InspirationComponent implements OnInit {
   private usedSceneObjects = [];
   private groupPlane:BABYLON.Mesh;
   private imagePlane:BABYLON.Mesh;
+  private worldNode:BABYLON.TransformNode;
 
   constructor(private http: HttpClient, public snackBar: MatSnackBar) {
     this.zoneRange = 360 / this.groupZones;
@@ -44,9 +45,13 @@ export class InspirationComponent implements OnInit {
 
   public sphereReady() {
     console.log("ready!");
+    this.worldNode = new BABYLON.TransformNode("root", this.arSphere.scene);
     this.groupPlane = BABYLON.MeshBuilder.CreatePlane("zone", {width: 0.2, height: 0.2}, this.arSphere.scene);
     this.imagePlane = BABYLON.MeshBuilder.CreatePlane("image_zone_", {width: 0.1, height: 0.1}, this.arSphere.scene);
     this.loadImages();
+
+    let finalAngle = 360 - this.arSphere.orientationResult.alpha + BABYLON.Tools.ToDegrees(this.arSphere.cameraOffset.y);
+    this.worldNode.rotation.y = BABYLON.Tools.ToRadians(finalAngle);
   }
 
   private clearScene() {
@@ -106,12 +111,11 @@ export class InspirationComponent implements OnInit {
   private placeGroups() {
     let cam = this.arSphere.scene.activeCamera;
     let startPoint = cam.position.clone();
-    let v1 = Vector3.Right();
+    let v1 = Vector3.Forward();
     let half = this.zoneRange / 2.0;
 
     v1.normalize().multiplyInPlace(new Vector3(1.3, 0, 1.3));
 
-    let node = new BABYLON.TransformNode("root", this.arSphere.scene);
     for(let i in this.zones) {
       let deg = this.zoneRange * Number(i) + half;
       let rad = BABYLON.Tools.ToRadians(deg);
@@ -124,6 +128,7 @@ export class InspirationComponent implements OnInit {
 
       plane.position = pos;
       plane.lookAt(cam.position);
+      plane.parent = this.worldNode;
 
       let items = Math.min(this.zones[i].length, this.maxImagesPerGroupd);
       let imageTexture = AdvancedDynamicTexture.CreateForMesh(plane);
@@ -151,9 +156,6 @@ export class InspirationComponent implements OnInit {
 
       this.usedSceneObjects.push(plane, button, imageTexture);
     }
-
-    node.rotation.y = BABYLON.Tools.ToRadians(180 - this.arSphere.orientationResult.alpha);
-    this.usedSceneObjects.push(node);
   }
 
   private removeImages(zone:number, position: BABYLON.Vector3) {
@@ -197,7 +199,7 @@ export class InspirationComponent implements OnInit {
   }
 
   private groupImage(photo:IGeoImage) {
-    let cam = this.arSphere.scene.activeCamera;
+    //let cam = this.arSphere.scene.activeCamera;
 
     // let v1:Vector3 = cam.position.add(Vector3.Left());
     // v1.normalize().multiplyInPlace(new Vector3(1, 0, 1));
@@ -232,11 +234,10 @@ export class InspirationComponent implements OnInit {
   private debugZones() {
     let cam = this.arSphere.scene.activeCamera;
     let startPoint = cam.position.clone();
-    let v1 = Vector3.Right();
+    let v1 = Vector3.Forward();
 
     startPoint.y -= 0.5;
     v1.normalize().multiplyInPlace(new Vector3(4, 0, 4));
-    let node = new BABYLON.TransformNode("center", this.arSphere.scene);
 
     for(let i = 0; i < this.groupZones; i++) {
       let deg = i * this.zoneRange;
@@ -252,12 +253,9 @@ export class InspirationComponent implements OnInit {
         colors: [c, c]
       };
       let line = BABYLON.MeshBuilder.CreateLines("lines", options, this.arSphere.scene);
-      line.parent = node;
+      line.parent = this.worldNode;
       this.usedSceneObjects.push(line);
     }
-
-    node.rotation.y = BABYLON.Tools.ToRadians(180 - this.arSphere.orientationResult.alpha);
-    this.usedSceneObjects.push(node);
   }
 
   private placeImages(zone:number, position: BABYLON.Vector3) {
@@ -267,6 +265,7 @@ export class InspirationComponent implements OnInit {
     let node = new BABYLON.TransformNode("zone_node_" + zone, this.arSphere.scene);
     node.position = position.clone();
     node.lookAt(cam.position);
+    node.parent = this.worldNode;
 
     let maxImages = Math.min(photos.length, this.maxImagesPerGroupd);
     let step = Math.PI * 2 / maxImages;
