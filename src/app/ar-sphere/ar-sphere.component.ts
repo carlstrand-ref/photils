@@ -61,6 +61,9 @@ export class ArSphereComponent implements OnInit , OnDestroy {
     try {
       let constraints = { audio: false, video: { width: 1280, height: 720, facingMode: Utils.isMobile ? 'environment' : 'user' } };
       this.videoObject = document.createElement('video');
+      this.videoObject.setAttribute('autoplay', '');
+      this.videoObject.setAttribute('muted', '');
+      this.videoObject.setAttribute('playsinline', '');
       this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
 
       this.videoObject.onloadedmetadata = () => {
@@ -73,7 +76,6 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
 
       this.deviceOrientation.deviceOrientationChanged.subscribe((e:AbsoluteDeviceOrientationResult) => {
-        console.log(e);
         if(!this.orientationResult) {
           console.log("init engine");
           this.orientationResult = e;
@@ -152,10 +154,8 @@ export class ArSphereComponent implements OnInit , OnDestroy {
         !this.camera.rotationQuaternion.equals(new Quaternion(0, 0, 0, 1)) &&
         !this.cameraOffset
       ) {
-        console.log("time to reset", this.camera.rotationQuaternion);
+        // after receiving first orientation data we use this as offset value
         this.cameraOffset = this.camera.rotationQuaternion.toEulerAngles();;
-        let d = this.cameraOffset;
-        console.log("eula", Tools.ToDegrees(d.x), Tools.ToDegrees(d.y), Tools.ToDegrees(d.z) )
         this.onReady.emit();
       }
     })
