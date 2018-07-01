@@ -65,12 +65,13 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       this.videoObject.setAttribute('muted', '');
       this.videoObject.setAttribute('playsinline', '');
       this.videoObject.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
+      this.videoObject.play();
+      this.hasVideo = true;
+      // this.videoObject.onloadedmetadata = () => {
+      //   this.hasVideo = true;
 
-      this.videoObject.onloadedmetadata = () => {
-        this.hasVideo = true;
-        this.videoObject.play();
-        //let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
-      }
+      //   //let settings = this.videoObject.srcObject.getTracks()[0].getSettings();
+      // }
 
       let position = await this.getPosition();
       this.geoLocation = {lat: position.coords.latitude, lon: position.coords.longitude};
