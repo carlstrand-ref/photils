@@ -160,6 +160,11 @@ export class ArSphereComponent implements OnInit , OnDestroy {
       }
     })
 
+    let options = new BABYLON.SceneOptimizerOptions();
+    options.addOptimization(new BABYLON.HardwareScalingOptimization(0, 4));
+
+    // Optimizer
+    let optimizer = new BABYLON.SceneOptimizer(scene, options);
     return scene;
   }
 
