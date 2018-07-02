@@ -6,13 +6,15 @@ import { DofComponent } from './dof/dof.component';
 import { ExposureComponent } from './exposure/exposure.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
 import { SunComponent } from './sun/sun.component';
+import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
 
-const routes: Routes = [  
+const routes: Routes = [
   { path: '', component: MainComponent, data: { state: 'main' } },
   { path: 'sun', component: SunComponent , data: { state: 'sun' }},
   { path: 'dof', component: DofComponent , data: { state: 'dof' }},
-  { path: 'exposure', component: ExposureComponent , data: { state: 'exposure' }}, 
-  { path: 'inspiration', component: InspirationComponent , data: { state: 'inspiration' }}, 
+  { path: 'exposure', component: ExposureComponent , data: { state: 'exposure' }},
+  { path: 'inspiration', component: InspirationComponent , data: { state: 'inspiration' }},
+  { path: 'autotagger', component: AutoTaggerComponent , data: { state: 'autotagger' }},
 ]
 
 @NgModule({

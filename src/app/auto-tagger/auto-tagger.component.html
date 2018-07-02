@@ -1,0 +1,40 @@
+<mat-toolbar color="primary">
+    <button mat-icon-button routerLink="/">
+        <mat-icon aria-label="icon-button with a back icon">chevron_left</mat-icon>
+    </button>
+    <span>Auto Tagger</span>
+    <span class="spacer"></span>
+</mat-toolbar>
+
+<div class="container" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px" fxLayoutAlign="space-around start">
+  <mat-card fxFlex="calc(50% - 48px)" fxFlex.lt-sm="100%">
+    <mat-card-title>
+        Image
+    </mat-card-title>
+    <mat-card-content>
+        <div #dropzone class="dropzone" (drop)="drop($event)" (dragover)="allowDrop($event)" (click)="handleClick()">
+          <img #srcImage [ngStyle]="{'display': showImage ? 'block' : 'none' }" />
+          <span class="message">Select or Drop Image!</span>
+        </div>
+        <input #inputFile id="file" type="file" name="name" style="display: none;" />
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card fxFlex="calc(50% - 48px)" fxFlex.lt-sm="100%">
+    <mat-card-title>
+        Tags
+    </mat-card-title>
+    <mat-card-content>
+      <mat-selection-list #selectedTags>
+          <mat-list-option *ngFor="let item of result">
+            {{(item.probability * 100).toFixed(2) + '%'}} - {{item.category}}
+          </mat-list-option>
+        </mat-selection-list>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="loading" *ngIf="message !== undefined">
+    <mat-progress-spinner mode="indeterminate" color="warn"></mat-progress-spinner>
+    <div class="message">{{message}}</div>
+  </div>
+</div>

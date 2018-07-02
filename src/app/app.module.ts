@@ -21,7 +21,8 @@ import {
   MatProgressSpinnerModule,
   MatPaginatorModule,
   MatPaginatorIntl,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatListModule
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -37,6 +38,7 @@ import { InspirationComponent } from './inspiration/inspiration.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SunComponent } from './sun/sun.component';
 import { PaginationProvider } from './inspiration/paginationProvider';
+import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +49,8 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     DofVisualizerComponent,
     ArSphereComponent,
     InspirationComponent,
-    SunComponent
+    SunComponent,
+    AutoTaggerComponent
   ],
   imports: [
     BrowserModule,
@@ -64,6 +67,7 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     MatGridListModule,
     MatCardModule,
     MatSelectModule,
+    MatListModule,
     MatCardModule,
     MatSelectModule,
     MatSliderModule,
@@ -78,7 +82,6 @@ import { PaginationProvider } from './inspiration/paginationProvider';
     HttpClientModule
   ],
   providers: [
-    //{provide: Window, useValue: window }, 
     { provide: MatPaginatorIntl, useClass: PaginationProvider }
   ],
   bootstrap: [AppComponent]
