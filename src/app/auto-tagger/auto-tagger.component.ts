@@ -1,11 +1,15 @@
-import { Component, OnInit, AfterContentInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Injectable, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import KerasJS from 'keras-js';
 import { imagenetClassesTopK } from './imagenet';
 import ndarray from 'ndarray';
 import ops from 'ndarray-ops';
-import { MatSelectionList } from '@angular/material';
+import { MatSelectionList, MatTreeFlattener, MatTreeFlatDataSource, MatProgressSpinner } from '@angular/material';
 import { Utils } from '../utils';
 import {MatSnackBar} from '@angular/material';
+import {TagDatabase, TagNode, TagFlatNode} from '../tags';
+import { FlatTreeControl } from '@angular/cdk/tree';
+import { SelectionModel } from '@angular/cdk/collections';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-auto-tagger',
@@ -16,7 +20,7 @@ export class AutoTaggerComponent implements OnInit {
   @ViewChild("dropzone") dropzone: ElementRef;
   @ViewChild("inputFile") inputFile: ElementRef;
   @ViewChild("srcImage") srcImage: ElementRef;
-  @ViewChild(MatSelectionList) selectedTags: MatSelectionList;
+  public spinner = {mode : "determinate", value: 0};
 
   public showImage:boolean = false;
   public model:KerasJS.Model;
@@ -24,10 +28,31 @@ export class AutoTaggerComponent implements OnInit {
   public message:string;
   public prefix:string = "";
 
-  constructor(public snackBar: MatSnackBar) { }
+  flatNodeMap = new Map<TagFlatNode, TagNode>();
+  nestedNodeMap = new Map<TagNode, TagFlatNode>();
+  selectedParent: TagNode | null = null;
+
+  treeControl: FlatTreeControl<TagFlatNode>;
+  treeFlattener: MatTreeFlattener<TagNode, TagFlatNode>;
+  dataSource: MatTreeFlatDataSource<TagNode, TagFlatNode>;
+  tagListSelection = new SelectionModel<TagFlatNode>(true /* multiple */);
+
+  getLevel = (node: TagFlatNode) => node.level;
+  isExpandable = (node: TagFlatNode) => node.expandable;
+  getChildren = (node: TagNode): Observable<Array<TagNode>> => {
+    return new BehaviorSubject(node.children);
+  };
+  hasChild = (_: number, _nodeData: TagFlatNode) => _nodeData.expandable;
+  hasNoContent = (_: number, _nodeData: TagFlatNode) => _nodeData.item === '';
+
+  constructor(public snackBar: MatSnackBar, private tagDatabase:TagDatabase) {
+    this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
+      this.isExpandable, this.getChildren);
+    this.treeControl = new FlatTreeControl<TagFlatNode>(this.getLevel, this.isExpandable);
+    this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+  }
 
   ngOnInit() {
-    this.message = "loading model ...";
     (this.inputFile.nativeElement as any).addEventListener("change",(e) => {
       this.handleFile(e.target.files[0]);
     }, false);
@@ -36,14 +61,52 @@ export class AutoTaggerComponent implements OnInit {
   }
 
   private async initModel() {
-    this.model = new KerasJS.Model({
-      filepath: 'assets/model.bin',
-      gpu: !Utils.isMobile
-    });
+    try {
+      this.model = new KerasJS.Model({
+        filepath: 'assets/model.bin',
+        gpu: !Utils.isMobile // on mobile devices the results a wrong because of an error
+      });
 
-    await this.model.ready();
-    this.message = undefined;
+      this.message = "loading model ...";
+      this.spinner.mode = "determinate";
+      this.model.events.on('loadingProgress', (e) => this.handleLoadingProgress(e))
+      this.model.events.on('initProgress', (e) => this.handleInitProgress(e))
+      this.model.events.on('predictProgress', (e) => this.handlePredictProgress(e))
+
+
+      await this.model.ready();
+      this.spinner.mode = "indeterminate";
+      this.message = undefined;
+    } catch(e) {
+      this.snackBar.open("Error: " + e.message, "", { duration: 2000, panelClass: 'error'})
+    }
   }
+
+  handleLoadingProgress(progress) {
+    this.spinner.value = Math.round(progress);
+    this.message = `Loading Model ${this.spinner.value} %`;
+    if (progress === 100) {
+      this.spinner.value = 0;
+    }
+  };
+
+  handleInitProgress(progress) {
+    this.spinner.value = Math.round(progress);
+    this.message = `Initialize Model ${this.spinner.value} %`;
+    this.spinner.value = progress;
+    if (progress === 100) {
+
+    }
+  };
+
+  handlePredictProgress(progress) {
+    this.spinner.value = Math.round(progress);
+    this.message = `Predicting tags: ${this.spinner.value} %`;
+    this.spinner.value = progress;
+    if (progress === 100) {
+
+    }
+  };
 
   public allowDrop(e:DragEvent) {
     e.preventDefault();
@@ -70,7 +133,7 @@ export class AutoTaggerComponent implements OnInit {
     wrapper.style.opacity = '0';
     document.body.appendChild(wrapper);
 
-    let content = this.selectedTags.selectedOptions.selected.map(item => item.value).join(' ');
+    let content = this.tagListSelection.selected.map(node => this.prefix + node.item).join(' ');
     wrapper.value = content;
     wrapper.focus();
     wrapper.select();
@@ -81,7 +144,7 @@ export class AutoTaggerComponent implements OnInit {
 
   private handleFile(file:File) {
     if(file.type.startsWith("image")) {
-      this.message = "generate tags ...";
+      this.message = "Predicting ...";
       const reader = new FileReader();
       reader.onload = (e) => {
         this.showImage = true;
@@ -108,9 +171,19 @@ export class AutoTaggerComponent implements OnInit {
     try {
       let out:any = await this.model.predict(inputData);
       let labels = imagenetClassesTopK(out.fc1000, 10);
+      let tags = [];
+
+      for(let label of labels) {
+        const node = new TagNode(label.category);
+        node.children = this.tagDatabase.getChildren(label.category === 'seashore' ? 'landscape' : 'seashore');
+        tags.push(node)
+      }
+
+      this.dataSource.data = tags;
       this.result = labels;
       this.message = undefined;
     } catch(e) {
+      this.snackBar.open("Error: " + e.message, "", { duration: 2000, panelClass: 'error'})
     }
 
   }
@@ -145,6 +218,29 @@ export class AutoTaggerComponent implements OnInit {
     ops.assign(dataProcessedTensor.pick(null, null, 1), dataTensor.pick(null, null, 1))
     ops.assign(dataProcessedTensor.pick(null, null, 2), dataTensor.pick(null, null, 0))
     return dataProcessedTensor.data
+  }
+
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  transformer = (node: TagNode, level: number) => {
+    const existingNode = this.nestedNodeMap.get(node);
+    const flatNode = existingNode && existingNode.item === node.item
+        ? existingNode
+        : new TagFlatNode();
+
+    flatNode.item = node.item;
+    flatNode.level = level;
+    flatNode.expandable = !!node.children;
+    this.flatNodeMap.set(flatNode, node);
+    this.nestedNodeMap.set(node, flatNode);
+    return flatNode;
+  }
+
+  /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  tagSelectionToggle(node: TagFlatNode): void {
+    console.log(node);
+    this.tagListSelection.toggle(node);
   }
 
 }

@@ -1003,7 +1003,6 @@ export const imagenetClasses = {
 
 export function imagenetClassesTopK(classProbabilities:Float32Array, k = 5) : Array<{category: string, probability: number}> {
     let map =  Array.prototype.slice.call(classProbabilities).map((prob, index) => ({prob: prob, index: index}));
-    console.log(classProbabilities);
     let sorted = map.sort((a, b) => a.prob - b.prob).reverse();
     const out: Array<{category: string, probability: number}> = sorted.slice(0, k).map((e) => ({category: imagenetClasses[e.index][1].replace(/_/, ''), probability: e.prob}));
     return out;
