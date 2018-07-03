@@ -2,7 +2,7 @@
 @import "themes";
 
 
-html, body {    
+html, body {
     margin: 0px;
     height: 100%;
     width: 100%;
@@ -29,7 +29,7 @@ html, body {
 
 
 #canvas {
-    width: 100%;    
+    width: 100%;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -40,10 +40,24 @@ html, body {
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* mobile webkit */
 
     @media screen and (max-width: 599px) {
-        height: calc(100vh - 64px);    
+        height: calc(100vh - 64px);
     }
 
     @media screen and (min-width: 600px) {
         height: calc(100vh - 64px);
+    }
+}
+
+.mat-snack-bar-container {
+    &.success {
+        background-color: mat-color($mat-green, 500) !important;
+    }
+
+    &.error {
+        background-color: mat-color($mat-red, 900) !important;
+    }
+
+    .mat-simple-snackbar {
+        justify-content: space-around;
     }
 }

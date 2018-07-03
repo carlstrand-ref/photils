@@ -11,15 +11,9 @@
     }
 }
 
-.mat-snack-bar-container {
-    &.error {
-        background-color: mat-color($dark-warn, 900) !important;
-    }    
-}
-
 .ui {
-    position: absolute;    
-    background: rgba(0, 0, 0, 0.8);   
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
     color: mat-color($dark-primary, 500);
 
     &.controls {
@@ -31,13 +25,13 @@
         padding: 4px;
         text-align: center;
         -webkit-transform: translateX(-50%);
-        transform: translateX(-50%);    
+        transform: translateX(-50%);
 
         dl {
             font-size: 10pt;
             display: flex;
             flex-wrap: wrap;
-            text-align: left;            
+            text-align: left;
         }
         dt {
             width: 20%;
@@ -53,7 +47,7 @@
         bottom: 0px;
         left: 0px;
         top: auto;
-        margin: 0 auto;        
+        margin: 0 auto;
     }
 }
 
@@ -66,13 +60,13 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
     -webkit-transition: width 0.5s; /* Safari */
-    transition: width 0.5s;    
+    transition: width 0.5s;
 
     &.opened {
         display: block;
         padding: 10px;
-        width: 80px;     
-        text-align: center;   
+        width: 80px;
+        text-align: center;
     }
 
     .mat-raised-button {

@@ -22,6 +22,7 @@ import {
   MatPaginatorModule,
   MatPaginatorIntl,
   MatSnackBarModule,
+  MatCheckboxModule,
   MatListModule
 } from '@angular/material';
 
@@ -76,6 +77,7 @@ import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
     MatFormFieldModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
     FlexLayoutModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,

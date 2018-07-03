@@ -5,6 +5,7 @@ import ndarray from 'ndarray';
 import ops from 'ndarray-ops';
 import { MatSelectionList } from '@angular/material';
 import { Utils } from '../utils';
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'app-auto-tagger',
@@ -21,8 +22,9 @@ export class AutoTaggerComponent implements OnInit {
   public model:KerasJS.Model;
   public result: Array<{category: string, probability: number}>;
   public message:string;
+  public prefix:string = "";
 
-  constructor() { }
+  constructor(public snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.message = "loading model ...";
@@ -31,7 +33,6 @@ export class AutoTaggerComponent implements OnInit {
     }, false);
 
     this.initModel();
-
   }
 
   private async initModel() {
@@ -55,6 +56,27 @@ export class AutoTaggerComponent implements OnInit {
 
   public handleClick() {
     (this.inputFile.nativeElement as any).click();
+  }
+
+  public togglePrefix() {
+    this.prefix = this.prefix === '' ? '#' : '';
+  }
+
+  public copySelectedItems() {
+    let wrapper = document.createElement('textarea');
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '0';
+    wrapper.style.top = '0';
+    wrapper.style.opacity = '0';
+    document.body.appendChild(wrapper);
+
+    let content = this.selectedTags.selectedOptions.selected.map(item => item.value).join(' ');
+    wrapper.value = content;
+    wrapper.focus();
+    wrapper.select();
+    document.execCommand('copy');
+    document.body.removeChild(wrapper);
+    this.snackBar.open('Copied tags to clipboard.', "", { duration: 2000, panelClass: 'success'});
   }
 
   private handleFile(file:File) {
