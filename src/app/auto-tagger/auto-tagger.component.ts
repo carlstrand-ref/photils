@@ -144,6 +144,8 @@ export class AutoTaggerComponent implements OnInit {
 
   private handleFile(file:File) {
     if(file.type.startsWith("image")) {
+      this.tagListSelection.clear();
+      this.dataSource.data = [];
       this.message = "Predicting ...";
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -175,7 +177,7 @@ export class AutoTaggerComponent implements OnInit {
 
       for(let label of labels) {
         const node = new TagNode(label.category);
-        node.children = this.tagDatabase.getChildren(label.category === 'seashore' ? 'landscape' : 'seashore');
+        node.children = this.tagDatabase.getChildren(label.category);
         tags.push(node)
       }
 
@@ -239,7 +241,6 @@ export class AutoTaggerComponent implements OnInit {
 
   /** Toggle the to-do item selection. Select/deselect all the descendants node */
   tagSelectionToggle(node: TagFlatNode): void {
-    console.log(node);
     this.tagListSelection.toggle(node);
   }
 
