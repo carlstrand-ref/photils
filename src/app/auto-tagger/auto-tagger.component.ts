@@ -82,7 +82,7 @@ export class AutoTaggerComponent implements OnInit {
     wrapper.style.opacity = '0';
     document.body.appendChild(wrapper);
 
-    let content = this.selectedTags.join(' ');
+    let content = this.selectedTags.map(e => this.prefix + e).join(' ');
     wrapper.value = content;
     wrapper.focus();
     wrapper.select();
@@ -94,6 +94,7 @@ export class AutoTaggerComponent implements OnInit {
   private handleFile(file:File) {
     if(file.type.startsWith("image")) {
       this.message = "Predicting ...";
+      this.tags = [];
       this.selectedTags = [];
       const reader = new FileReader();
       reader.onload = (e) => {
