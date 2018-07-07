@@ -22,32 +22,18 @@
 
   <mat-card fxFlex="calc(50% - 48px)" fxFlex.lt-sm="100%">
     <mat-card-title fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="space-around start">
-        <span fxFlex>Tags <span *ngIf="tagListSelection.selected.length"> ({{tagListSelection.selected.length}})</span></span>
+        <span fxFlex>Tags <span *ngIf="selectedTags.length"> ({{selectedTags.length}})</span></span>
         <span class="spacer"></span>
         <mat-checkbox (change)="togglePrefix()">#</mat-checkbox>
-        <button mat-icon-button (click)="copySelectedItems()" [disabled]="tagListSelection.selected.length === 0">
+        <button mat-icon-button (click)="copySelectedItems()" [disabled]="selectedTags.length === 0">
           <mat-icon aria-label="icon-button with a back icon">file_copy</mat-icon>
         </button>
     </mat-card-title>
-    <mat-card-content>
-        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-          <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
-            <button mat-icon-button disabled></button>
-            <mat-checkbox class="tagList-leaf-node"
-                          [checked]="tagListSelection.isSelected(node)"
-                          (change)="tagSelectionToggle(node);">{{prefix + node.item}}</mat-checkbox>
-          </mat-tree-node>
-
-          <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
-            <button mat-icon-button matTreeNodeToggle
-                    [attr.aria-label]="'toggle ' + node.filename">
-              <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-              </mat-icon>
-            </button>
-            <mat-checkbox (change)="tagSelectionToggle(node);">{{prefix + node.item}}</mat-checkbox>
-          </mat-tree-node>
-        </mat-tree>
+    <mat-card-content class="taglist">
+      <mat-button-toggle [ngClass]="this.checked === true ? 'mat-raised-button mat-primary' : 'mat-stroked-button'"
+      (change)="toggleTag($event)" [value]="prefix + tag.name" *ngFor="let tag of tags">
+        {{prefix + tag.name}}
+      </mat-button-toggle>
     </mat-card-content>
   </mat-card>
 
