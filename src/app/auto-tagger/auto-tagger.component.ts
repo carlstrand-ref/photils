@@ -82,7 +82,7 @@ export class AutoTaggerComponent implements OnInit {
     wrapper.style.opacity = '0';
     document.body.appendChild(wrapper);
 
-    let content = this.selectedTags.map(e => this.prefix + e).join(' ');
+    let content = this.selectedTags.join(' ' + this.prefix);
     wrapper.value = content;
     wrapper.focus();
     wrapper.select();
@@ -94,7 +94,6 @@ export class AutoTaggerComponent implements OnInit {
   private handleFile(file:File) {
     if(file.type.startsWith("image")) {
       this.message = "Predicting ...";
-      this.tags = [];
       this.selectedTags = [];
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -121,13 +120,12 @@ export class AutoTaggerComponent implements OnInit {
   private async predict(data:tf.Tensor3D) {
     try {
       const prediction = this.model.predict(data) as tf.Tensor2D;
-      const feature = prediction.dot(this.pcaTensor).flatten();
+      const featureMap = prediction.dot(this.pcaTensor).flatten().dataSync();
+      const feature = Object.keys(featureMap).map((key) => featureMap[key]);
       this.message = "lookup for available tags";
-      let resp:any = await this.http.post('https://api.photils.app/tags', {feature: feature.dataSync()}).toPromise()
+      let resp:any = await this.http.post('https://api.photils.app/tags', {feature: feature}).toPromise()
       if (resp.success) {
-        let tags = Object.keys(resp.tags);
-        tags.sort((a, b) => resp.tags[a] - resp.tags[b]).reverse();
-        this.tags = tags.map((tag) : {name:string} => ({name: tag}))
+        this.tags = resp.tags.map((v) => { return {name: v}} );
       } else {
         throw Error(resp.message);
       }
