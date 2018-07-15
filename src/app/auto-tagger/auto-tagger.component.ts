@@ -94,6 +94,7 @@ export class AutoTaggerComponent implements OnInit {
   private handleFile(file:File) {
     if(file.type.startsWith("image")) {
       this.message = "Predicting ...";
+      this.tags = [];
       this.selectedTags = [];
       const reader = new FileReader();
       reader.onload = (e) => {
