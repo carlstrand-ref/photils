@@ -82,7 +82,7 @@ export class AutoTaggerComponent implements OnInit {
     wrapper.style.opacity = '0';
     document.body.appendChild(wrapper);
 
-    let content = this.selectedTags.join(' ' + this.prefix);
+    let content = this.prefix + this.selectedTags.join(' ' + this.prefix);
     wrapper.value = content;
     wrapper.focus();
     wrapper.select();
