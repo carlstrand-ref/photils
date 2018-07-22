@@ -7,6 +7,7 @@ import { ExposureComponent } from './exposure/exposure.component';
 import { InspirationComponent } from './inspiration/inspiration.component';
 import { SunComponent } from './sun/sun.component';
 import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
+import { AboutComponent } from './about/about.component';
 
 const routes: Routes = [
   { path: '', component: MainComponent, data: { state: 'main' } },
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'exposure', component: ExposureComponent , data: { state: 'exposure' }},
   { path: 'inspiration', component: InspirationComponent , data: { state: 'inspiration' }},
   { path: 'autotagger', component: AutoTaggerComponent , data: { state: 'autotagger' }},
+  { path: 'about', component: AboutComponent , data: { state: 'about' }},
 ]
 
 @NgModule({

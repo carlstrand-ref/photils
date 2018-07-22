@@ -42,6 +42,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { SunComponent } from './sun/sun.component';
 import { PaginationProvider } from './inspiration/paginationProvider';
 import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
     ArSphereComponent,
     InspirationComponent,
     SunComponent,
-    AutoTaggerComponent
+    AutoTaggerComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
