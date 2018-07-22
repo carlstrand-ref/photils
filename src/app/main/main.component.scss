@@ -1,6 +1,15 @@
 @import "../../themes";
 .app-menu {
     padding: 20px;
+
+    .logo {
+        text-align: center;
+        margin-bottom: 1em;
+        img {
+            max-width: 100%;
+        }
+    }
+
     ul {
 
         display: grid;

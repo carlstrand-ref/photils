@@ -1,7 +1,19 @@
 @import '~@angular/material/theming';
 @import '~leaflet/dist/leaflet.css';
-@include mat-core();
 
+@font-face {
+    font-family: 'rounded_eleganceregular';
+    src: url('/assets/fonts/hinted-RoundedElegance-Regular.woff2') format('woff2'),
+         url('/assets/fonts/hinted-RoundedElegance-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+$custom-typography: mat-typography-config(
+  $font-family: 'rounded_eleganceregular, monospace'
+);
+
+@include mat-core($custom-typography);
 
 $dark-primary: mat-palette($mat-blue-grey);
 $dark-accent:  mat-palette($mat-amber, A200, A100, A400);
@@ -9,3 +21,5 @@ $dark-warn:    mat-palette($mat-deep-orange);
 $dark-theme:   mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
 
 @include angular-material-theme($dark-theme);
+// @include mat-base-typography($custom-typography);
+// @include angular-material-typography($custom-typography);
