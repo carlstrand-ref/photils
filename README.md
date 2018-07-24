@@ -1,59 +1,106 @@
-# Photils
+<p align="center">
+<img align="center" src='./photils-logo.png' />
+</p>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.1.
+<h1 align="center">
+photils
+</h1>
 
-## Development server
+<h4 align="center">a PWA that features many useful tools for amateur and professional photographers.</h4>
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+### ![](img/exposure.png) Exposure Calculator
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Set your aperture, ISO and exposure time and let this this module have your exposure value being calculated.
 
-## Build
+### ![](img/depth_of_fields.png) Depth of Field Calculator
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as the Circle of confusion will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.
 
-## Running unit tests
+### ![](img/ar_inspiration.png) AR Inspiration
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+This module uses the device gyro sensors and camera to overlay markers of snapped pictures in your surrounding area. Click on one of the images to see in which distance it was taken and let your phone navigate you that point of interest.
 
-## Running end-to-end tests
+### ![](img/autotagger.png) Auto Tagger
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Take a picture and let the Auto Tagger suggest many Hashtags for your image.
 
-## Further help
+## Try Photils
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+You can try the current development state of Photils either on Desktop or your Smartphone under [dev.photils.app](https://dev.photils.app).
+Check the following Browser Matrix for availability.
 
+**Browser Matrix:**
 
+|OS|Browser||
+|---|---|---|
+|macOS|Safari|?|
+||Chrome|?|
+||Firefox|?|
+||Opera|?|
+|Windows|Chrome|?|
+||Firefox|?|
+|iOS|Safari|?|
+||Chrome|?|
+|Android|Safari|?|
+||Chrome|?|
+||Firefox|?|
 
-### Required for geolocation:
+## About
 
-Generate a local certificate in some folder:
-```
-git clone https://github.com/RubenVermeulen/generate-trusted-ssl-certificate.git
-cd generate-trusted-ssl-certificate
-bash generate.sh
-```
+Photils is a project by Tobias Scheck ([scheckmedia](https://github.com/scheckmedia)) and Michél Neumann ([Corrodize](https://github.com/Corrodize)).
 
-Create a ssl folder inside this directory, copy the server.crt and server.key file into this folder.
-Enable ssl for dev-server with the angular.json file.
+## Todo
+Find here the things we are still working on and want to accomplish:
 
-```
-"serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "photils:build",
-            "ssl": true,
-            "sslKey": "ssl/server.key",
-            "sslCert": "ssl/server.crt"
-          },
-          ...
-```
+[Irgendwelche großen Meilensteine?] 
 
-run dev server with the following command:
-```
-ng serve --host 0.0.0.0 --disableHostCheck
-```
+## Troubleshooting
+Found a bug? Use the projects [issue page]() to let us know about it.
 
+## Contributing
+
+Want to contribute to Photils? We're happy to get some help during development. Send us a Pull Request or get in touch via XXXX.
+
+### Fork it
+
+Fork the project and implement your own modules. We're happy to receive your Pull Request!
+
+## Development
+#### Certificate (Geolocation)
+
+To test a feature using the clients geolocation, a certificate will be required. In order to create the certificate, follow these steps:
+
+1. Generate a local certificate in some folder:
+
+    ```
+    git clone https://github.com/RubenVermeulen/generate-trusted-ssl-certificate.git
+    cd generate-trusted-ssl-certificate
+    bash generate.sh
+    ```
+
+2. Create an ssl folder inside this directory, copy the `server.crt` and `server.key` file into this folder.
+Enable ssl for the dev-server with the `angular.json` file.
+
+    ```
+    "serve": {
+              "builder": "@angular-devkit/build-angular:dev-server",
+              "options": {
+                "browserTarget": "photils:build",
+                "ssl": true,
+                "sslKey": "ssl/server.key",
+                "sslCert": "ssl/server.crt"
+              },
+              ...
+    ```
+
+3. Start the development server with the following command:
+
+    ```
+    ng serve --host 0.0.0.0 --disableHostCheck
+    ```
+    
+## License
+
+[Welche Lizenz? Soll das überhaupt erwähnt werden?]
