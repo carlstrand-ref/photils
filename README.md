@@ -1,5 +1,5 @@
 <p align="center">
-<img align="center" src='./photils-logo.png' />
+<img align="center" src='images/photils-logo.png' />
 </p>
 
 <h1 align="center">
@@ -10,19 +10,19 @@ photils
 
 ## Features
 
-### ![](img/exposure.png) Exposure Calculator
+### ![](images/exposure.png) Exposure Calculator
 
 Set your aperture, ISO and exposure time and let this this module have your exposure value being calculated.
 
-### ![](img/depth_of_fields.png) Depth of Field Calculator
+### ![](images/depth_of_fields.png) Depth of Field Calculator
 
 Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as the Circle of confusion will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.
 
-### ![](img/ar_inspiration.png) AR Inspiration
+### ![](images/ar_inspiration.png) AR Inspiration
 
 This module uses the device gyro sensors and camera to overlay markers of snapped pictures in your surrounding area. Click on one of the images to see in which distance it was taken and let your phone navigate you that point of interest.
 
-### ![](img/autotagger.png) Auto Tagger
+### ![](images/autotagger.png) Auto Tagger
 
 Take a picture and let the Auto Tagger suggest many Hashtags for your image.
 
