@@ -5,6 +5,7 @@ import {MatSnackBar} from '@angular/material';
 import { PCA_COMPONENTES } from '../pca_components';
 import { HttpClient } from '@angular/common/http';
 import { DeviceDetectorService, DeviceInfo } from '../../../node_modules/ngx-device-detector';
+
 @Component({
   selector: 'app-auto-tagger',
   templateUrl: './auto-tagger.component.html',
@@ -84,16 +85,28 @@ export class AutoTaggerComponent implements OnInit {
 
   public copySelectedItems() {
     let wrapper = document.createElement('textarea');
+    wrapper.readOnly = true;
     wrapper.style.position = 'fixed';
     wrapper.style.left = '0';
     wrapper.style.top = '0';
     wrapper.style.opacity = '0';
     document.body.appendChild(wrapper);
 
-    let content = this.prefix + this.selectedTags.join(' ' + this.prefix);
+    let content = this.prefix + this.selectedTags.join(' ' + this.prefix) + ' ' + this.prefix + 'photils';
     wrapper.value = content;
     wrapper.focus();
-    wrapper.select();
+
+    if(this.deviceService.getDeviceInfo().device === 'iphone') {
+      let range = document.createRange();
+      let selection = window.getSelection();
+
+      range.selectNodeContents(wrapper);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      wrapper.setSelectionRange(0, 999999);
+    } else {
+      wrapper.select();
+    }
     document.execCommand('copy');
     document.body.removeChild(wrapper);
     this.snackBar.open('Copied tags to clipboard.', "", { duration: 5000, panelClass: 'success'});
