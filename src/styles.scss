@@ -16,6 +16,10 @@ html, body {
 
     /* Support for IE. */
     font-feature-settings: 'liga';
+
+    a, a:active, a:visited {
+        color: mat-color($dark-primary);
+    }
 }
 
 .app-frame {
@@ -70,4 +74,8 @@ html, body {
     .mat-simple-snackbar {
         justify-content: space-around;
     }
+}
+
+.mat-dialog-content {
+    font-family: 'rounded_eleganceregular';
 }

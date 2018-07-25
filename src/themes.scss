@@ -13,9 +13,47 @@ $custom-typography: mat-typography-config(
   $font-family: 'rounded_eleganceregular, monospace'
 );
 
+@include mat-base-typography($custom-typography);
+// Override typography for all Angular Material, including mat-base-typography and all components.
+@include angular-material-typography($custom-typography);
+@include mat-dialog-typography($custom-typography);
+
 @include mat-core($custom-typography);
 
-$dark-primary: mat-palette($mat-blue-grey);
+$md-photilsred: (
+    50 : #f7e7e8,
+    100 : #eac4c5,
+    200 : #dd9d9e,
+    300 : #cf7677,
+    400 : #c4585a,
+    500 : #ba3b3d,
+    600 : #b33537,
+    700 : #ab2d2f,
+    800 : #a32627,
+    900 : #94191a,
+    A100 : #ffcacb,
+    A200 : #ff9798,
+    A400 : #ff6466,
+    A700 : #ff4b4c,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #ffffff,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$dark-primary: mat-palette($md-photilsred);
 $dark-accent:  mat-palette($mat-amber, A200, A100, A400);
 $dark-warn:    mat-palette($mat-deep-orange);
 $dark-theme:   mat-dark-theme($dark-primary, $dark-accent, $dark-warn);
