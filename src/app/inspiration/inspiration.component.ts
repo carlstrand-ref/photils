@@ -103,7 +103,7 @@ export class InspirationComponent implements OnInit {
       numItemsPerPages: s.getItemsPerPage()
     }
 
-    this.debugZones();
+    //this.debugZones();
 
     this.loading = false;
   }
