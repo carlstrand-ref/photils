@@ -164,7 +164,6 @@ export class AutoTaggerComponent implements OnInit {
   }
 
   private async predictLegacy(base64:string) {
-    console.log("base: ", base64);
     try {
       this.message = "lookup for available tags";
       let resp:any = await this.http.post('https://api.photils.app/tags', {image: base64}).toPromise()
