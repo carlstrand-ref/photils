@@ -4,6 +4,7 @@ import * as tf from '@tensorflow/tfjs';
 import {MatSnackBar} from '@angular/material';
 import { PCA_COMPONENTES } from '../pca_components';
 import { HttpClient } from '@angular/common/http';
+import { DeviceDetectorService, DeviceInfo } from '../../../node_modules/ngx-device-detector';
 @Component({
   selector: 'app-auto-tagger',
   templateUrl: './auto-tagger.component.html',
@@ -24,8 +25,12 @@ export class AutoTaggerComponent implements OnInit {
   public tags:Array<any>;
   public selectedTags:Array<string> = [];
   private pcaTensor:tf.Tensor2D;
+  private legacy = false;
 
-  constructor(public snackBar: MatSnackBar,   private http: HttpClient) {
+  constructor(public snackBar: MatSnackBar,   private http: HttpClient, private deviceService: DeviceDetectorService) {
+    this.legacy = this.deviceService.getDeviceInfo().os === 'ios';
+
+    console.log("legacy: ", this.legacy);
   }
 
   ngOnInit() {
@@ -33,7 +38,8 @@ export class AutoTaggerComponent implements OnInit {
       this.handleFile(e.target.files[0]);
     }, false);
 
-    this.initModel();
+    if(!this.legacy)
+      this.initModel();
   }
 
   private async initModel() {
@@ -105,8 +111,13 @@ export class AutoTaggerComponent implements OnInit {
         (this.srcImage.nativeElement as any).src = url;
         (this.srcImage.nativeElement as any).onload = async () => {
           let data =  await this.resizeImage(this.srcImage.nativeElement, 256, 256);
-          let preprocessed = this.preprocess(data.imageData);
-          this.predict(preprocessed);
+
+          if(this.legacy) {
+            this.predictLegacy(data.base64);
+          } else {
+            let preprocessed = this.preprocess(data.imageData);
+            this.predict(preprocessed);
+          }
         }
       }
 
@@ -137,8 +148,25 @@ export class AutoTaggerComponent implements OnInit {
     }
   }
 
-  private resizeImage(img, width, height) : Promise<{imageData: ImageData, blob: Blob}> {
-    return new Promise<{imageData: ImageData, blob: Blob}>((resolve, reject) => {
+  private async predictLegacy(base64:string) {
+    console.log("base: ", base64);
+    try {
+      this.message = "lookup for available tags";
+      let resp:any = await this.http.post('https://api.photils.app/tags', {image: base64}).toPromise()
+      if (resp.success) {
+        this.tags = resp.tags.map((v) => { return {name: v}} );
+      } else {
+        throw Error(resp.message);
+      }
+    } catch(e) {
+      this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
+    } finally {
+      this.message = undefined;
+    }
+  }
+
+  private resizeImage(img, width, height) : Promise<{imageData: ImageData, blob: Blob, base64:string}> {
+    return new Promise<{imageData: ImageData, blob: Blob, base64:string}>((resolve, reject) => {
       try {
         let canvas = document.createElement("canvas");
         canvas.width = width;
@@ -148,7 +176,7 @@ export class AutoTaggerComponent implements OnInit {
         ctx.drawImage(img, 0, 0, width, height);
         let imageData = ctx.getImageData(0, 0, width, height);
         canvas.toBlob(blob => {
-          resolve({imageData: imageData, blob: blob});
+          resolve({imageData: imageData, blob: blob, base64: canvas.toDataURL().replace('data:image/png;base64,','')});
         });
       } catch(e) { reject(e) };
     })
