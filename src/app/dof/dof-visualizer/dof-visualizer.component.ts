@@ -8,7 +8,7 @@ import { LOCATION_INITIALIZED } from '@angular/common';
   templateUrl: './dof-visualizer.component.html',
   styleUrls: ['./dof-visualizer.component.scss']
 })
-export class DofVisualizerComponent implements OnInit, AfterViewInit, Destr {
+export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy {
   @Output() onInit: EventEmitter<any> = new EventEmitter();
   private canvas;
   private engine;

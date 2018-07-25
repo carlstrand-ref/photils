@@ -140,9 +140,9 @@ export class AutoTaggerComponent implements OnInit {
               }
               catch(e) {
                 this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
-              } finally {
-                this.message = undefined;
               }
+            } finally {
+              this.message = undefined;
             }
           }
         }
@@ -157,17 +157,15 @@ export class AutoTaggerComponent implements OnInit {
   }
 
   private async predict(data:tf.Tensor3D) {
-    try {
-      const prediction = this.model.predict(data) as tf.Tensor2D;
-      const featureMap = prediction.dot(this.pcaTensor).flatten().dataSync();
-      const feature = Object.keys(featureMap).map((key) => featureMap[key]);
-      this.message = "lookup for available tags";
-      let resp:any = await this.http.post('https://api.photils.app/tags', {feature: feature}).toPromise()
-      if (resp.success) {
-        this.tags = resp.tags.map((v) => { return {name: v}} );
-      } else {
-        throw Error(resp.message);
-      }
+    const prediction = this.model.predict(data) as tf.Tensor2D;
+    const featureMap = prediction.dot(this.pcaTensor).flatten().dataSync();
+    const feature = Object.keys(featureMap).map((key) => featureMap[key]);
+    this.message = "lookup for available tags";
+    let resp:any = await this.http.post('https://api.photils.app/tags', {feature: feature}).toPromise()
+    if (resp.success) {
+      this.tags = resp.tags.map((v) => { return {name: v}} );
+    } else {
+      throw Error(resp.message);
     }
   }
 
