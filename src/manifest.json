@@ -1,7 +1,7 @@
 {
-  "name": "Photils",
+  "name": "photils",
   "short_name": "photils",
-  "theme_color": "#5f7c8a",
+  "theme_color": "#ba3b3d",
   "background_color": "#323232",
   "display": "fullscreen",
   "orientation": "portrait",
