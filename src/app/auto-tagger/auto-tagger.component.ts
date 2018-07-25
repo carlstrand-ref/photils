@@ -23,9 +23,9 @@ export class AutoTaggerComponent implements OnInit {
   public message:string;
   public prefix:string = "";
   public tags:Array<any>;
+  public legacy = false;
   public selectedTags:Array<string> = [];
   private pcaTensor:tf.Tensor2D;
-  private legacy = false;
 
   constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
       private http: HttpClient, private deviceService: DeviceDetectorService) {
