@@ -50,7 +50,8 @@ export class AutoTaggerComponent implements OnInit {
       this.model = await tf.loadModel('assets/tfsmodel/model.json');
       this.pcaTensor = tf.tensor2d(PCA_COMPONENTES);
     } catch(e) {
-      this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
+      //this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
+      this.legacy = true;
     } finally {
       this.message = undefined;
     }
