@@ -4,6 +4,9 @@
     </button>
     <span>Auto Tagger</span>
     <span class="spacer"></span>
+    <button *ngIf="legacy" mat-icon-button (click)="openLegacyDialog()">
+      <mat-icon aria-label="icon-button with a warning icon" color="warn">warning</mat-icon>
+    </button>
 </mat-toolbar>
 
 <div class="container" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px" fxLayoutAlign="space-around start">

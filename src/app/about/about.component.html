@@ -5,6 +5,24 @@
     <span>About</span>
 </mat-toolbar>
 
-<div class="result">
-
+<div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+    <mat-card class="item" fxFlex>
+        <mat-card-content>
+            <mat-list>
+                <h2  mat-subheader>build</h2>
+                <mat-list-item>Version: {{version.version}}</mat-list-item>
+                <mat-list-item>Hash: {{version.hash}}</mat-list-item>
+                <mat-divider></mat-divider>
+                <h2  mat-subheader>Github</h2>
+                <mat-list-item>
+                    <a href="https://github.com/scheckmedia/photils" target="_blank">https://github.com/scheckmedia/photils</a>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+                <h2  mat-subheader>Contributors</h2>
+                <mat-list-item><a href="https://github.com/scheckmedia" target="_blank">Tobias Scheck</a></mat-list-item>
+                <mat-list-item><a href="https://github.com/Corrodize" target="_blank">Michél Neumann</a></mat-list-item>
+                <mat-list-item><a href="https://github.com/maxbehr" target="_blank">Max Behr</a></mat-list-item>
+            </mat-list>
+        </mat-card-content>
+    </mat-card>
 </div>

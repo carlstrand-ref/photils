@@ -25,7 +25,7 @@ import {
   MatSnackBarModule,
   MatCheckboxModule,
   MatListModule,
-  MatChipsModule,
+  MatDialogModule,
   MatButtonToggleModule
 } from '@angular/material';
 
@@ -42,7 +42,7 @@ import { InspirationComponent } from './inspiration/inspiration.component';
 import { HttpClientModule } from '@angular/common/http';
 import { SunComponent } from './sun/sun.component';
 import { PaginationProvider } from './inspiration/paginationProvider';
-import { AutoTaggerComponent } from './auto-tagger/auto-tagger.component';
+import { AutoTaggerComponent, DialogContentLegacy } from './auto-tagger/auto-tagger.component';
 import { AboutComponent } from './about/about.component';
 
 @NgModule({
@@ -56,6 +56,7 @@ import { AboutComponent } from './about/about.component';
     InspirationComponent,
     SunComponent,
     AutoTaggerComponent,
+    DialogContentLegacy,
     AboutComponent
   ],
   imports: [
@@ -84,12 +85,14 @@ import { AboutComponent } from './about/about.component';
     MatProgressSpinnerModule,
     MatCheckboxModule,
     MatButtonToggleModule,
+    MatDialogModule,
     FlexLayoutModule,
     DeviceDetectorModule.forRoot(),
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
     HttpClientModule
   ],
+  entryComponents: [DialogContentLegacy],
   providers: [
     { provide: MatPaginatorIntl, useClass: PaginationProvider }
   ],

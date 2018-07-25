@@ -1,5 +1,5 @@
 import { Component, OnInit, Injectable,ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { MatButtonToggleChange } from '@angular/material';
+import { MatButtonToggleChange, MatDialog } from '@angular/material';
 import * as tf from '@tensorflow/tfjs';
 import {MatSnackBar} from '@angular/material';
 import { PCA_COMPONENTES } from '../pca_components';
@@ -27,7 +27,8 @@ export class AutoTaggerComponent implements OnInit {
   private pcaTensor:tf.Tensor2D;
   private legacy = false;
 
-  constructor(public snackBar: MatSnackBar,   private http: HttpClient, private deviceService: DeviceDetectorService) {
+  constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
+      private http: HttpClient, private deviceService: DeviceDetectorService) {
     this.legacy = this.deviceService.getDeviceInfo().os === 'ios';
 
     console.log("legacy: ", this.legacy);
@@ -190,4 +191,18 @@ export class AutoTaggerComponent implements OnInit {
     x = tf.expandDims(x);
     return x
   }
+
+  public openLegacyDialog() {
+    const dialogRef = this.dialog.open(DialogContentLegacy);
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 }
+
+@Component({
+  selector: 'dialog-content-legacy',
+  templateUrl: 'dialog-content-legacy.html',
+})
+export class DialogContentLegacy {}
