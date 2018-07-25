@@ -130,8 +130,20 @@ export class AutoTaggerComponent implements OnInit {
           if(this.legacy) {
             this.predictLegacy(data.base64);
           } else {
-            let preprocessed = this.preprocess(data.imageData);
-            this.predict(preprocessed);
+            try {
+              let preprocessed = this.preprocess(data.imageData);
+              this.predict(preprocessed);
+            } catch(e) {
+              try {
+                this.legacy = true;
+                this.predictLegacy(data.base64);
+              }
+              catch(e) {
+                this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
+              } finally {
+                this.message = undefined;
+              }
+            }
           }
         }
       }
@@ -156,10 +168,6 @@ export class AutoTaggerComponent implements OnInit {
       } else {
         throw Error(resp.message);
       }
-    } catch(e) {
-      this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
-    } finally {
-      this.message = undefined;
     }
   }
 
@@ -207,10 +215,6 @@ export class AutoTaggerComponent implements OnInit {
 
   public openLegacyDialog() {
     const dialogRef = this.dialog.open(DialogContentLegacy);
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
   }
 }
 

@@ -1,4 +1,4 @@
-import { Component, Output, OnInit, AfterViewInit, HostListener, AfterContentChecked, EventEmitter } from '@angular/core';
+import { Component, Output, OnInit, AfterViewInit, OnDestroy, HostListener, AfterContentChecked, EventEmitter } from '@angular/core';
 import { DofCalculation } from '../dof.component';
 import * as BABYLON from 'babylonjs';
 import { LOCATION_INITIALIZED } from '@angular/common';
@@ -8,16 +8,16 @@ import { LOCATION_INITIALIZED } from '@angular/common';
   templateUrl: './dof-visualizer.component.html',
   styleUrls: ['./dof-visualizer.component.scss']
 })
-export class DofVisualizerComponent implements OnInit, AfterViewInit {  
+export class DofVisualizerComponent implements OnInit, AfterViewInit, Destr {
   @Output() onInit: EventEmitter<any> = new EventEmitter();
   private canvas;
   private engine;
-  private scene; 
+  private scene;
   private pipeline;
   private leftCamera: BABYLON.DeviceOrientationCamera;
   private rightCamera: BABYLON.FreeCamera;
   private dofObjects = {nearPlane: undefined, farPlane: undefined, dof: undefined};
-  
+
   public colors = {
     farPlane: new BABYLON.Color3(1, 0.6, 0.27),
     nearPlane: BABYLON.Color3.Blue(),
@@ -25,12 +25,12 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
   }
 
 
-  @HostListener('window:resize') onResize() {    
-    this.resize();    
+  @HostListener('window:resize') onResize() {
+    this.resize();
   }
 
   ngAfterViewInit() {
-    this.resize();    
+    this.resize();
   }
 
   ngOnInit() {
@@ -47,8 +47,12 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
         self.onInit.emit();
         init = true;
       }
-    });        
-  } 
+    });
+  }
+
+  ngOnDestroy() {
+    this.engine.stopRenderLoop();
+  }
 
   public updateCamera(fov:number) {
     this.leftCamera.fov = fov;
@@ -57,7 +61,7 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
   public updateDoF(fStop:number, focalLength:number, focusDistance:number, dofAttrs:DofCalculation) {
     this.pipeline.depthOfField.focalLength = focalLength * 10;
     this.pipeline.depthOfField.fStop = fStop;
-    this.pipeline.depthOfField.focusDistance = focusDistance;    
+    this.pipeline.depthOfField.focusDistance = focusDistance;
 
     let farLimit = dofAttrs.farLimit == Infinity ? 200 : dofAttrs.farLimit;
     let dof = dofAttrs.DoF == Infinity ? 200 : dofAttrs.DoF;
@@ -75,10 +79,10 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     this.rightCamera.orthoLeft = -orthoWidth;
     this.rightCamera.orthoRight = orthoWidth;
     this.rightCamera.orthoTop = orthoHeight;
-    this.rightCamera.orthoBottom = -orthoHeight;   
-    
-    this.rightCamera.position = new BABYLON.Vector3(10, 1.5, halfLimit);  
-    this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, halfLimit));    
+    this.rightCamera.orthoBottom = -orthoHeight;
+
+    this.rightCamera.position = new BABYLON.Vector3(10, 1.5, halfLimit);
+    this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, halfLimit));
 
   }
 
@@ -92,31 +96,31 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     this.leftCamera = new BABYLON.DeviceOrientationCamera("camera1", new BABYLON.Vector3(0, 1.5, -1.0), scene);
     this.leftCamera.speed = 0.01;
     this.leftCamera.minZ = 0.001;
-    this.leftCamera.layerMask = ~0b11;      
-    this.leftCamera.attachControl(this.canvas, true);  
+    this.leftCamera.layerMask = ~0b11;
+    this.leftCamera.attachControl(this.canvas, true);
     if(navigator.userAgent.indexOf("Mobile") !== -1) {
       this.leftCamera.inputs.removeByType("FreeCameraTouchInput");
       this.leftCamera.inputs.removeByType("FreeCameraKeyboardMoveInput");
       this.leftCamera.inputs.removeByType("FreeCameraMouseInput");
     }
 
-    this.rightCamera = new BABYLON.FreeCamera("camera2", new BABYLON.Vector3(50, 1.5, 50), scene);  
+    this.rightCamera = new BABYLON.FreeCamera("camera2", new BABYLON.Vector3(50, 1.5, 50), scene);
     this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, 50));
     this.rightCamera.layerMask = 0b11;
     this.rightCamera.speed = 0.01;
-    this.rightCamera.minZ = 0.001;   
-    this.rightCamera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA; 
+    this.rightCamera.minZ = 0.001;
+    this.rightCamera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
     this.rightCamera.orthoLeft = -51;
     this.rightCamera.orthoRight = 51;
     this.rightCamera.orthoTop = 51;
-    this.rightCamera.orthoBottom = -51;    
+    this.rightCamera.orthoBottom = -51;
 
     this.leftCamera.viewport = new BABYLON.Viewport(0, 0, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.rightCamera.viewport = new BABYLON.Viewport(sideBySide ? 0.5 : 0.0, sideBySide ? 0.0 : 0.5, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.leftCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.leftCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
     this.rightCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.rightCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
 
-    new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(10, 10.0, 50.0), scene);    
+    new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(10, 10.0, 50.0), scene);
 
     let pbr = new BABYLON.PBRMetallicRoughnessMaterial("pbr", scene);
     pbr.environmentTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("assets/textures/environment.dds", scene);
@@ -141,10 +145,10 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
             sphere.material = sphereMat;
             sphere.position.y = i*1.0;
             sphere.position.x = -1.0;
-            sphere.position.z = j*1.0;                   
+            sphere.position.z = j*1.0;
         }
     }
-    
+
     let matOrange = pbr.clone("matOrange");
     matOrange.metallic = 0.0;
     matOrange.roughness = 1.0;
@@ -172,21 +176,21 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     this.dofObjects.farPlane.position  = new BABYLON.Vector3(1.5, 1.5, 0.0);
     this.dofObjects.dof.position  = new BABYLON.Vector3(1.4, 1.5, 0.0);
     this.dofObjects.dof.visibility = 0.8;
-    
+
     this.dofObjects.nearPlane.layerMask = 0b11;
     this.dofObjects.farPlane.layerMask = 0b11;
     this.dofObjects.dof.layerMask = 0b11;
 
     scene.activeCameras.push(this.leftCamera);
     scene.activeCameras.push(this.rightCamera);
-    
+
     // Create default pipeline and enable dof with Medium blur level
     this.pipeline = new BABYLON.DefaultRenderingPipeline("default", true, scene, [scene.activeCamera]);
     this.pipeline.depthOfFieldBlurLevel = BABYLON.DepthOfFieldEffectBlurLevel.High;
     this.pipeline.depthOfFieldEnabled = true;
     this.pipeline.depthOfField.focalLength = 180;
     this.pipeline.depthOfField.fStop = 3;
-    this.pipeline.depthOfField.focusDistance = 2250;    
+    this.pipeline.depthOfField.focusDistance = 2250;
 
     return scene;
   }
@@ -196,5 +200,5 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit {
     this.leftCamera.viewport = new BABYLON.Viewport(0, 0, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.rightCamera.viewport = new BABYLON.Viewport(sideBySide ? 0.5 : 0.0, sideBySide ? 0.0 : 0.5, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.engine.resize();
-  }  
+  }
 }
