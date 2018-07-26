@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { DeviceDetectorModule } from 'ngx-device-detector';
+import { WebStorageModule } from 'ngx-store';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MatSelectModule } from '@angular/material/select';
@@ -87,6 +88,7 @@ import { AboutComponent } from './about/about.component';
     MatButtonToggleModule,
     MatDialogModule,
     FlexLayoutModule,
+    WebStorageModule,
     DeviceDetectorModule.forRoot(),
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     AppRoutingModule,
