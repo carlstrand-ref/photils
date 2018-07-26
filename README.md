@@ -34,9 +34,7 @@ Take a picture and let the Auto Tagger suggest many Hashtags for your image.
 
 
 
-
-You can try the current development state of Photils either on Desktop or your Smartphone under [dev.photils.app](https://dev.photils.app).
-Check the following Browser Matrix for availability.
+## Supported Devices
 
 **Browser Matrix:**
 
@@ -46,8 +44,8 @@ Check the following Browser Matrix for availability.
 ||Chrome|✔️|✔️|️✖️|✔️|
 ||Firefox|✔️|✔️|️✖️|✔️|
 ||Opera|✔️|✔️|️✖️|✔️|
-|Windows|Chrome|?|
-||Firefox|?|
+|Windows|Chrome|✔️|✔️|️✖️|✔️|
+||Firefox|✔️|✔️|️✖️|✔️|
 |iOS >= 11.4|Safari|✔️|✔️|️✔️|✔️|
 ||Chrome|✔️|✔️|️✖️|✔️|
 ||Firefox|✔️|✔️|️✖️|✔️|
@@ -66,7 +64,7 @@ Find here the things we are still working on and want to accomplish:
  - light polution
 
 ## Troubleshooting
-Found a bug? Use the projects [issue page]() to let us know about it.
+Found a bug? Use the projects [issue page](https://github.com/scheckmedia/photils/issues) to let us know about it.
 
 ## Contributing
 
