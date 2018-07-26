@@ -17,6 +17,7 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy 
   private leftCamera: BABYLON.DeviceOrientationCamera;
   private rightCamera: BABYLON.FreeCamera;
   private dofObjects = {nearPlane: undefined, farPlane: undefined, dof: undefined};
+  private orthoRect: BABYLON.Vector2 = new BABYLON.Vector2(51, 51)
 
   public colors = {
     farPlane: new BABYLON.Color3(1, 0.6, 0.27),
@@ -38,13 +39,12 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy 
     this.engine = new BABYLON.Engine(this.canvas, true);
     this.scene = this.createScene();
 
-    let self = this;
     let init = false;
-    this.engine.runRenderLoop(function() {
-      self.scene.render();
+    this.engine.runRenderLoop(() => {
+      this.scene.render();
 
       if(!init) {
-        self.onInit.emit();
+        this.onInit.emit();
         init = true;
       }
     });
@@ -72,14 +72,9 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy 
     this.dofObjects.dof.scaling = new BABYLON.Vector3(1.0, 1.0, dof - 0.1);
 
     let halfLimit = farLimit / 2.0;
-    let orthoWidth = halfLimit + 1;
-    let orthoHeight = halfLimit + 1;
-
-
-    this.rightCamera.orthoLeft = -orthoWidth;
-    this.rightCamera.orthoRight = orthoWidth;
-    this.rightCamera.orthoTop = orthoHeight;
-    this.rightCamera.orthoBottom = -orthoHeight;
+    this.orthoRect.x = halfLimit + 1;
+    this.orthoRect.y = halfLimit + 1;
+    this.updateApsectRatio();
 
     this.rightCamera.position = new BABYLON.Vector3(10, 1.5, halfLimit);
     this.rightCamera.setTarget(new BABYLON.Vector3(0, 1.5, halfLimit));
@@ -110,16 +105,13 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy 
     this.rightCamera.speed = 0.01;
     this.rightCamera.minZ = 0.001;
     this.rightCamera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-    this.rightCamera.orthoLeft = -51;
-    this.rightCamera.orthoRight = 51;
-    this.rightCamera.orthoTop = 51;
-    this.rightCamera.orthoBottom = -51;
+    this.rightCamera.orthoLeft = -this.orthoRect.x;
+    this.rightCamera.orthoRight = this.orthoRect.x;
+    this.rightCamera.orthoTop = this.orthoRect.y;
+    this.rightCamera.orthoBottom = -this.orthoRect.y;
 
     this.leftCamera.viewport = new BABYLON.Viewport(0, 0, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.rightCamera.viewport = new BABYLON.Viewport(sideBySide ? 0.5 : 0.0, sideBySide ? 0.0 : 0.5, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
-    this.leftCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.leftCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
-    this.rightCamera.attachPostProcess(new BABYLON.FxaaPostProcess("fxaa", 1.0, this.rightCamera, BABYLON.Texture.BILINEAR_SAMPLINGMODE, this.engine, false));
-
     new BABYLON.DirectionalLight("light1", new BABYLON.Vector3(10, 10.0, 50.0), scene);
 
     let pbr = new BABYLON.PBRMetallicRoughnessMaterial("pbr", scene);
@@ -199,6 +191,26 @@ export class DofVisualizerComponent implements OnInit, AfterViewInit, OnDestroy 
     let sideBySide = (this.canvas.width / this.canvas.height) >= 1;
     this.leftCamera.viewport = new BABYLON.Viewport(0, 0, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
     this.rightCamera.viewport = new BABYLON.Viewport(sideBySide ? 0.5 : 0.0, sideBySide ? 0.0 : 0.5, sideBySide ? 0.5 : 1.0, sideBySide ? 1.0 : 0.5);
+
+    this.updateApsectRatio();
     this.engine.resize();
+  }
+
+  private updateApsectRatio() {
+    let sideBySide = (this.canvas.width / this.canvas.height) >= 1;
+    let w = sideBySide ? this.canvas.width * 0.5 : this.canvas.width;
+    let h = sideBySide ? this.canvas.height : this.canvas.height * 0.5;
+
+    let ratio = Math.max(w, h) / Math.min(w, h);
+    let width = 1.0;
+    let height = 1.0;
+
+    if(w >= h) width *= ratio;
+    else height *= ratio;
+
+    this.rightCamera.orthoLeft = -this.orthoRect.x * width;
+    this.rightCamera.orthoRight = this.orthoRect.x * width;
+    this.rightCamera.orthoTop = this.orthoRect.y * height;
+    this.rightCamera.orthoBottom = -this.orthoRect.y * height;
   }
 }
