@@ -76,4 +76,4 @@ Fork the project and implement your own modules. We're happy to receive your Pul
 
 ## License
 
-[Welche Lizenz? Soll das überhaupt erwähnt werden?]
+[Apache License 2.0](https://github.com/scheckmedia/photils/blob/master/LICENSE.md)
