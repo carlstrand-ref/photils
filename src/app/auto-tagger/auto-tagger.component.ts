@@ -16,7 +16,7 @@ export class AutoTaggerComponent implements OnInit {
   @ViewChild("dropzone") dropzone: ElementRef;
   @ViewChild("inputFile") inputFile: ElementRef;
   @ViewChild("srcImage") srcImage: ElementRef;
-  @LocalStorage() legacy: boolean = undefined;
+  @LocalStorage() legacy: boolean = false;
 
   public spinner = {mode : "determinate", value: 0};
   public showImage:boolean = false;
@@ -30,8 +30,8 @@ export class AutoTaggerComponent implements OnInit {
 
   constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
       private http: HttpClient, private deviceService: DeviceDetectorService) {
-    if(this.legacy === undefined)
-      this.legacy = this.deviceService.getDeviceInfo().device === 'iphone';
+    if(this.deviceService.getDeviceInfo().device === 'iphone')
+      this.legacy = true;
 
     console.log("legacy: ", this.legacy, this.deviceService.getDeviceInfo());
   }
