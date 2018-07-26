@@ -22,7 +22,7 @@ Set your aperture, ISO and exposure time and let this this module have your expo
 
 ### ![](images/depth_of_fields.png) Depth of Field Calculator
 
-Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as the Circle of confusion will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.
+Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as near and far limit will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.
 
 ### ![](images/ar_inspiration.png) AR Inspiration
 
