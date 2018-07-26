@@ -33,7 +33,7 @@ Check the following Browser Matrix for availability.
 
 **Browser Matrix:**
 
-|OS|Browser||
+|OS|Browser|Exposure Calculator|DoF Calculator|
 |---|---|---|
 |macOS|Safari|?|
 ||Chrome|?|
@@ -54,7 +54,7 @@ Photils is a project by Tobias Scheck ([scheckmedia](https://github.com/scheckme
 ## Todo
 Find here the things we are still working on and want to accomplish:
 
-[Irgendwelche großen Meilensteine?] 
+[Irgendwelche großen Meilensteine?]
 
 ## Troubleshooting
 Found a bug? Use the projects [issue page]() to let us know about it.
@@ -100,7 +100,7 @@ Enable ssl for the dev-server with the `angular.json` file.
     ```
     ng serve --host 0.0.0.0 --disableHostCheck
     ```
-    
+
 ## License
 
 [Welche Lizenz? Soll das überhaupt erwähnt werden?]
