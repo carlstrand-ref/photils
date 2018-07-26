@@ -1,8 +1,8 @@
-<mat-toolbar color="primary">    
+<mat-toolbar color="primary">
     <button mat-icon-button	 routerLink="/">
       <mat-icon aria-label="Example icon-button with a heart icon">chevron_left</mat-icon>
     </button>
-    <span>Depth of Field Calculator</span>    
+    <span>Depth of Field Calculator</span>
 </mat-toolbar>
 
 <mat-card>
@@ -13,7 +13,7 @@
           {{ vendor }}
         </mat-option>
       </mat-select>
-    </mat-form-field>    
+    </mat-form-field>
 
     <mat-form-field>
       <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel($event)">
@@ -22,7 +22,7 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    
+
     <mat-form-field>
       <mat-select placeholder="Aperture" [(ngModel)]="dataModel.aperture" (selectionChange)="calculateDof()"
         disabled="{{dataModel.vendor === '' || dataModel.model === ''}}" >
@@ -33,15 +33,15 @@
     </mat-form-field>
 
     <mat-form-field>
-        <input matInput type="number" placeholder="Focal length " [(ngModel)]="dataModel.focalLength" 
+        <input matInput type="number" placeholder="Focal length " [(ngModel)]="dataModel.focalLength"
         (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
-        <span matSuffix>mm</span>          
+        <span matSuffix>mm</span>
     </mat-form-field>
 
     <mat-form-field>
-        <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance" 
+        <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance"
         (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
-        <span matSuffix>{{dataModel.metric == true ? 'm' : 'ft'}}</span>          
+        <span matSuffix>{{dataModel.metric == true ? 'm' : 'ft'}}</span>
     </mat-form-field>
 
     <mat-slide-toggle
@@ -59,14 +59,14 @@
       [(ngModel)]="visualize">
         Visualize
     </mat-slide-toggle>
-  </div>  
+  </div>
 
-  <div *ngIf="result.isReady" class="result" 
+  <div *ngIf="result.isReady" class="result"
   fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
     <mat-card class="item" fxFlex>
       <mat-card-title>Subject distance</mat-card-title>
       <mat-card-content>{{dataModel.distance.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>    
+    </mat-card>
     <mat-card class="item" fxFlex>
       <mat-card-title>DoF Near limit</mat-card-title>
       <mat-card-content>{{result.nearLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
@@ -79,10 +79,10 @@
 
     <mat-card class="item" fxFlex>
         <mat-card-title>
-          DoF Total          
+          DoF Total
         </mat-card-title>
         <mat-card-content>
-            
+
           {{result.DoF.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}
         </mat-card-content>
       </mat-card>

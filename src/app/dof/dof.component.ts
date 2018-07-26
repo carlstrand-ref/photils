@@ -1,25 +1,26 @@
-import { Component, ViewChild, DoCheck } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import json from '../../assets/camera-sensor-data.json';
 import { AppServics } from '../app-service.service';
 import { Location } from '@angular/common';
 import { DofVisualizerComponent } from './dof-visualizer/dof-visualizer.component';
 import { Utils } from '../utils';
+import { LocalStorage } from 'ngx-store';
 
 @Component({
   selector: 'app-dof',
   templateUrl: './dof.component.html',
   styleUrls: ['./dof.component.scss']
 })
-export class DofComponent {
+export class DofComponent implements OnInit {
   @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;
+  public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
+  @LocalStorage() cachedSelection:any = {vendor: '', model: ''}
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = [];
   public models: {} = {};
-  public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
-  public apertures = [];  
+  public apertures = [];
   public visualize = false;
-  private utils = Utils;
   public result:DofCalculation =  new DofCalculation();
 
   constructor(private appService: AppServics, private location: Location) {
@@ -33,54 +34,77 @@ export class DofComponent {
       this.models[camera.CameraMaker].push(camera);
     }
 
-    for(let i = -1; i <= 12; i++) {      
+    if(this.dataModel.vendor !== '')
+      this.selectVendor(null);
+
+    for(let i = -1; i <= 12; i++) {
       for(let j = 0; j < 3; j++) {
-        let av = (i + j/3.0);               
-        let dec_places = i < 6 ? 1 : 0;              
-        let aperture_third = Math.round(Math.sqrt(2**av) * 10) / 10;                
-        this.apertures.push(Number.parseFloat(aperture_third.toFixed(dec_places)));        
-      }      
+        let av = (i + j/3.0);
+        let dec_places = i < 6 ? 1 : 0;
+        let aperture_third = Math.round(Math.sqrt(2**av) * 10) / 10;
+        this.apertures.push(Number.parseFloat(aperture_third.toFixed(dec_places)));
+      }
+    }
+  }
+
+  ngOnInit() {
+    if(this.cachedSelection.vendor !== "" && this.cachedSelection.model !== "") {
+      this.dataModel.vendor = this.cachedSelection.vendor;
+      this.selectedModels = this.models[this.dataModel.vendor];
+
+      let idx;
+      for(let i in this.selectedModels) {
+        if(this.selectedModels[i].CameraModel === this.cachedSelection.model) {
+          idx = i;
+          break;
+        }
+      }
+      this.dataModel.model = this.selectedModels[idx];
+      this.calculateDof();
     }
   }
 
 
-  public calculateDof() {    
+  public calculateDof() {
     let camera = this.dataModel.model;
     let sh = camera['SensorHeight(mm)'];
-    let sw = camera['SensorWidth(mm)'];    
+    let sw = camera['SensorWidth(mm)'];
     let d = Math.sqrt(sw**2 + sh**2);
     let CoC = d / 1500;
-    
+
     let focalLength = this.dataModel.focalLength;
-    let s = this.dataModel.distance * 1000; // convert m to mm        
+    let s = this.dataModel.distance * 1000; // convert m to mm
 
     this.result.calculate(
       focalLength, s,
       this.dataModel.aperture,
       CoC, this.dataModel.metric
     );
-  
+
     if (this.dofVisualizer === undefined)
       return;
 
-    if(!(sw > 35.5)) // is not fullframe     
+    if(!(sw > 35.5)) // is not fullframe
       focalLength *= Number((43.27 / d).toPrecision(2)); // full frame diagonal = 43.27
 
     let fov = 2 * Math.atan(sw / (2 * focalLength)); // in rad
     this.dofVisualizer.updateCamera(fov);
 
     this.dofVisualizer.updateDoF(
-      this.dataModel.aperture, 
+      this.dataModel.aperture,
       focalLength, s,this.result
     );
   }
 
-  public selectVendor(evt:any) {    
-    this.selectedModels = this.models[this.dataModel.vendor];    
+  public selectVendor(evt:any) {
+    this.selectedModels = this.models[this.dataModel.vendor];
   }
 
   public selectModel(evt:any) {
     this.calculateDof();
+    this.cachedSelection.vendor = this.dataModel.vendor;
+    this.cachedSelection.model = (this.dataModel.model as any).CameraModel;
+    this.cachedSelection.save();
   }
 }
 
@@ -91,15 +115,15 @@ export class DofCalculation {
   public DoF: number;
   public circleOfConfusion: number;
   public isReady = false;
-  
+
   calculate(
-    focalLength:number, 
-    subjectDistance: number, 
-    fstop:number, 
+    focalLength:number,
+    subjectDistance: number,
+    fstop:number,
     CoC:number,
     isMetric:boolean) {
-    
-    
+
+
     let H = focalLength + (focalLength ** 2) / (fstop * CoC); // Hyperfocal in mm
     let Hs = subjectDistance *  H;
     let Dn = Hs / (H + subjectDistance);
@@ -107,16 +131,16 @@ export class DofCalculation {
     let DoF = Df - Dn;
 
 
-    let isInfinity = subjectDistance >= H ; 
+    let isInfinity = subjectDistance >= H ;
 
     let f = isMetric ? 1 : 3.2808;
     this.hyperFocal = (H / 1000.0) * f;
     this.nearLimit = (Dn / 1000.0) * f;
-    this.farLimit =  isInfinity ? Infinity : (Df / 1000.0)  * f;    
+    this.farLimit =  isInfinity ? Infinity : (Df / 1000.0)  * f;
     this.DoF = isInfinity ? Infinity : (DoF / 1000.0)  * f;
     this.circleOfConfusion = CoC;
     this.isReady = true;
-      
+
   }
 
   toString() {
