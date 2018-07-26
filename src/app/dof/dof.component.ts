@@ -13,8 +13,9 @@ import { LocalStorage } from 'ngx-store';
 })
 export class DofComponent implements OnInit {
   @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;
+  @LocalStorage() cachedSelection:any = { vendor: '',  model: ''}
+
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
-  @LocalStorage() cachedSelection:any = {vendor: '', model: ''}
   private data: any = <any> json;
   public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = [];
@@ -101,10 +102,10 @@ export class DofComponent implements OnInit {
   }
 
   public selectModel(evt:any) {
-    this.calculateDof();
     this.cachedSelection.vendor = this.dataModel.vendor;
     this.cachedSelection.model = (this.dataModel.model as any).CameraModel;
     this.cachedSelection.save();
+    this.calculateDof();
   }
 }
 
