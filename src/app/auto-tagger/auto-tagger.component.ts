@@ -5,6 +5,7 @@ import {MatSnackBar} from '@angular/material';
 import { PCA_COMPONENTES } from '../pca_components';
 import { HttpClient } from '@angular/common/http';
 import { DeviceDetectorService, DeviceInfo } from '../../../node_modules/ngx-device-detector';
+import { LocalStorage } from 'ngx-store';
 
 @Component({
   selector: 'app-auto-tagger',
@@ -15,22 +16,22 @@ export class AutoTaggerComponent implements OnInit {
   @ViewChild("dropzone") dropzone: ElementRef;
   @ViewChild("inputFile") inputFile: ElementRef;
   @ViewChild("srcImage") srcImage: ElementRef;
+  @LocalStorage() legacy: boolean = undefined;
 
   public spinner = {mode : "determinate", value: 0};
-
   public showImage:boolean = false;
   public model:tf.Model;
   public result: Array<{category: string, probability: number}>;
   public message:string;
   public prefix:string = "";
   public tags:Array<any>;
-  public legacy = false;
   public selectedTags:Array<string> = [];
   private pcaTensor:tf.Tensor2D;
 
   constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
       private http: HttpClient, private deviceService: DeviceDetectorService) {
-    this.legacy = this.deviceService.getDeviceInfo().device === 'iphone';
+    if(this.legacy === undefined)
+      this.legacy = this.deviceService.getDeviceInfo().device === 'iphone';
 
     console.log("legacy: ", this.legacy, this.deviceService.getDeviceInfo());
   }
