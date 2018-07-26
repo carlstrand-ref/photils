@@ -30,10 +30,11 @@ export class AutoTaggerComponent implements OnInit {
 
   constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
       private http: HttpClient, private deviceService: DeviceDetectorService) {
-    if(this.deviceService.getDeviceInfo().device === 'iphone')
+    if(this.deviceService.getDeviceInfo().device === 'iphone' ||
+      tf.getBackend() === 'cpu')
       this.legacy = true;
 
-    console.log("legacy: ", this.legacy, this.deviceService.getDeviceInfo());
+    console.log("legacy: ", this.legacy);
   }
 
   ngOnInit() {
