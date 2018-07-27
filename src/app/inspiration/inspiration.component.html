@@ -1,22 +1,22 @@
-<mat-toolbar color="primary">    
+<mat-toolbar color="primary">
     <button mat-icon-button routerLink="/">
         <mat-icon aria-label="icon-button with a back icon">chevron_left</mat-icon>
     </button>
-    <span>AR Inspiration</span> 
+    <span>AR Inspiration</span>
     <span class="spacer"></span>
     <button mat-icon-button
         class="gui settings button" (click)="displaySettings = !displaySettings">
         <mat-icon aria-label="icon-button with a settings icon">settings</mat-icon>
-    </button>    
+    </button>
 </mat-toolbar>
 
 <div class="container">
-    <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>        
+    <app-ar-sphere #arSphere (onReady)="sphereReady()"></app-ar-sphere>
     <mat-progress-spinner mode="indeterminate" color="warn" *ngIf="loading"></mat-progress-spinner>
     <div *ngIf="selectedImage !== null" class="ui controls">
         <dl class="infos">
             <dt>Title: </dt> <dd>{{this.selectedImage.photo.title}}</dd>
-            <dt>Beeline: </dt> <dd>{{this.selectedImage.photo.distance.toFixed(2)}} km</dd>            
+            <dt>Beeline: </dt> <dd>{{this.selectedImage.photo.distance.toFixed(2)}} km</dd>
         </dl>
         <mat-divider></mat-divider>
         <div class="buttonbar">
@@ -30,13 +30,13 @@
     </div>
     <div class="settings sidebar" [ngClass]="{'opened': displaySettings}">
         Radius
-        <mat-slider      
-            [(ngModel)]="radius"                  
+        <mat-slider
+            [(ngModel)]="radius"
             max="30"
             min="1"
             step="1"
-            thumbLabel        
-            tickInterval="5"  
+            thumbLabel
+            tickInterval="5"
             vertical>
         </mat-slider>
         <button mat-raised-button color="primary"
@@ -46,11 +46,11 @@
         </button>
     </div>
 
-    <mat-paginator *ngIf="paginator" class="ui" 
+    <mat-paginator *ngIf="paginator" class="ui"
         hidePageSize
         [length]="paginator.total"
         [pageIndex] = "paginator.page - 1"
-        [pageSize]="paginator.numItemsPerPages"        
+        [pageSize]="paginator.numItemsPerPages"
         (page)="changePage($event)">
     </mat-paginator>
 </div>

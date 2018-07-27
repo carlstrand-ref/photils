@@ -1,11 +1,11 @@
-<mat-toolbar color="primary">    
+<mat-toolbar color="primary">
     <button mat-icon-button routerLink="/">
         <mat-icon aria-label="Example icon-button with a heart icon">chevron_left</mat-icon>
     </button>
-    <span>Exposure Calculator</span>    
+    <span>Exposure Calculator</span>
 </mat-toolbar>
 
-<div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+<div class="container" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
     <mat-card class="item" fxFlex>
         <mat-card-title>Aperture</mat-card-title>
         <mat-form-field>
@@ -18,7 +18,7 @@
         <mat-form-field>
             <input #timeInput matInput name="time" type="number" placeholder="Exposure time (s)" [(ngModel)]="currentTime" (blur)="onValueChanged(timeInput.name)">
         </mat-form-field>
-    </mat-card> 
+    </mat-card>
 
     <mat-card class="item" fxFlex>
         <mat-card-title>ISO Sensitivity</mat-card-title>

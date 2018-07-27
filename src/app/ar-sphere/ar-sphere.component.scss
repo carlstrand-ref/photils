@@ -1,8 +1,4 @@
 @import "../../themes";
-canvas {
-    height: calc(100vh - 64px);
-    width: 100%;
-}
 
 #fpsCounter {
     position: absolute;
@@ -13,7 +9,7 @@ canvas {
 }
 
 .wrapper {
-    position: relative;    
+    position: relative;
 }
 
 .wrapper svg {

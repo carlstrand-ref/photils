@@ -5,97 +5,99 @@
     <span>Depth of Field Calculator</span>
 </mat-toolbar>
 
-<mat-card>
-  <div>
-    <mat-form-field>
-      <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor($event)">
-        <mat-option *ngFor="let vendor of appDataService.vendors" [value]="vendor">
-          {{ vendor }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel($event)">
-        <mat-option *ngFor="let model of selectedModels" [value]="model">
-          {{ model.CameraModel }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field>
-      <mat-select placeholder="Aperture" [(ngModel)]="dataModel.aperture" (selectionChange)="calculateDof()"
-        disabled="{{dataModel.vendor === '' || dataModel.model === ''}}" >
-          <mat-option *ngFor="let aperture of apertures" [value]="aperture">
-            {{ aperture }}
+<div class="container">
+  <mat-card>
+    <div>
+      <mat-form-field>
+        <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor($event)">
+          <mat-option *ngFor="let vendor of appDataService.vendors" [value]="vendor">
+            {{ vendor }}
           </mat-option>
         </mat-select>
-    </mat-form-field>
+      </mat-form-field>
 
-    <mat-form-field>
-        <input matInput type="number" placeholder="Focal length " [(ngModel)]="dataModel.focalLength"
-        (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
-        <span matSuffix>mm</span>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel($event)">
+          <mat-option *ngFor="let model of selectedModels" [value]="model">
+            {{ model.CameraModel }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-        <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance"
-        (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
-        <span matSuffix>{{dataModel.metric == true ? 'm' : 'ft'}}</span>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-select placeholder="Aperture" [(ngModel)]="dataModel.aperture" (selectionChange)="calculateDof()"
+          disabled="{{dataModel.vendor === '' || dataModel.model === ''}}" >
+            <mat-option *ngFor="let aperture of apertures" [value]="aperture">
+              {{ aperture }}
+            </mat-option>
+          </mat-select>
+      </mat-form-field>
 
-    <mat-slide-toggle
-      color='primary'
-      (change)="calculateDof()"
-      disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
-      [(ngModel)]="dataModel.metric">
-        Metric
-    </mat-slide-toggle>
+      <mat-form-field>
+          <input matInput type="number" placeholder="Focal length " [(ngModel)]="dataModel.focalLength"
+          (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
+          <span matSuffix>mm</span>
+      </mat-form-field>
 
-    <mat-slide-toggle
-      color='primary'
-      disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
-      (change)="calculateDof()"
-      [(ngModel)]="visualize">
-        Visualize
-    </mat-slide-toggle>
-  </div>
+      <mat-form-field>
+          <input matInput type="number" placeholder="Subject Distance" [(ngModel)]="dataModel.distance"
+          (input)="calculateDof()" disabled="{{dataModel.vendor === '' || dataModel.model === ''}}">
+          <span matSuffix>{{dataModel.metric == true ? 'm' : 'ft'}}</span>
+      </mat-form-field>
 
-  <div *ngIf="result.isReady" class="result"
-  fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
-    <mat-card class="item" fxFlex>
-      <mat-card-title>Subject distance</mat-card-title>
-      <mat-card-content>{{dataModel.distance.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>
-    <mat-card class="item" fxFlex>
-      <mat-card-title>DoF Near limit</mat-card-title>
-      <mat-card-content>{{result.nearLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>
+      <mat-slide-toggle
+        color='primary'
+        (change)="calculateDof()"
+        disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
+        [(ngModel)]="dataModel.metric">
+          Metric
+      </mat-slide-toggle>
 
-    <mat-card class="item" fxFlex>
-      <mat-card-title>DoF Far limit</mat-card-title>
-      <mat-card-content>{{result.farLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>
+      <mat-slide-toggle
+        color='primary'
+        disabled="{{dataModel.vendor === '' || dataModel.model === ''}}"
+        (change)="calculateDof()"
+        [(ngModel)]="visualize">
+          Visualize
+      </mat-slide-toggle>
+    </div>
 
-    <mat-card class="item" fxFlex>
-        <mat-card-title>
-          DoF Total
-        </mat-card-title>
-        <mat-card-content>
-
-          {{result.DoF.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}
-        </mat-card-content>
+    <div *ngIf="result.isReady" class="result"
+    fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+      <mat-card class="item" fxFlex>
+        <mat-card-title>Subject distance</mat-card-title>
+        <mat-card-content>{{dataModel.distance.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+      </mat-card>
+      <mat-card class="item" fxFlex>
+        <mat-card-title>DoF Near limit</mat-card-title>
+        <mat-card-content>{{result.nearLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
       </mat-card>
 
-    <mat-card class="item" fxFlex>
-      <mat-card-title>Hyperfocal distance</mat-card-title>
-      <mat-card-content>{{result.hyperFocal.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>
+      <mat-card class="item" fxFlex>
+        <mat-card-title>DoF Far limit</mat-card-title>
+        <mat-card-content>{{result.farLimit.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+      </mat-card>
 
-    <mat-card class="item" fxFlex>
-      <mat-card-title>Circle of confusion</mat-card-title>
-      <mat-card-content>{{result.circleOfConfusion.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
-    </mat-card>
-  </div>
-</mat-card>
-<dof-visualizer *ngIf="visualize" #dofVisualizer (onInit)="calculateDof()"></dof-visualizer>
+      <mat-card class="item" fxFlex>
+          <mat-card-title>
+            DoF Total
+          </mat-card-title>
+          <mat-card-content>
+
+            {{result.DoF.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}
+          </mat-card-content>
+        </mat-card>
+
+      <mat-card class="item" fxFlex>
+        <mat-card-title>Hyperfocal distance</mat-card-title>
+        <mat-card-content>{{result.hyperFocal.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+      </mat-card>
+
+      <mat-card class="item" fxFlex>
+        <mat-card-title>Circle of confusion</mat-card-title>
+        <mat-card-content>{{result.circleOfConfusion.toFixed(2)}} {{dataModel.metric == true ? 'm' : 'ft'}}</mat-card-content>
+      </mat-card>
+    </div>
+  </mat-card>
+  <dof-visualizer *ngIf="visualize" #dofVisualizer (onInit)="calculateDof()"></dof-visualizer>
+</div>
