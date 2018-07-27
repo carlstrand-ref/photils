@@ -1,0 +1,39 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/">
+      <mat-icon aria-label="icon-button with a back icon">chevron_left</mat-icon>
+  </button>
+  <span>Settings</span>
+</mat-toolbar>
+
+<div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
+  <mat-card class="item" fxFlex>
+      <mat-card-title>Camera</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor($event)">
+            <mat-option *ngFor="let vendor of appDataService.vendors" [value]="vendor">
+              {{ vendor }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-select placeholder="{{ dataModel.vendor === '' ? '' : 'Model'}}" [(ngModel)]="dataModel.model" (selectionChange)="selectModel($event)">
+            <mat-option *ngFor="let model of selectedModels" [value]="model">
+              {{ model.CameraModel }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-card-content>
+  </mat-card>
+
+  <mat-card class="item" fxFlex>
+      <mat-card-title>Auto Tagger</mat-card-title>
+      <mat-form-field>
+        <mat-select placeholder="Mode" value="{{legacy}}" (selectionChange)="changeLegacy($event)">
+          <mat-option value="false">Default</mat-option>
+          <mat-option value="true">Legacy</mat-option>
+        </mat-select>
+      </mat-form-field>
+  </mat-card>
+</div>
