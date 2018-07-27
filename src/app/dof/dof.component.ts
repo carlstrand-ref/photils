@@ -1,9 +1,7 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import json from '../../assets/camera-sensor-data.json';
-import { AppServics } from '../app-service.service';
+import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { AppDataServics } from '../app-data.service';
 import { Location } from '@angular/common';
 import { DofVisualizerComponent } from './dof-visualizer/dof-visualizer.component';
-import { Utils } from '../utils';
 import { LocalStorage } from 'ngx-store';
 
 @Component({
@@ -11,30 +9,17 @@ import { LocalStorage } from 'ngx-store';
   templateUrl: './dof.component.html',
   styleUrls: ['./dof.component.scss']
 })
-export class DofComponent implements OnInit {
+export class DofComponent implements OnInit, OnDestroy {
   @ViewChild(DofVisualizerComponent) dofVisualizer: DofVisualizerComponent;
   @LocalStorage() cachedSelection:any = { vendor: '',  model: ''}
 
   public dataModel = {vendor: '', model: '', aperture: 2.8, focalLength: 55, distance: 10, metric: true};
-  private data: any = <any> json;
-  public vendors: Set<String> = new Set<String>();
   public selectedModels:Array<any> = [];
-  public models: {} = {};
   public apertures = [];
   public visualize = false;
   public result:DofCalculation =  new DofCalculation();
 
-  constructor(private appService: AppServics, private location: Location) {
-    for(const camera of this.data) {
-      this.vendors.add(camera.CameraMaker);
-
-      if (!(this.models[camera.CameraMaker] instanceof Array)){
-        this.models[camera.CameraMaker] = [];
-      }
-
-      this.models[camera.CameraMaker].push(camera);
-    }
-
+  constructor(public appDataService: AppDataServics, private location: Location) {
     if(this.dataModel.vendor !== '')
       this.selectVendor(null);
 
@@ -48,10 +33,13 @@ export class DofComponent implements OnInit {
     }
   }
 
+  // necessary for ngx-store
+  ngOnDestroy() {}
+
   ngOnInit() {
     if(this.cachedSelection.vendor !== "" && this.cachedSelection.model !== "") {
       this.dataModel.vendor = this.cachedSelection.vendor;
-      this.selectedModels = this.models[this.dataModel.vendor];
+      this.selectedModels = this.appDataService.getModels(this.dataModel.vendor);
 
       let idx;
       for(let i in this.selectedModels) {
@@ -98,13 +86,16 @@ export class DofComponent implements OnInit {
   }
 
   public selectVendor(evt:any) {
-    this.selectedModels = this.models[this.dataModel.vendor];
+    this.selectedModels = this.appDataService.getModels(this.dataModel.vendor);
   }
 
   public selectModel(evt:any) {
-    this.cachedSelection.vendor = this.dataModel.vendor;
-    this.cachedSelection.model = (this.dataModel.model as any).CameraModel;
-    this.cachedSelection.save();
+    // if we have no default camera save the first selection
+    if(this.cachedSelection.vendor === "" && this.cachedSelection.model === "") {
+      this.cachedSelection.vendor = this.dataModel.vendor;
+      this.cachedSelection.model = (this.dataModel.model as any).CameraModel;
+      this.cachedSelection.save();
+    }
     this.calculateDof();
   }
 }

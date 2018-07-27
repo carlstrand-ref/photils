@@ -9,7 +9,7 @@
   <div>
     <mat-form-field>
       <mat-select placeholder="Vendor" name="vendor" [(ngModel)]="dataModel.vendor" (selectionChange)="selectVendor($event)">
-        <mat-option *ngFor="let vendor of vendors" [value]="vendor">
+        <mat-option *ngFor="let vendor of appDataService.vendors" [value]="vendor">
           {{ vendor }}
         </mat-option>
       </mat-select>
