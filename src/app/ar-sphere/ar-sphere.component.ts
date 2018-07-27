@@ -45,8 +45,8 @@ export class ArSphereComponent implements OnInit , OnDestroy {
 
   ngOnDestroy() {
     this.stopVideo()
-    this.scene.dispose();
-    this.engine.dispose();
+    if(this.scene) this.scene.dispose();
+    if(this.engine) this.engine.dispose();
   }
 
   public reset() {
