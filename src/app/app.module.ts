@@ -34,7 +34,7 @@ import { AppComponent } from './app.component';
 import { DofComponent } from './dof/dof.component';
 import { ExposureComponent } from './exposure/exposure.component';
 import { environment } from '../environments/environment';
-import { AppRoutingModule } from './/app-routing.module';
+import { AppRoutingModule } from './app-routing.module';
 import { CommonModule } from '@angular/common';
 import { MainComponent } from './main/main.component';
 import { DofVisualizerComponent } from './dof/dof-visualizer/dof-visualizer.component';
