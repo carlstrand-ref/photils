@@ -18,9 +18,13 @@ photils
 
 ### ![](images/exposure.png) Exposure Calculator
 
+![](images/exposure.gif)
+
 Set your aperture, ISO and exposure time and let this module have your exposure value being calculated.
 
 ### ![](images/depth_of_fields.png) Depth of Field Calculator
+
+![](images/depth_of_fields.gif)
 
 Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as near and far limit will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.
 
@@ -29,6 +33,8 @@ Use this calculator in order to have your Depth of Field calculated for your spe
 This module uses the device gyro sensors and camera to overlay markers of snapped pictures in your surrounding area. Click on one of the images to see in which distance it was taken and let your phone navigate you that point of interest.
 
 ### ![](images/autotagger.png) Auto Tagger
+
+![](images/autotagger.gif)
 
 Take a picture and let the Auto Tagger suggest many Hashtags for your image. There are two modes for the Auto Tagger (changeable under settings), the default and a legacy mode. Sometimes (at the moment all iOS devices) there are problems with the default mode because of missing features or hardware restrictions. If this is the case the application automaticly use the legacy mode as fallback. In the default mode every calculation to extract informations of your image will be executed locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~ 1.2 kB. Unfortunately the default mode requires to download a CNN model which is ~ 100 MB. But it will be cached so that a download just happen once until something change in the CNN model (really rare). The Auto Tagger in legacy mode (an orange warning sign is shown) will send a downsample version of your image (256x256 px) to the backend where the calculation and feature lookup will be executed. The disadvantage of this method is the size of the downsampled image. It tooks ~ 250 kB for a single request. If you are using the Auto Tagger with your cellular data, the default mode is more customer friendly.
 
