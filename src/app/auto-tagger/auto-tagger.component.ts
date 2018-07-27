@@ -4,7 +4,7 @@ import * as tf from '@tensorflow/tfjs';
 import {MatSnackBar} from '@angular/material';
 import { PCA_COMPONENTES } from '../pca_components';
 import { HttpClient } from '@angular/common/http';
-import { DeviceDetectorService, DeviceInfo } from '../../../node_modules/ngx-device-detector';
+import { DeviceDetectorService } from 'ngx-device-detector';
 import { LocalStorage } from 'ngx-store';
 
 @Component({
