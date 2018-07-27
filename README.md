@@ -18,7 +18,7 @@ photils
 
 ### ![](images/exposure.png) Exposure Calculator
 
-Set your aperture, ISO and exposure time and let this this module have your exposure value being calculated.
+Set your aperture, ISO and exposure time and let this module have your exposure value being calculated.
 
 ### ![](images/depth_of_fields.png) Depth of Field Calculator
 
@@ -30,8 +30,7 @@ This module uses the device gyro sensors and camera to overlay markers of snappe
 
 ### ![](images/autotagger.png) Auto Tagger
 
-Take a picture and let the Auto Tagger suggest many Hashtags for your image.
-
+Take a picture and let the Auto Tagger suggest many Hashtags for your image. There are two modes for the Auto Tagger (changeable under settings), the default and a legacy mode. Sometimes (at the moment all iOS devices) there are problems with the default mode because of missing features or hardware restrictions. If this is the case the application automaticly use the legacy mode as fallback. In the default mode every calculation to extract informations of your image will be executed locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~ 1.2 kB. Unfortunately the default mode requires to download a CNN model which is ~ 100 MB. But it will be cached so that a download just happen once until something change in the CNN model (really rare). The Auto Tagger in legacy mode (an orange warning sign is shown) will send a downsample version of your image (256x256 px) to the backend where the calculation and feature lookup will be executed. The disadvantage of this method is the size of the downsampled image. It tooks ~ 250 kB for a single request. If you are using the Auto Tagger with your cellular data, the default mode is more customer friendly.
 
 
 ## Supported Devices
