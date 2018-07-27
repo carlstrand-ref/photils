@@ -1,0 +1,30 @@
+@import "../../themes";
+
+table {
+    background-color: mat-color($mat-gray, 700);
+    border-collapse: collapse;
+
+    thead {
+        th {
+            border-bottom: 1px solid mat-color($mat-gray, 900);
+        }
+    }
+
+    tbody {
+        tr {
+            &:nth-child(odd) {
+                background-color: mat-color($mat-gray, 600);
+            }
+
+            td {
+                padding: 4pt;
+            }
+        }
+    }
+}
+
+.mat-card {
+    img {
+        max-width: 100%;
+    }
+}

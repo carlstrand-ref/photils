@@ -6,23 +6,201 @@
 </mat-toolbar>
 
 <div class="result" fxLayout="row" fxLayout.lt-sm="column" fxLayoutGap="10px">
-    <mat-card class="item" fxFlex>
+    <mat-card class="item" fxFlex.gt-sm="80" fxFlex>
+        <img src="assets/images/photils-logo-inverted-transperent.png" />
+        <mat-card-header>
+            <mat-card-subtitle>A PWA that features many useful tools for amateur and professional photographers.</mat-card-subtitle>
+        </mat-card-header>
         <mat-card-content>
-            <mat-list>
-                <h2  mat-subheader>build</h2>
+            <p>
+                <a href="https://travis-ci.com/scheckmedia/photils">
+                    <img src="https://travis-ci.com/scheckmedia/photils.svg?token=yxFcaKcyMQHwPfT6EUy7&amp;branch=master" alt="Build Status">
+                </a>
+                &nbsp;
+                <a href="https://dev.photils.app">
+                    <img src="https://img.shields.io/website-up-down-green-red/http/shields.io.svg?label=try%20photils" alt="Website">
+                </a>
+                &nbsp;
+                <a href="https://github.com/scheckmedia/photils">
+                    <img src="https://img.shields.io/badge/Github-Repository-blue.svg" />
+                </a>
+
+            </p>
+            <mat-divider></mat-divider>
+            <h2 id="toc_0">Features</h2>
+
+            <h3 id="toc_1"><mat-icon>exposure</mat-icon> Exposure Calculator</h3>
+
+            <p>Set your aperture, ISO and exposure time and let this this module have your exposure value being calculated.</p>
+
+            <h3 id="toc_2"><mat-icon>nature_people</mat-icon> Depth of Field Calculator</h3>
+
+            <p>Use this calculator in order to have your Depth of Field calculated for your specific camera model. Input values for aperture, the focal length of your lens and specify the distance of your object. The Depth of Field and values such as the Hyperfocal distance as well as near and far limit will automatically be calculated. You can also try the interactive demo that meets your input values and simulates objects in the distance.</p>
+
+            <h3 id="toc_3"><mat-icon>image_search</mat-icon> AR Inspiration</h3>
+
+            <p>This module uses the device gyro sensors and camera to overlay markers of snapped pictures in your surrounding area. Click on one of the images to see in which distance it was taken and let your phone navigate you that point of interest.</p>
+
+            <h3 id="toc_4"><mat-icon>local_offer</mat-icon> Auto Tagger</h3>
+
+            <p>Take a picture and let the Auto Tagger suggest many Hashtags for your image.</p>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_5">Supported Devices</h2>
+
+            <p><strong>Browser Matrix:</strong></p>
+
+            <table>
+            <thead>
+            <tr>
+            <th>OS</th>
+            <th>Browser</th>
+            <th><mat-icon>exposure</mat-icon></th>
+            <th><mat-icon>nature_people</mat-icon></th>
+            <th><mat-icon>image_search</mat-icon></th>
+            <th><mat-icon>local_offer</mat-icon></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+            <td>macOS</td>
+            <td>Safari</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Chrome</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Firefox</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Opera</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td>Windows</td>
+            <td>Chrome</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Firefox</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td>iOS &gt;= 11.4</td>
+            <td>Safari</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Chrome</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Firefox</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td>Android</td>
+            <td>Chrome</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            <tr>
+            <td></td>
+            <td>Firefox</td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            <td><mat-icon>clear</mat-icon></td>
+            <td><mat-icon>done</mat-icon></td>
+            </tr>
+            </tbody>
+            </table>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_6">Contributor</h2>
+
+            <ul>
+            <li><a href="https://scheck-media.de">Tobias Scheck</a>  - <a href="https://github.com/scheckmedia"><img src="assets/images/octocat.png" width="20"/></a></li>
+            <li>Michél Neumann - <a href="https://github.com/Corrodize"><img src="assets/images/octocat.png" width="20"/></a></li>
+            <li><a href="https://maxbehr.de/">Max Behr</a> - <a href="https://github.com/maxbehr"><img src="assets/images/octocat.png" width="20"/></a></li>
+            </ul>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_7">Todo</h2>
+
+            <p>Find here the things we are still working on and want to accomplish:
+                - sun calculator
+                - light polution</p>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_8">Troubleshooting</h2>
+
+            <p>Found a bug? Use the projects <a href="https://github.com/scheckmedia/photils/issues">issue page</a> to let us know about it.</p>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_9">Contributing</h2>
+
+            <p>Want to contribute to Photils? We&#39;re happy to get some help during development. Send us a Pull Request or get in touch.</p>
+
+            <mat-divider></mat-divider>
+            <h3 id="toc_10">Fork it</h3>
+
+            <p>Fork the project and implement your own modules. We&#39;re happy to receive your Pull Request!</p>
+
+            <mat-divider></mat-divider>
+            <h2 id="toc_11">License</h2>
+
+            <p><a href="https://github.com/scheckmedia/photils/blob/master/LICENSE.md">Apache License 2.0</a></p>
+        </mat-card-content>
+    </mat-card>
+
+
+    <mat-card class="item" fxFlex.gt-sm="20" fxFlex>
+        <mat-card-content>
+                <h2  mat-subheader>Build</h2>
                 <mat-list-item>Version: {{version.version}}</mat-list-item>
                 <mat-list-item>Hash: {{version.hash}}</mat-list-item>
+                <mat-list-item>Date: {{version.date}}</mat-list-item>
                 <mat-divider></mat-divider>
-                <h2  mat-subheader>Github</h2>
-                <mat-list-item>
-                    <a href="https://github.com/scheckmedia/photils" target="_blank">https://github.com/scheckmedia/photils</a>
-                </mat-list-item>
-                <mat-divider></mat-divider>
-                <h2  mat-subheader>Contributors</h2>
-                <mat-list-item><a href="https://github.com/scheckmedia" target="_blank">Tobias Scheck</a></mat-list-item>
-                <mat-list-item><a href="https://github.com/Corrodize" target="_blank">Michél Neumann</a></mat-list-item>
-                <mat-list-item><a href="https://github.com/maxbehr" target="_blank">Max Behr</a></mat-list-item>
-            </mat-list>
         </mat-card-content>
     </mat-card>
 </div>
+
