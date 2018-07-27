@@ -10,6 +10,7 @@ const gitInfo = gitDescribeSync({
 });
 
 gitInfo.version = version;
+gitInfo.date = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
 
 const file = resolve(__dirname, '..', 'src', 'environments', 'version.ts');
 writeFileSync(file,
