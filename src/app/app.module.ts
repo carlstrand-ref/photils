@@ -45,6 +45,7 @@ import { SunComponent } from './sun/sun.component';
 import { PaginationProvider } from './inspiration/paginationProvider';
 import { AutoTaggerComponent, DialogContentLegacy } from './auto-tagger/auto-tagger.component';
 import { AboutComponent } from './about/about.component';
+import { SettingsComponent } from './settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,8 @@ import { AboutComponent } from './about/about.component';
     SunComponent,
     AutoTaggerComponent,
     DialogContentLegacy,
-    AboutComponent
+    AboutComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
