@@ -1,4 +1,4 @@
-import { Component, OnInit, Injectable,ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { MatButtonToggleChange, MatDialog } from '@angular/material';
 import * as tf from '@tensorflow/tfjs';
 import {MatSnackBar} from '@angular/material';
@@ -12,7 +12,7 @@ import { LocalStorage } from 'ngx-store';
   templateUrl: './auto-tagger.component.html',
   styleUrls: ['./auto-tagger.component.scss']
 })
-export class AutoTaggerComponent implements OnInit {
+export class AutoTaggerComponent implements OnInit, OnDestroy {
   @ViewChild("dropzone") dropzone: ElementRef;
   @ViewChild("inputFile") inputFile: ElementRef;
   @ViewChild("srcImage") srcImage: ElementRef;
@@ -36,6 +36,9 @@ export class AutoTaggerComponent implements OnInit {
 
     console.log("legacy: ", this.legacy);
   }
+
+  // necessary for ngx-store
+  ngOnDestroy() {}
 
   ngOnInit() {
     (this.inputFile.nativeElement as any).addEventListener("change",(e) => {
