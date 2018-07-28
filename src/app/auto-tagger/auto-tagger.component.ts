@@ -137,11 +137,11 @@ export class AutoTaggerComponent implements OnInit, OnDestroy {
           } else {
             try {
               let preprocessed = this.preprocess(data.imageData);
-              this.predict(preprocessed);
+              await this.predict(preprocessed);
             } catch(e) {
               try {
                 this.legacy = true;
-                this.predictLegacy(data.base64);
+                await this.predictLegacy(data.base64);
               }
               catch(e) {
                 this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
