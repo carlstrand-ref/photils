@@ -163,10 +163,13 @@ export class AutoTaggerComponent implements OnInit, OnDestroy {
 
   private async predict(data:tf.Tensor3D) {
     const prediction = this.model.predict(data) as tf.Tensor2D;
-    const featureMap = prediction.dot(this.pcaTensor).flatten().dataSync();
-    const feature = Object.keys(featureMap).map((key) => featureMap[key]);
+    const featureMap:Float32Array = prediction.dot(this.pcaTensor).flatten().dataSync() as Float32Array;
     this.message = "lookup for available tags";
-    let resp:any = await this.http.post('https://api.photils.app/tags', {feature: feature}).toPromise()
+
+    const feature = Object.keys(featureMap).map((key) => featureMap[key]);
+    const decodedFeature = btoa([].reduce.call(new Uint8Array(featureMap.buffer),(p,c) => {return p+String.fromCharCode(c)},''))
+
+    let resp:any = await this.http.post('https://api.photils.app/tags', {feature: decodedFeature}).toPromise()
     if (resp.success) {
       this.tags = resp.tags.map((v) => { return {name: v}} );
     } else {
