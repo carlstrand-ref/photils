@@ -30,6 +30,8 @@ Use this calculator in order to have your Depth of Field calculated for your spe
 
 ### ![](images/ar_inspiration.png) AR Inspiration
 
+![](images/ar_inspiration.gif)
+
 This module uses the device gyro sensors and camera to overlay markers of snapped pictures in your surrounding area. Click on one of the images to see in which distance it was taken and let your phone navigate you that point of interest.
 
 ### ![](images/autotagger.png) Auto Tagger
