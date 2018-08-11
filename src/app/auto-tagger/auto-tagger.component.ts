@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } fr
 import { MatButtonToggleChange, MatDialog } from '@angular/material';
 import * as tf from '@tensorflow/tfjs';
 import {MatSnackBar} from '@angular/material';
-import { PCA_COMPONENTES } from '../pca_components';
 import { HttpClient } from '@angular/common/http';
 import { DeviceDetectorService } from 'ngx-device-detector';
 import { LocalStorage } from 'ngx-store';
@@ -26,7 +25,6 @@ export class AutoTaggerComponent implements OnInit, OnDestroy {
   public prefix:string = "";
   public tags:Array<any>;
   public selectedTags:Array<string> = [];
-  private pcaTensor:tf.Tensor2D;
 
   constructor(public snackBar: MatSnackBar, public dialog: MatDialog,
       private http: HttpClient, private deviceService: DeviceDetectorService) {
@@ -54,7 +52,6 @@ export class AutoTaggerComponent implements OnInit, OnDestroy {
       this.message = "loading model ...";
       this.spinner.mode = "indeterminate";
       this.model = await tf.loadModel('assets/tfsmodel/model.json');
-      this.pcaTensor = tf.tensor2d(PCA_COMPONENTES);
     } catch(e) {
       //this.snackBar.open("Error: " + e.message, "", { duration: 5000, panelClass: 'error'})
       this.legacy = true;
@@ -163,7 +160,7 @@ export class AutoTaggerComponent implements OnInit, OnDestroy {
 
   private async predict(data:tf.Tensor3D) {
     const prediction = this.model.predict(data) as tf.Tensor2D;
-    const featureMap:Float32Array = prediction.dot(this.pcaTensor).flatten().dataSync() as Float32Array;
+    const featureMap:Float32Array = prediction.flatten().dataSync() as Float32Array;
     this.message = "lookup for available tags";
     const decodedFeature = btoa([].reduce.call(new Uint8Array(featureMap.buffer),(p,c) => {return p+String.fromCharCode(c)},''))
 
